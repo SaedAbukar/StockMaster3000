@@ -1,6 +1,7 @@
 package org.stockmaster3000.stockmaster3000.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.views.LoginView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     private final CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
     public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
         this.customUserDetailsService = customUserDetailsService;
     }
@@ -31,13 +33,8 @@ public class SecurityConfig extends VaadinWebSecurity {
         setLoginView(http, LoginView.class);
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
     }
 }

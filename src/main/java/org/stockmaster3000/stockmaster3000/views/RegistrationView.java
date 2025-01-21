@@ -1,5 +1,6 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.stockmaster3000.stockmaster3000.service.UserService;
 import com.vaadin.flow.component.button.Button;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("register") // Accessible at /register
+@PageTitle("Register")
 @AnonymousAllowed
 public class RegistrationView extends VerticalLayout {
 
@@ -51,35 +53,32 @@ public class RegistrationView extends VerticalLayout {
         String password = passwordField.getValue();
         String confirmPassword = confirmPasswordField.getValue();
 
-        // Basic validation
+        // Basic validation for empty fields
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showError("All fields are required.");
             return;
         }
 
+        // Password confirmation check
         if (!password.equals(confirmPassword)) {
             showError("Passwords do not match.");
             return;
         }
 
-        // Check if the username already exists
-        if (userService.findByUsername(username).isPresent()) {
-            showError("Username is already taken.");
-            return;
+        // Call the registerUser method and get the result
+        String registrationResult = userService.registerUser(username, password);
+
+        // Show either success or error message based on the result
+        if (registrationResult.equals("Registration successful")) {
+            Notification.show("Registration successful! You can now log in.", 3000, Notification.Position.MIDDLE);
+            UI.getCurrent().navigate("login"); // Redirect to login view
+        } else {
+            showError(registrationResult); // Show the error message
         }
-
-        // Register the user
-        userService.registerUser(username, password);
-
-        // Show success message and redirect to login view
-        Notification.show("Registration successful! You can now log in.", 3000, Notification.Position.MIDDLE);
-
-        // Redirect to the login view after a successful registration
-        UI.getCurrent().navigate(LoginView.class);
     }
 
     private void showError(String message) {
-        // Show error message
+        // Show the error message in a notification
         Notification.show(message, 3000, Notification.Position.MIDDLE);
     }
 }

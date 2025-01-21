@@ -1,15 +1,10 @@
 package org.stockmaster3000.stockmaster3000.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Objects;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+// For some reason lombok doesnt work so I added all the getters, setter etc manually
+
 @Entity
 @Table(name = "_users")
 public class User {
@@ -24,6 +19,18 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // No-arg constructor (required by JPA)
+    public User() {
+    }
+
+    // All-args constructor
+    public User(Long id, String username, String password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+    }
+
+    // Getters
     public Long getId() {
         return id;
     }
@@ -46,5 +53,31 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    // hashCode method to generate a unique identifier for each User based on id and username
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username);
+    }
+
+    // equals method to compare two User objects based on id and username
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User user = (User) obj;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(username, user.username);
+    }
+
+    // toString method to print out a string representation of the User object
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

@@ -11,20 +11,39 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    public User registerUser(String username, String password) {
+    public String registerUser(String username, String password) {
+        // Check if the username already exists
+        if (userRepository.findByUsername(username).isPresent()) {
+            return "Username already exists";  // Return error message
+        }
+
+        if (username.isEmpty()) {
+            return "Username cannot be empty";  // Return error message
+        }
+
+        if (password == null || password.length() < 8) {
+            return "Password must be at least 8 characters long";  // Return error message
+        }
+
+        // Proceed with user registration
         User user = new User();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password)); // password hashing
-        return userRepository.save(user);
+        user.setPassword(passwordEncoder.encode(password)); // Password hashing
+        userRepository.save(user);
+
+        return "Registration successful";  // Success message
     }
 
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username); // Check if user already exists
+        return userRepository.findByUsername(username);
     }
 }
