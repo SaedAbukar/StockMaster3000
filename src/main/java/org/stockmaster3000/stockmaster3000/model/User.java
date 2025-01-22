@@ -1,10 +1,14 @@
 package org.stockmaster3000.stockmaster3000.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
 // For some reason lombok doesnt work so I added all the getters, setter etc manually
-
 @Entity
 @Table(name = "_users")
 public class User {

@@ -1,5 +1,6 @@
 package org.stockmaster3000.stockmaster3000.security;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.stockmaster3000.stockmaster3000.model.User;
 import org.stockmaster3000.stockmaster3000.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username)
+    public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

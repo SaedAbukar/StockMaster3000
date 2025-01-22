@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
@@ -14,7 +15,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent; // Correct import 
 
 @Route(value = "/")
 @PageTitle("Public View")
-@PermitAll
+@AnonymousAllowed
 public class MainLayout extends AppLayout {
 
     private final SecurityService securityService;
@@ -38,10 +39,10 @@ public class MainLayout extends AppLayout {
             header = new HorizontalLayout(logo, greeting, logout);
         } else {
             // Not authenticated: Display login message and login button
+            // Not authenticated: Display login message and login button
             Span message = new Span("Please log in to access your account.");
-            Button finalLogin = login;
-            login = new Button("Login", click ->
-                    finalLogin.getUI().ifPresent(ui -> ui.navigate("login")));
+            login.addClickListener(click ->
+                    login.getUI().ifPresent(ui -> ui.navigate("login")));
             header = new HorizontalLayout(logo, message, login);
         }
 
