@@ -51,7 +51,7 @@ CREATE TABLE reports (
     summary_data JSON,                          -- If your DB supports JSON, otherwise TEXT
     inventory_id BIGINT NOT NULL,               -- Foreign key referencing the inventory
 
-    CONSTRAINT fk_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
+    CONSTRAINT fk_reports_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
 
 
@@ -71,7 +71,7 @@ CREATE TABLE products (
     -- Foreign key constraints:
     CONSTRAINT fk_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id),
-    CONSTRAINT fk_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
+    CONSTRAINT fk_products_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
 
 
