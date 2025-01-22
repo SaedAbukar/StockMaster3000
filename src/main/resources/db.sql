@@ -13,13 +13,13 @@ CREATE TABLE _users (
 );
 
 -- Drop the user account 'appuser' if it exists
-DROP USER IF EXISTS 'saed'@'localhost';
+DROP USER IF EXISTS 'viet'@'localhost';
 
 -- Create the 'appuser' account with a secure password
-CREATE USER 'saed'@'localhost' IDENTIFIED BY '12345678';
+CREATE USER 'viet'@'localhost' IDENTIFIED BY 'root';
 
 -- Grant appropriate privileges to 'appuser'
-GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'saed'@'localhost';
+GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'viet'@'localhost';
 
 -- Flush privileges to apply the changes
 FLUSH PRIVILEGES;
