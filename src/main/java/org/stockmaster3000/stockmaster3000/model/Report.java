@@ -10,9 +10,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
+import org.hibernate.annotations.Type;
+
 import lombok.Data;
 
 import java.util.Map;
+
 
 @Entity
 @Table(name = "reports")
@@ -30,6 +34,8 @@ public class Report {
 
     private String summary;
 
+    @Column(name = "json_summary", columnDefinition = "json")
+    @Type(JsonType.class)
     private Map<String, Double> json_summary;
 
 

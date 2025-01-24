@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.repositories;
+package org.stockmaster3000.stockmaster3000;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,7 @@ import org.stockmaster3000.stockmaster3000.repository.SupplierRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest  // This annotation is for testing JPA repositories
+@DataJpaTest  
 public class SupplierRepositoryTest {
 
     @Autowired
@@ -30,11 +30,14 @@ public class SupplierRepositoryTest {
         assertEquals("Fazer", savedSupplier.getName(), "The supplier name should be 'Fazer'");
     }
 
-    // @Test
-    // public void testFindSupplierByName() {
-    //     supplierRepository.save(supplier);
-    //     Supplier foundSupplier = supplierRepository.findByName("Fazer").orElse(null);
-    //     assertNotNull(foundSupplier, "Supplier should be found by name");
-    //     assertEquals("Supplier A", foundSupplier.getName(), "The supplier name should match 'Supplier A'");
-    // }
+    @Test
+    public void testFindById() {
+        Supplier savedSupplier = supplierRepository.save(supplier);
+        Supplier foundSupplier = supplierRepository.findById(savedSupplier.getId()).orElse(null);
+        
+        assertNotNull(foundSupplier, "Supplier should be found by ID");
+        assertEquals(savedSupplier.getName(), foundSupplier.getName(), "The names should match");
+    }
+
+
 }

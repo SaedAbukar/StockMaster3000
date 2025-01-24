@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000;
+package org.stockmaster3000;
 
 import org.stockmaster3000.stockmaster3000.model.User;
 
