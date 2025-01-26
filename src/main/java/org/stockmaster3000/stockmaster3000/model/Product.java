@@ -38,6 +38,7 @@ public class Product {
 
     private Integer amountOfDaysUntilExpiration;
 
+    // Relationships
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)
     private Supplier supplier;

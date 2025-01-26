@@ -38,7 +38,7 @@ public class Report {
     @Type(JsonType.class)
     private Map<String, Double> json_summary;
 
-
+    // Relationships
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = false) 
     private Inventory inventory;

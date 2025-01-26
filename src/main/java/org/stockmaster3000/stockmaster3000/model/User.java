@@ -1,6 +1,9 @@
 package org.stockmaster3000.stockmaster3000.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 // For some reason lombok doesnt work so I added all the getters, setter etc manually
@@ -18,6 +21,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    // Relationships
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Inventory> inventories = new ArrayList<>();
 
     // No-arg constructor (required by JPA)
     public User() {
