@@ -41,6 +41,7 @@ public class MainLayout extends AppLayout {
             // Not authenticated: Display login message and login button
             // Not authenticated: Display login message and login button
             Span message = new Span("Please log in to access your account.");
+         
             login.addClickListener(click ->
                     login.getUI().ifPresent(ui -> ui.navigate("login")));
             header = new HorizontalLayout(logo, message, login);

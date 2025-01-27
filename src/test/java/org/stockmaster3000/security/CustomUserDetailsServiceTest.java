@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.security;
+package org.stockmaster3000.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.stockmaster3000.stockmaster3000.model.User;
 import org.stockmaster3000.stockmaster3000.repository.UserRepository;
+import org.stockmaster3000.stockmaster3000.security.CustomUserDetailsService;
 
 import java.util.Optional;
 

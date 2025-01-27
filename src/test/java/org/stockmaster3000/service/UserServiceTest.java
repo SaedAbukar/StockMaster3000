@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.service;
+package org.stockmaster3000.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.stockmaster3000.stockmaster3000.model.User;
 import org.stockmaster3000.stockmaster3000.repository.UserRepository;
+import org.stockmaster3000.stockmaster3000.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;

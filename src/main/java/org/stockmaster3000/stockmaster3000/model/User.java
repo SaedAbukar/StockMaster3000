@@ -23,6 +23,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // Relationships
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Inventory> inventories = new ArrayList<>();
+
     // No-arg constructor (required by JPA)
     public User() {
     }
