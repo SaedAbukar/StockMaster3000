@@ -9,11 +9,14 @@ import org.stockmaster3000.stockmaster3000.repository.ProductRepository;
 import org.stockmaster3000.stockmaster3000.repository.InventoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.CategoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.SupplierRepository;
+import org.stockmaster3000.stockmaster3000.repository.UserRepository;
 import org.stockmaster3000.stockmaster3000.model.Category;
 import org.stockmaster3000.stockmaster3000.model.Supplier;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
+import org.stockmaster3000.stockmaster3000.model.User;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 @DataJpaTest
 public class ProductRepositoryTest {
@@ -29,16 +32,25 @@ public class ProductRepositoryTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private UserRepository userRepository;
     
 
     private Product product;
     private Category category;
     private Supplier supplier;
     private Inventory inventory;
+    private User user;
 
     @BeforeEach
     public void setUp() {
         // Setting up required dependencies
+        user = new User();
+        user.setUsername("Viettranni");
+        user.setPassword("Hello!");
+        user = userRepository.save(user);
+
         supplier = new Supplier();
         supplier.setName("Fazer");
         supplier = supplierRepository.save(supplier);
@@ -49,6 +61,7 @@ public class ProductRepositoryTest {
 
         inventory = new Inventory();
         inventory.setName("Fridge");
+        inventory.setUser(user);
         inventory = inventoryRepository.save(inventory);
 
         // Create the product
