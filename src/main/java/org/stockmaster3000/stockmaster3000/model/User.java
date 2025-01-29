@@ -12,9 +12,9 @@ import java.util.Objects;
 
 // For some reason lombok doesnt work so I added all the getters, setter etc manually
 @Entity
-@Table(name = "_users")
+@Table(name = "users")
+@Data // Lombok
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

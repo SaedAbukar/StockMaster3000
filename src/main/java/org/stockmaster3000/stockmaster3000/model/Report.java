@@ -40,6 +40,6 @@ public class Report {
 
     // Relationships
     @ManyToOne
-    @JoinColumn(name = "inventory_id", nullable = false) 
+    @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 }

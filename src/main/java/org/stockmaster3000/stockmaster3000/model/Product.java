@@ -44,10 +44,10 @@ public class Product {
     private Supplier supplier;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false) 
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToOne (cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "inventory_id", nullable = false) 
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 }

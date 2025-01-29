@@ -26,5 +26,4 @@ public class Supplier {
     // Relationships
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
-
 }
