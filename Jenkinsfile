@@ -27,7 +27,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Pawaffle/StockMaster3000.git'
+                git branch: 'main', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
