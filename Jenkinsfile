@@ -2,24 +2,22 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'  // This is the name you gave your Maven installation in Jenkins
+        maven 'Maven'
     }
 
     environment {
-        // Define the Docker Image and Tag environment variables
-        DOCKER_IMAGE = "saedabukar/stockmaster3000"  // Replace with your Docker Hub repository name
-        DOCKER_TAG = "latest" // Optionally, you can use a dynamic tag based on the commit ID or branch name
+        DOCKER_IMAGE = "viettran/stockmaster3000"
+        DOCKER_TAG = "latest"
     }
 
     stages {
         stage('Set Docker Host') {
             steps {
                 script {
-                    // Set Docker host for Unix-based systems (Linux/macOS)
                     if (isUnix()) {
-                        env.DOCKER_HOST = 'unix:///var/run/docker.sock' // For Unix
+                        env.DOCKER_HOST = 'unix:///var/run/docker.sock'
                     } else {
-                        env.DOCKER_HOST = 'npipe:////./pipe/docker_engine' // For Windows
+                        env.DOCKER_HOST = 'npipe:////./pipe/docker_engine'
                     }
                 }
             }
@@ -34,7 +32,6 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    echo "Building the application using Maven..."
                     if (isUnix()) {
                         sh 'mvn clean package -Pproduction -DskipTests'
                     } else {
@@ -47,7 +44,6 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    echo "Running tests on the application..."
                     if (isUnix()) {
                         sh 'mvn test'
                     } else {
@@ -57,14 +53,31 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Enable Docker Buildx') {  // ✅ Moved up before Docker build
             steps {
                 script {
-                    echo "Building Docker image..."
                     if (isUnix()) {
-                        sh 'docker build -t "$DOCKER_IMAGE:$DOCKER_TAG" .'
+                        sh 'docker buildx create --use'
                     } else {
-                        bat 'docker build -t "%DOCKER_IMAGE%:%DOCKER_TAG%" .'
+                        bat 'docker buildx create --use'
+                    }
+                }
+            }
+        }
+
+        stage('Build & Push Multi-Arch Image') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                        docker buildx build --platform linux/amd64,linux/arm64 \
+                            -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                        '''
+                    } else {
+                        bat '''
+                        docker buildx build --platform linux/amd64,linux/arm64 ^
+                            -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                        '''
                     }
                 }
             }
@@ -73,19 +86,22 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    echo "Testing the Docker image..."
                     if (isUnix()) {
-                        sh 'docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"'
-                        sh 'docker ps -a'
-                        sh 'docker logs test-container'
-                        sh 'docker stop test-container'
-                        sh 'docker rm test-container'
+                        sh '''
+                        docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
+                        docker ps -a
+                        docker logs test-container
+                        docker stop test-container
+                        docker rm test-container
+                        '''
                     } else {
-                        bat 'docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"'
-                        bat 'docker ps -a'
-                        bat 'docker logs test-container'
-                        bat 'docker stop test-container'
-                        bat 'docker rm test-container'
+                        bat '''
+                        docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                        docker ps -a
+                        docker logs test-container
+                        docker stop test-container
+                        docker rm test-container
+                        '''
                     }
                 }
             }
@@ -94,39 +110,20 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    echo "Deploying with Docker Compose..."
-
-                    // Ensure you're using the correct directory for the docker-compose.yml file
-                    dir('.') {
-                        // Stop and remove existing containers, networks, and volumes
-                        if (isUnix()) {
-                            sh 'docker-compose -f docker-compose.yml down'   // Stop and remove old containers
-                            sh 'docker-compose -f docker-compose.yml up -d'  // Start containers in detached mode
-                            sh 'docker-compose ps'  // Verify running containers
-                            sh 'docker-compose logs'  // Check logs
-                        } else {
-                            bat 'docker-compose -f docker-compose.yml down'   // For Windows, stop and remove old containers
-                            bat 'docker-compose -f docker-compose.yml up -d'  // Start containers in detached mode
-                            bat 'docker-compose ps'  // Verify running containers
-                            bat 'docker-compose logs'  // Check logs
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Push Docker Image to Docker Hub') {
-            steps {
-                script {
-                    echo "Pushing Docker image to Docker Hub..."
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        if (isUnix()) {
-                            sh 'docker tag "$DOCKER_IMAGE:$DOCKER_TAG" "$DOCKER_IMAGE:$DOCKER_TAG"'
-                            sh 'docker push "$DOCKER_IMAGE:$DOCKER_TAG"'
-                        } else {
-                            bat 'docker tag "%DOCKER_IMAGE%:%DOCKER_TAG%" "%DOCKER_IMAGE%:%DOCKER_TAG%"'
-                            bat 'docker push "%DOCKER_IMAGE%:%DOCKER_TAG%"'
-                        }
+                    if (isUnix()) {
+                        sh '''
+                        docker-compose -f docker-compose.yml down
+                        docker-compose -f docker-compose.yml up -d
+                        docker-compose ps
+                        docker-compose logs
+                        '''
+                    } else {
+                        bat '''
+                        docker-compose -f docker-compose.yml down
+                        docker-compose -f docker-compose.yml up -d
+                        docker-compose ps
+                        docker-compose logs
+                        '''
                     }
                 }
             }
@@ -136,11 +133,9 @@ pipeline {
     post {
         success {
             echo 'Build and deployment completed successfully!'
-            // Add notifications for successful build (e.g., email, Slack)
         }
         failure {
             echo 'Build or deployment failed!'
-            // Add notifications for failed builds
         }
     }
 }
