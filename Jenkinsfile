@@ -12,9 +12,20 @@ pipeline {
         PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
     }
 
-    
-
     stages {
+        stage('Print Environment') {
+            steps {
+                sh 'printenv'
+            }
+        }
+
+        stage('Debug Docker') {
+            steps {
+                sh 'echo $PATH'
+                sh 'which docker'
+                sh 'docker --version'
+            }
+        }
 
         stage('Test Docker') {
             steps {
@@ -25,8 +36,7 @@ pipeline {
                 sh 'docker ps'
             }
         }
-    
-        
+
         stage('Set Docker Host') {
             steps {
                 script {
@@ -69,7 +79,7 @@ pipeline {
             }
         }
 
-        stage('Enable Docker Buildx') {  // ✅ Moved up before Docker build
+        stage('Enable Docker Buildx') {
             steps {
                 script {
                     if (isUnix()) {
