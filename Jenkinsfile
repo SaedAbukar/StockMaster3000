@@ -9,20 +9,9 @@ pipeline {
         DOCKER_IMAGE = "viettran/stockmaster3000"
         DOCKER_TAG = "latest"
         DOCKER_BIN = '/usr/local/bin/docker'
-        PATH = "$PATH:/usr/local/bin:/opt/homebrew/bin"
     }
 
     stages {
-        stage('Debug Shell') {
-            steps {
-                sh '''
-                echo "Available shells:"
-                cat /etc/shells
-                echo "Current PATH: $PATH"
-                which sh
-                '''
-            }
-        }
 
         stage('Debug Docker') {
             steps {
