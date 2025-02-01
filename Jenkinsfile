@@ -15,14 +15,10 @@ pipeline {
 
     stages {
 
-        stage('Set Docker Host') {
+        stage('Test Docker') {  // Moved this stage inside the 'stages' block
             steps {
                 script {
-                    if (isUnix()) {
-                        env.DOCKER_HOST = 'unix:///var/run/docker.sock'
-                    } else {
-                        env.DOCKER_HOST = 'npipe:////./pipe/docker_engine'
-                    }
+                    sh 'which docker'
                 }
             }
         }
