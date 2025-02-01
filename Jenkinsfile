@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'docker buildx create --use'
+                        sh 'sudo docker buildx create --use'
                     } else {
                         bat 'docker buildx create --use'
                     }
