@@ -9,7 +9,7 @@ pipeline {
         DOCKER_IMAGE = "viettran/stockmaster3000"
         DOCKER_TAG = "latest"
         DOCKER_BIN = '/usr/local/bin/docker'
-        PATH+EXTRA = "/usr/local/bin:/opt/homebrew/bin"
+        PATH = "$PATH:/usr/local/bin:/opt/homebrew/bin"
     }
 
     stages {
