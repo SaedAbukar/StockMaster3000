@@ -9,13 +9,9 @@ pipeline {
         DOCKER_IMAGE = "viettranni/stockmaster3000"
         DOCKER_TAG = "latest"
         DOCKER_BIN = '/usr/local/bin/docker'
-        PATH = '/usr/local/bin/docker'
     }
 
     stages {
-
-        
-
         stage('Set Docker Host') {
             steps {
                 script {
