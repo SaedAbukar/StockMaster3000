@@ -15,13 +15,16 @@ pipeline {
 
     stages {
 
-        stage('Test Docker') {  // Moved this stage inside the 'stages' block
+        stage('Test Docker') {
             steps {
-                script {
-                    sh 'which docker'
-                }
+                sh 'whoami'
+                sh 'groups'
+                sh 'ls -l /Users/viettran/.docker/run/docker.sock'
+                sh 'docker --version'
+                sh 'docker ps'
             }
         }
+    
         
         stage('Set Docker Host') {
             steps {
