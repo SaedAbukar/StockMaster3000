@@ -9,13 +9,18 @@ pipeline {
         DOCKER_IMAGE = "viettran/stockmaster3000"
         DOCKER_TAG = "latest"
         DOCKER_BIN = '/usr/local/bin/docker'
-        PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+        PATH+EXTRA = "/usr/local/bin:/opt/homebrew/bin"
     }
 
     stages {
-        stage('Print Environment') {
+        stage('Debug Shell') {
             steps {
-                sh 'printenv'
+                sh '''
+                echo "Available shells:"
+                cat /etc/shells
+                echo "Current PATH: $PATH"
+                which sh
+                '''
             }
         }
 
