@@ -1,33 +1,44 @@
+version: '3.8'
 
 services:
+  # MariaDB Database
   mariadb:
     image: mariadb:10.5
     container_name: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: stockmaster3000
-      MYSQL_USER: viet
-      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: rootpassword  # Root password for MariaDB
+      MYSQL_DATABASE: stockmaster3000     # Database to create
+      MYSQL_USER: saed                   # User for the app
+      MYSQL_PASSWORD: 12345678           # User password
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Expose MariaDB port (can be used for local testing)
+    volumes:
+      - mariadb_data:/var/lib/mysql  # Persist MariaDB data across container restarts
     networks:
       - my-network
 
+  # Vaadin Spring Boot Application
   springboot-app:
-    build:
-      context: .
+    image: saedabukar/stockmaster3000:latest  # Your Spring Boot image
     container_name: springboot-app
     ports:
-      - "8081:8081"
+      - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000
-      SPRING_DATASOURCE_USERNAME: viet
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000  # Point to the MariaDB database
+      SPRING_DATASOURCE_USERNAME: saed  # MariaDB username
+      SPRING_DATASOURCE_PASSWORD: 12345678  # MariaDB password
     depends_on:
       - mariadb
     networks:
       - my-network
+    restart: unless-stopped  # Automatically restart unless stopped manually
 
+# Volumes to persist MariaDB data
+volumes:
+  mariadb_data:
+    driver: local
+
+# Define a custom network for both services to communicate
 networks:
   my-network:
     driver: bridge
