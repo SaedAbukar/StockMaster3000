@@ -6,8 +6,11 @@ pipeline {
     }
 
     environment {
-        DOCKER_HOST = "npipe:////./pipe/docker_engine"  // Docker Desktop default pipe
+        // Set Docker host for Unix-based systems (Linux/macOS)
+        DOCKER_HOST = (isUnix()) ? 'unix:///var/run/docker.sock' : 'npipe:////./pipe/docker_engine' // For Windows
+
         DOCKER_IMAGE = "saedabukar/stockmaster3000"  // Replace with your Docker Hub repository name
+        DOCKER_TAG = "latest" // Optionally, you can use a dynamic tag based on the commit ID or branch name
     }
 
     stages {
@@ -20,6 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    echo "Building the application using Maven..."
                     if (isUnix()) {
                         sh 'mvn clean package -Pproduction -DskipTests'
                     } else {
@@ -32,6 +36,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    echo "Running tests on the application..."
                     if (isUnix()) {
                         sh 'mvn test'
                     } else {
@@ -44,30 +49,30 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
+                    echo "Building Docker image..."
                     if (isUnix()) {
-                        sh 'docker build -t "$DOCKER_IMAGE" .'
+                        sh 'docker build -t "$DOCKER_IMAGE:$DOCKER_TAG" .'
                     } else {
-                        bat 'docker build -t "%DOCKER_IMAGE%" .'
+                        bat 'docker build -t "%DOCKER_IMAGE%:%DOCKER_TAG%" .'
                     }
                 }
             }
         }
 
-        stage('Test Docker Image') {  // New stage to test the Docker image
+        stage('Test Docker Image') {
             steps {
                 script {
-                    echo "Testing Docker image..."
+                    echo "Testing the Docker image..."
                     if (isUnix()) {
-                        // Run the Docker image and check if it's working
-                        sh 'docker run -d --name test-container "$DOCKER_IMAGE"'
-                        sh 'docker ps -a'  // To verify the container is running
-                        sh 'docker logs test-container'  // Check logs for any errors
-                        sh 'docker stop test-container'  // Stop the container after test
-                        sh 'docker rm test-container'    // Remove the container
+                        sh 'docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"'
+                        sh 'docker ps -a'
+                        sh 'docker logs test-container'
+                        sh 'docker stop test-container'
+                        sh 'docker rm test-container'
                     } else {
-                        bat 'docker run -d --name test-container "%DOCKER_IMAGE%"'
-                        bat 'docker ps -a'  // Verify the container is running
-                        bat 'docker logs test-container'  // Check logs
+                        bat 'docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"'
+                        bat 'docker ps -a'
+                        bat 'docker logs test-container'
                         bat 'docker stop test-container'
                         bat 'docker rm test-container'
                     }
@@ -80,25 +85,17 @@ pipeline {
                 script {
                     echo "Deploying with Docker Compose..."
 
-                    // Check if the environment is Unix or Windows
-                    if (isUnix()) {
-                        // Run Docker Compose for Unix-based systems (Linux/macOS)
-                        sh 'docker-compose -f docker-compose.yml up -d'
-
-                        // Verify if everything is running correctly
-                        sh 'docker-compose ps'
-
-                        // Optionally check logs to ensure everything started correctly
-                        sh 'docker-compose logs'
-                    } else {
-                        // For Windows systems, use the Windows command to run Docker Compose
-                        bat 'docker-compose -f docker-compose.yml up -d'
-
-                        // Verify if everything is running correctly
-                        bat 'docker-compose ps'
-
-                        // Optionally check logs to ensure everything started correctly
-                        bat 'docker-compose logs'
+                    // Ensure you're using the correct directory for the docker-compose.yml file
+                    dir('.') {
+                        if (isUnix()) {
+                            sh 'docker-compose -f docker-compose.yml up -d'
+                            sh 'docker-compose ps'
+                            sh 'docker-compose logs'
+                        } else {
+                            bat 'docker-compose -f docker-compose.yml up -d'
+                            bat 'docker-compose ps'
+                            bat 'docker-compose logs'
+                        }
                     }
                 }
             }
@@ -107,19 +104,29 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 script {
-                    // Use docker.withRegistry() to push image to Docker Hub
+                    echo "Pushing Docker image to Docker Hub..."
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         if (isUnix()) {
-                            // Tag and push the Docker image
-                            sh 'docker tag "$DOCKER_IMAGE" "$DOCKER_IMAGE:latest"'
-                            sh 'docker push "$DOCKER_IMAGE:latest"'
+                            sh 'docker tag "$DOCKER_IMAGE:$DOCKER_TAG" "$DOCKER_IMAGE:$DOCKER_TAG"'
+                            sh 'docker push "$DOCKER_IMAGE:$DOCKER_TAG"'
                         } else {
-                            bat 'docker tag "%DOCKER_IMAGE%" "%DOCKER_IMAGE%:latest"'
-                            bat 'docker push "%DOCKER_IMAGE%:latest"'
+                            bat 'docker tag "%DOCKER_IMAGE%:%DOCKER_TAG%" "%DOCKER_IMAGE%:%DOCKER_TAG%"'
+                            bat 'docker push "%DOCKER_IMAGE%:%DOCKER_TAG%"'
                         }
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build and deployment completed successfully!'
+            // Add notifications for successful build (e.g., email, Slack)
+        }
+        failure {
+            echo 'Build or deployment failed!'
+            // Add notifications for failed builds
         }
     }
 }
