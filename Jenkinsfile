@@ -11,6 +11,15 @@ pipeline {
         DOCKER_BIN = '/usr/local/bin/docker'
     }
 
+    stage('Test Docker') {
+    steps {
+        script {
+            sh 'which docker'
+        }
+    }
+}
+
+
     stages {
         stage('Set Docker Host') {
             steps {
