@@ -8,6 +8,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "viettran/stockmaster3000"
         DOCKER_TAG = "latest"
+        DOCKER_BIN = '/usr/local/bin/docker'
     }
 
     stages {
