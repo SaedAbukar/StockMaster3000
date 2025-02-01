@@ -6,11 +6,10 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "viettran/stockmaster3000"
+        DOCKER_IMAGE = "viettranni/stockmaster3000"
         DOCKER_TAG = "latest"
-        DOCKER_HOST = 'unix:///var/run/docker.sock'
-        // DOCKER_BIN = '/usr/local/bin/docker'
-        // PATH = '/usr/local/bin/docker'
+        DOCKER_BIN = '/usr/local/bin/docker'
+        PATH = '/usr/local/bin/docker'
     }
 
     stages {
