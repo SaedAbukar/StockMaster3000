@@ -6,14 +6,25 @@ pipeline {
     }
 
     environment {
-        // Set Docker host for Unix-based systems (Linux/macOS)
-        DOCKER_HOST = (isUnix()) ? 'unix:///var/run/docker.sock' : 'npipe:////./pipe/docker_engine' // For Windows
-
+        // Define the Docker Image and Tag environment variables
         DOCKER_IMAGE = "saedabukar/stockmaster3000"  // Replace with your Docker Hub repository name
         DOCKER_TAG = "latest" // Optionally, you can use a dynamic tag based on the commit ID or branch name
     }
 
     stages {
+        stage('Set Docker Host') {
+            steps {
+                script {
+                    // Set Docker host for Unix-based systems (Linux/macOS)
+                    if (isUnix()) {
+                        env.DOCKER_HOST = 'unix:///var/run/docker.sock' // For Unix
+                    } else {
+                        env.DOCKER_HOST = 'npipe:////./pipe/docker_engine' // For Windows
+                    }
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/Pawaffle/StockMaster3000.git'
@@ -87,14 +98,17 @@ pipeline {
 
                     // Ensure you're using the correct directory for the docker-compose.yml file
                     dir('.') {
+                        // Stop and remove existing containers, networks, and volumes
                         if (isUnix()) {
-                            sh 'docker-compose -f docker-compose.yml up -d'
-                            sh 'docker-compose ps'
-                            sh 'docker-compose logs'
+                            sh 'docker-compose -f docker-compose.yml down'   // Stop and remove old containers
+                            sh 'docker-compose -f docker-compose.yml up -d'  // Start containers in detached mode
+                            sh 'docker-compose ps'  // Verify running containers
+                            sh 'docker-compose logs'  // Check logs
                         } else {
-                            bat 'docker-compose -f docker-compose.yml up -d'
-                            bat 'docker-compose ps'
-                            bat 'docker-compose logs'
+                            bat 'docker-compose -f docker-compose.yml down'   // For Windows, stop and remove old containers
+                            bat 'docker-compose -f docker-compose.yml up -d'  // Start containers in detached mode
+                            bat 'docker-compose ps'  // Verify running containers
+                            bat 'docker-compose logs'  // Check logs
                         }
                     }
                 }
