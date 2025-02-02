@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MariaDB Database
   mariadb:
@@ -20,20 +18,20 @@ services:
   # Vaadin Spring Boot Application
   springboot-app:
     image: viettranni/stockmaster3000:latest
-  # Your Spring Boot image
-    platform: linux/amd64
+    platform: linux/arm64
     container_name: springboot-app
     ports:
-      - "8081:8081"  # Expose Spring Boot app on port 8081
+      - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000  # Point to the MariaDB database
-      SPRING_DATASOURCE_USERNAME: viet  # MariaDB username
-      SPRING_DATASOURCE_PASSWORD: root  # MariaDB password
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000
+      SPRING_DATASOURCE_USERNAME: viet
+      SPRING_DATASOURCE_PASSWORD: root
     depends_on:
       - mariadb
     networks:
       - my-network
-    restart: unless-stopped  # Automatically restart unless stopped manually
+    restart: unless-stopped
+
 
 # Volumes to persist MariaDB data
 volumes:
