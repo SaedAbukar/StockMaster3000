@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "saedabukar/stockmaster3000"
+        DOCKER_IMAGE = "paveldeg/stockmaster3000"
         DOCKER_TAG = "latest"
     }
 
