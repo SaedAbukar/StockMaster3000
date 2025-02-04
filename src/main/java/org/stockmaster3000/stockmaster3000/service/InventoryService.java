@@ -65,4 +65,8 @@ public class InventoryService {
                 .map(Inventory::getName)
                 .toList();
     }
+
+    public Optional<Inventory> findById(Long id) {
+        return inventoryRepository.findById(id);
+    }
 }

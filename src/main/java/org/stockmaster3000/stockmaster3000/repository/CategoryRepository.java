@@ -4,7 +4,9 @@ import org.stockmaster3000.stockmaster3000.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    // You can add custom queries here if needed
+    Optional<Category> findByName(String name);
 }

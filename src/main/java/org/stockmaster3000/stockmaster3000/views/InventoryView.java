@@ -3,8 +3,7 @@ package org.stockmaster3000.stockmaster3000.views;
 import jakarta.annotation.security.PermitAll;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
-import org.stockmaster3000.stockmaster3000.service.InventoryService;
-import org.stockmaster3000.stockmaster3000.service.ProductService;
+import org.stockmaster3000.stockmaster3000.service.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -17,7 +16,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.stockmaster3000.stockmaster3000.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,16 +28,20 @@ public class InventoryView extends VerticalLayout {
     private final SecurityService securityService;
     private final InventoryService inventoryService;
     private final ProductService productService;
+    private final CategoryService categoryService;
+    private final SupplierService supplierService;
     private final UserService userService;
 
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
 
-    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, UserService userService) {
+    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService, UserService userService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
+        this.categoryService = categoryService;
+        this.supplierService = supplierService;
 
         addClassName("inventory-view");
         setSizeFull();
@@ -157,7 +159,10 @@ public class InventoryView extends VerticalLayout {
                 newProduct.setQuantity(Integer.parseInt(quantityField.getValue()));
                 newProduct.setPrice(Double.parseDouble(priceField.getValue()));
                 newProduct.setAmountOfDaysUntilExpiration(expirationDate.getValue().getDayOfYear());
-                newProduct.setInventory(selectedInventory);
+                Inventory inventory = inventoryService.findById(selectedInventory.getId())
+                        .orElseThrow(() -> new RuntimeException("Inventory not found"));
+                newProduct.setInventory(inventory);
+
 
                 // Set Supplier and Category from TextFields
                 String supplierName = supplierField.getValue().trim();
@@ -167,9 +172,21 @@ public class InventoryView extends VerticalLayout {
                     Notification.show("Supplier and Category cannot be empty");
                     return;
                 }
+                Supplier supplier = supplierService.findByName(supplierName)
+                        .orElseGet(() -> {
+                            Supplier newSupplier = new Supplier(supplierName);
+                            return supplierService.save(newSupplier);
+                        });
 
-                newProduct.setSupplier(new Supplier(supplierName));
-                newProduct.setCategory(new Category(categoryName));
+                Category category = categoryService.findByName(categoryName)
+                        .orElseGet(() -> {
+                            Category newCategory = new Category(categoryName);
+                            return categoryService.save(newCategory);
+                        });
+
+                newProduct.setSupplier(supplier);
+                newProduct.setCategory(category);
+
 
                 productService.addProduct(newProduct);
                 updateGrid();
@@ -196,30 +213,45 @@ public class InventoryView extends VerticalLayout {
         TextField supplierField = new TextField("Supplier", product.getSupplier().getName());
         TextField categoryField = new TextField("Category", product.getCategory().getName());
 
-        // ComboBox for Inventory (pre-filled with current product's inventory)
-        ComboBox<Inventory> inventoryComboBox = new ComboBox<>("Inventory", inventoryService.getAllInventoriesByUser(securityService.getAuthenticatedUser().getUsername()));
-        inventoryComboBox.setValue(product.getInventory());
-
         Button saveButton = new Button("Save", e -> {
             try {
                 product.setName(nameField.getValue());
                 product.setQuantity(Integer.parseInt(quantityField.getValue()));
                 product.setPrice(Double.parseDouble(priceField.getValue()));
                 product.setAmountOfDaysUntilExpiration(expirationDate.getValue().getDayOfYear());
-                product.setInventory(inventoryComboBox.getValue());
 
-                // Set Supplier and Category from TextFields
+                // Ensure an inventory is selected
+                Inventory selectedInventory = product.getInventory();
+                if (selectedInventory == null) {
+                    Notification.show("Please select an inventory");
+                    return;
+                }
+                product.setInventory(selectedInventory);
+
+                // Fetch or Create Supplier & Category
                 String supplierName = supplierField.getValue().trim();
                 String categoryName = categoryField.getValue().trim();
+
+                if (nameField.getValue().isEmpty()) {
+                    Notification.show("Supplier name cannot be empty");
+                    return;
+                }
 
                 if (supplierName.isEmpty() || categoryName.isEmpty()) {
                     Notification.show("Supplier and Category cannot be empty");
                     return;
                 }
 
-                product.setSupplier(new Supplier(supplierName));
-                product.setCategory(new Category(categoryName));
+                Supplier supplier = supplierService.findByName(supplierName)
+                        .orElseGet(() -> supplierService.save(new Supplier(supplierName)));
 
+                Category category = categoryService.findByName(categoryName)
+                        .orElseGet(() -> categoryService.save(new Category(categoryName)));
+
+                product.setSupplier(supplier);
+                product.setCategory(category);
+
+                // Update the product in the database
                 productService.updateProduct(product);
                 updateGrid();
                 dialog.close();
@@ -229,7 +261,7 @@ public class InventoryView extends VerticalLayout {
             }
         });
 
-        dialog.add(nameField, quantityField, priceField, expirationDate, supplierField, categoryField, inventoryComboBox, saveButton);
+        dialog.add(nameField, quantityField, priceField, expirationDate, supplierField, categoryField, saveButton);
         dialog.open();
     }
 
