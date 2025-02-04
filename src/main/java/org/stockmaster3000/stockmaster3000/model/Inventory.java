@@ -17,7 +17,7 @@ import lombok.Data;
 
 @Entity
 @Table(name = "inventories")
-@Data // Lombok
+@Data 
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment

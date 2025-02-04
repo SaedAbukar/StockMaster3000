@@ -1,21 +1,19 @@
 package org.stockmaster3000.stockmaster3000.model;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
-import org.hibernate.annotations.Type;
-
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
+
 
 
 @Entity
@@ -32,10 +30,6 @@ public class Product {
 
     private Integer quantity;
 
-    @Column(name = "json_summary", columnDefinition = "json")
-    @Type(JsonType.class)
-    private Map<String, Double> nutritions;
-
     private Integer amountOfDaysUntilExpiration;
 
     // Relationships
@@ -50,4 +44,8 @@ public class Product {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
+
+    // One Product can have many Nutritions because of the different suppliers
+    @OneToMany(mappedBy = "product")
+    private List<Nutritions> nutritions;
 }
