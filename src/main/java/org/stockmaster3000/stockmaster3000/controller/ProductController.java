@@ -34,9 +34,14 @@ public class ProductController {
 
     // Fetching all of the products from that specific inventory
     @GetMapping("/{inventoryId}")
-    public List<Product> getAllProductsByInventory(@PathVariable Long inventoryId) {
-        return productService.getAllProductsByInventoryId(inventoryId);
+    public ResponseEntity<List<Product>> getAllProductsByInventory(@PathVariable Long inventoryId) {
+        List<Product> products = productService.getAllProductsByInventoryId(inventoryId);
+        if (products.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Return 404 if no products found
+        }
+        return ResponseEntity.ok(products);
     }
+
 
     // Deleting Product by ID
     @DeleteMapping("/{productId}")
@@ -50,5 +55,11 @@ public class ProductController {
     public ResponseEntity<String> updateQuantity(@PathVariable Long id, @PathVariable int newQuantity) {
         productService.updateQuantity(id, newQuantity); // Calls service method
         return ResponseEntity.ok("Quantity updated successfully!");
+    }
+
+    @GetMapping("/expiringSoonProducts")
+    public ResponseEntity<List<Product>> getExpiringSoonProducts() {
+        List<Product> expiringProducts = productService.getExpiringSoonProducts();
+        return ResponseEntity.ok(expiringProducts);
     }
 }

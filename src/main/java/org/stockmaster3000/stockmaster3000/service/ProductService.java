@@ -55,4 +55,9 @@ public class ProductService {
             throw new RuntimeException("Product not found or not updated");
         }
     }
+
+    // Returning a list of Products which are Expiring soon
+    public List<Product> getExpiringSoonProducts() {
+        return productRepository.getExpiringSoonProducts();
+    }
 }
