@@ -4,12 +4,16 @@ import org.stockmaster3000.stockmaster3000.model.Inventory;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.stockmaster3000.stockmaster3000.model.User;
+
+import java.util.List;
 // import org.springframework.data.jpa.repository.Modifying;
 // import org.springframework.data.jpa.repository.Query;
 // import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
+    List<Inventory> findByUser(User user);
     // TODO: Needs fixing according to the UI logic
 
     // @Modifying

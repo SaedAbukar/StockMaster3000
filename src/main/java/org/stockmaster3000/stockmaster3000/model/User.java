@@ -12,7 +12,7 @@ import java.util.Objects;
 
 // For some reason lombok doesnt work so I added all the getters, setter etc manually
 @Entity
-@Table(name = "users")
+@Table(name = "_users")
 @Data // Lombok
 public class User {
     @Id
