@@ -56,6 +56,10 @@ public class InventoryService {
         inventoryRepository.deleteById(inventoryId);
     }
 
+    public void deleteInventory(Inventory inventory) {
+        inventoryRepository.delete(inventory);
+    }
+
     // Get all inventory names by User object (returns List of inventory names for a user)
     public List<String> getAllInventoryNamesByUser(String username) {
         User user = userRepository.findByUsername(username)

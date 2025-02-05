@@ -17,6 +17,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +51,8 @@ public class InventoryView extends VerticalLayout {
         createInventorySelector();
         createFilterButtons();
         createGrid();
-        createInventoryButton();  // New method to create an inventory
+        createInventoryButton();
+        createDeleteInventoryButton();
         updateGrid();
         this.userService = userService;
     }
@@ -134,6 +137,11 @@ public class InventoryView extends VerticalLayout {
         add(addInventoryButton);
     }
 
+    private void createDeleteInventoryButton() {
+        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
+        add(deleteInventoryButton);
+    }
+
     private void showAddProductDialog() {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Product Name");
@@ -158,7 +166,15 @@ public class InventoryView extends VerticalLayout {
                 newProduct.setName(nameField.getValue());
                 newProduct.setQuantity(Integer.parseInt(quantityField.getValue()));
                 newProduct.setPrice(Double.parseDouble(priceField.getValue()));
-                newProduct.setAmountOfDaysUntilExpiration(expirationDate.getValue().getDayOfYear());
+
+                if (expirationDate.getValue() != null) {
+                    long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
+                    newProduct.setAmountOfDaysUntilExpiration((int) daysUntilExpiration);
+                } else {
+                    Notification.show("Please select a valid expiration date.");
+                }
+
+
                 Inventory inventory = inventoryService.findById(selectedInventory.getId())
                         .orElseThrow(() -> new RuntimeException("Inventory not found"));
                 newProduct.setInventory(inventory);
@@ -204,21 +220,35 @@ public class InventoryView extends VerticalLayout {
 
     private void showEditProductDialog(Product product) {
         Dialog dialog = new Dialog();
-        TextField nameField = new TextField("Product Name", product.getName());
-        TextField quantityField = new TextField("Quantity", String.valueOf(product.getQuantity()));
-        TextField priceField = new TextField("Price", String.valueOf(product.getPrice()));
+        TextField nameField = new TextField("Product Name");
+        nameField.setValue(product.getName());
+
+        TextField quantityField = new TextField("Quantity");
+        quantityField.setValue(String.valueOf(product.getQuantity()));
+
+        TextField priceField = new TextField("Price");
+        priceField.setValue(String.valueOf(product.getPrice()));
+
         DatePicker expirationDate = new DatePicker("Expiration Date");
 
-        // TextFields for Supplier and Category
-        TextField supplierField = new TextField("Supplier", product.getSupplier().getName());
-        TextField categoryField = new TextField("Category", product.getCategory().getName());
+        TextField supplierField = new TextField("Supplier");
+        supplierField.setValue(product.getSupplier().getName());
+
+        TextField categoryField = new TextField("Category");
+        categoryField.setValue(product.getCategory().getName());
+
 
         Button saveButton = new Button("Save", e -> {
             try {
                 product.setName(nameField.getValue());
                 product.setQuantity(Integer.parseInt(quantityField.getValue()));
                 product.setPrice(Double.parseDouble(priceField.getValue()));
-                product.setAmountOfDaysUntilExpiration(expirationDate.getValue().getDayOfYear());
+                if (expirationDate.getValue() != null) {
+                    long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
+                    product.setAmountOfDaysUntilExpiration((int) daysUntilExpiration);
+                } else {
+                    Notification.show("Please select a valid expiration date.");
+                }
 
                 // Ensure an inventory is selected
                 Inventory selectedInventory = product.getInventory();
@@ -303,6 +333,47 @@ public class InventoryView extends VerticalLayout {
         Button closeButton = new Button("Close", e -> dialog.close());
 
         dialog.add(nameField, saveButton, closeButton);
+        dialog.open();
+    }
+
+    private void showDeleteInventoryDialog() {
+        Dialog dialog = new Dialog();
+        ComboBox<Inventory> inventoryDialogComboBox = new ComboBox<>("Select Inventory");
+        inventoryDialogComboBox.setItemLabelGenerator(Inventory::getName);
+
+        String username = getCurrentUsername();
+        List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
+        inventoryDialogComboBox.setItems(inventories);
+
+        Button deleteButton = new Button("Delete", e -> {
+            Inventory inventory = inventoryDialogComboBox.getValue();
+
+            // Validation: Ensure the name is not empty
+            if (inventory == null) {
+                Notification.show("Please select an inventory.");
+                return;
+            }
+
+            try {
+                // Pass the inventory name and the current user to the InventoryService
+                inventoryService.deleteInventory(inventory);
+
+                // Update the ComboBox with the new list of inventories
+                inventoryDialogComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
+                // Update the ComboBox with the new list of inventories
+                inventoryComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
+
+                dialog.close();
+                Notification.show("Inventory deleted successfully");
+            } catch (Exception ex) {
+                // Improved error handling with the exception message
+                Notification.show("Error while deleting inventory: " + ex.getMessage());
+            }
+        });
+        // Create the Close button
+        Button closeButton = new Button("Close", e -> dialog.close());
+
+        dialog.add(inventoryDialogComboBox, deleteButton, closeButton);
         dialog.open();
     }
 

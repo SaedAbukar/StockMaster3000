@@ -15,14 +15,14 @@ import 'Frontend/generated/jar-resources/ReactRouterOutletElement.tsx';
 
 const loadOnDemand = (key) => {
   const pending = [];
-  if (key === 'ca9bd51a380521522accefd702825df3f99187565565f7dfc924892bd962e067') {
-    pending.push(import('./chunks/chunk-92f08a34764b14cba2ec7fe1c09197aa5c3110be22e555851aee5264a9698a57.js'));
-  }
   if (key === 'ae1ffea947c6d509814069a689a0998f8a7fb38e5035e2d1df1027b6a5b5a208') {
     pending.push(import('./chunks/chunk-e9920726f6ed57edb75acc27b2ba8513318484e0a812122a44332c846f540550.js'));
   }
   if (key === 'a1937aa60de8769fb8cf511465edecca24a6ac3cd35d0ae1045169296020a920') {
     pending.push(import('./chunks/chunk-6502649f9be867d8d7f84fd6b816f9b0b6b567674ba7af516296aeb7ce505744.js'));
+  }
+  if (key === 'ca9bd51a380521522accefd702825df3f99187565565f7dfc924892bd962e067') {
+    pending.push(import('./chunks/chunk-92f08a34764b14cba2ec7fe1c09197aa5c3110be22e555851aee5264a9698a57.js'));
   }
   return Promise.all(pending);
 }
