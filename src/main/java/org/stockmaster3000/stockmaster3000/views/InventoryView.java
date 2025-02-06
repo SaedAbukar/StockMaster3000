@@ -1,5 +1,8 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
@@ -32,13 +35,12 @@ public class InventoryView extends VerticalLayout {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
-    private final UserService userService;
 
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
 
-    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService, UserService userService) {
+    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
@@ -47,14 +49,53 @@ public class InventoryView extends VerticalLayout {
 
         addClassName("inventory-view");
         setSizeFull();
-
+        createHeader();
         createInventorySelector();
         createFilterButtons();
         createGrid();
         createInventoryButton();
         createDeleteInventoryButton();
         updateGrid();
-        this.userService = userService;
+    }
+
+    private void createHeader() {
+        // Header container
+        HorizontalLayout header = new HorizontalLayout();
+        header.addClassName("header");
+        header.setWidthFull();
+        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        header.setSpacing(true);
+
+        header.getStyle().set("background-color", "#03fc7f")
+                .set("padding", "5px")
+                .set("color", "white");
+
+        H1 title = new H1();
+        title.addClassName("logo");
+        title.getElement().setProperty("innerHTML", "StockMaster <span>3000</span>");
+        title.getStyle().set("color", "white");
+
+        HorizontalLayout authSection = new HorizontalLayout();
+        authSection.setWidthFull();
+        authSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        authSection.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+
+        Button login = new Button("Login");
+        if (securityService.getAuthenticatedUser() != null) {
+            String username = securityService.getAuthenticatedUser().getUsername();
+            Span greeting = new Span("Hello, " + username + "!");
+            greeting.getStyle().set("color", "white");
+            Button logout = new Button("Logout", click -> securityService.logout());
+            logout.getStyle().set("color", "white");
+            authSection.add(greeting, logout);
+        } else {
+            login.addClickListener(click -> login.getUI().ifPresent(ui -> ui.navigate("login")));
+            login.getStyle().set("color", "white");
+            authSection.add(login);
+        }
+
+        header.add(title, authSection);
+        add(header);
     }
 
     private void createInventorySelector() {
