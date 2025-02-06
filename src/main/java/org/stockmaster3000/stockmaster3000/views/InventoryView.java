@@ -111,12 +111,12 @@ public class InventoryView extends VerticalLayout {
     }
 
     private void createGrid() {
-        grid.addColumn(Product::getName).setHeader("Name");
-        grid.addColumn(Product::getQuantity).setHeader("Quantity");
-        grid.addColumn(Product::getPrice).setHeader("Price");
-        grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration");
-        grid.addColumn(product -> product.getCategory().getName()).setHeader("Category");
-        grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier");
+        grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
+        grid.addColumn(Product::getQuantity).setHeader("Quantity").setSortable(true);
+        grid.addColumn(Product::getPrice).setHeader("Price").setSortable(true);
+        grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration").setSortable(true);
+        grid.addColumn(product -> product.getCategory().getName()).setHeader("Category").setSortable(true);
+        grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier").setSortable(true);
 
         // Add buttons for editing and deleting products
         grid.addComponentColumn(product -> {
