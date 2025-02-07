@@ -105,7 +105,7 @@ public class UserServiceTest {
     @Test
     public void testRegisterUser_nullPassword() {
         // Call the registerUser method with an empty password
-        String result = userService.registerUser(username, emptyPassword);
+        String result = userService.registerUser(username, null);
 
         // Verify that the result is the expected error message
         assertEquals("Password must be at least 8 characters long", result);
@@ -113,4 +113,37 @@ public class UserServiceTest {
         // Verify that the repository's save method was not called
         verify(userRepository, times(0)).save(any(User.class));
     }
+
+    @Test
+    public void testFindByUsername_userExists() {
+        // Mock the repository to return a user when searched by a valid username
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(testUser));
+
+        // Call the method to fetch the user by username
+        Optional<User> result = userService.findByUsername(username);
+
+        // Ensure the user was found and matches the expected values
+        assertTrue(result.isPresent());
+        assertEquals(username, result.get().getUsername());
+
+        // Verify that the repository method was called exactly once
+        verify(userRepository, times(1)).findByUsername(username);
+    }
+
+    @Test
+    public void testFindByUsername_userDoesNotExist() {
+        // Mock the repository to return an empty result when searching for a non-existent username
+        when(userRepository.findByUsername("nonexistentuser")).thenReturn(Optional.empty());
+
+        // Call the method and verify that no user is found
+        Optional<User> result = userService.findByUsername("nonexistentuser");
+
+        // Ensure the user was not found
+        assertFalse(result.isPresent());
+
+        // Verify that the repository method was called exactly once
+        verify(userRepository, times(1)).findByUsername("nonexistentuser");
+    }
+
+
 }
