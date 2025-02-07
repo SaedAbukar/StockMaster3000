@@ -1,5 +1,8 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
@@ -17,6 +20,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.notification.Notification;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,13 +35,12 @@ public class InventoryView extends VerticalLayout {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
-    private final UserService userService;
 
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
 
-    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService, UserService userService) {
+    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
@@ -45,13 +49,53 @@ public class InventoryView extends VerticalLayout {
 
         addClassName("inventory-view");
         setSizeFull();
-
+        createHeader();
         createInventorySelector();
         createFilterButtons();
         createGrid();
-        createInventoryButton();  // New method to create an inventory
+        createInventoryButton();
+        createDeleteInventoryButton();
         updateGrid();
-        this.userService = userService;
+    }
+
+    private void createHeader() {
+        // Header container
+        HorizontalLayout header = new HorizontalLayout();
+        header.addClassName("header");
+        header.setWidthFull();
+        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        header.setSpacing(true);
+
+        header.getStyle().set("background-color", "#03fc7f")
+                .set("padding", "5px")
+                .set("color", "white");
+
+        H1 title = new H1();
+        title.addClassName("logo");
+        title.getElement().setProperty("innerHTML", "StockMaster <span>3000</span>");
+        title.getStyle().set("color", "white");
+
+        HorizontalLayout authSection = new HorizontalLayout();
+        authSection.setWidthFull();
+        authSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        authSection.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+
+        Button login = new Button("Login");
+        if (securityService.getAuthenticatedUser() != null) {
+            String username = securityService.getAuthenticatedUser().getUsername();
+            Span greeting = new Span("Hello, " + username + "!");
+            greeting.getStyle().set("color", "white");
+            Button logout = new Button("Logout", click -> securityService.logout());
+            logout.getStyle().set("color", "white");
+            authSection.add(greeting, logout);
+        } else {
+            login.addClickListener(click -> login.getUI().ifPresent(ui -> ui.navigate("login")));
+            login.getStyle().set("color", "white");
+            authSection.add(login);
+        }
+
+        header.add(title, authSection);
+        add(header);
     }
 
     private void createInventorySelector() {
@@ -108,12 +152,12 @@ public class InventoryView extends VerticalLayout {
     }
 
     private void createGrid() {
-        grid.addColumn(Product::getName).setHeader("Name");
-        grid.addColumn(Product::getQuantity).setHeader("Quantity");
-        grid.addColumn(Product::getPrice).setHeader("Price");
-        grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration");
-        grid.addColumn(product -> product.getCategory().getName()).setHeader("Category");
-        grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier");
+        grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
+        grid.addColumn(Product::getQuantity).setHeader("Quantity").setSortable(true);
+        grid.addColumn(Product::getPrice).setHeader("Price").setSortable(true);
+        grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration").setSortable(true);
+        grid.addColumn(product -> product.getCategory().getName()).setHeader("Category").setSortable(true);
+        grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier").setSortable(true);
 
         // Add buttons for editing and deleting products
         grid.addComponentColumn(product -> {
@@ -132,6 +176,11 @@ public class InventoryView extends VerticalLayout {
     private void createInventoryButton() {
         Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
         add(addInventoryButton);
+    }
+
+    private void createDeleteInventoryButton() {
+        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
+        add(deleteInventoryButton);
     }
 
     private void showAddProductDialog() {
@@ -158,7 +207,15 @@ public class InventoryView extends VerticalLayout {
                 newProduct.setName(nameField.getValue());
                 newProduct.setQuantity(Integer.parseInt(quantityField.getValue()));
                 newProduct.setPrice(Double.parseDouble(priceField.getValue()));
-                newProduct.setAmountOfDaysUntilExpiration(expirationDate.getValue().getDayOfYear());
+
+                if (expirationDate.getValue() != null) {
+                    long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
+                    newProduct.setAmountOfDaysUntilExpiration((int) daysUntilExpiration);
+                } else {
+                    Notification.show("Please select a valid expiration date.");
+                }
+
+
                 Inventory inventory = inventoryService.findById(selectedInventory.getId())
                         .orElseThrow(() -> new RuntimeException("Inventory not found"));
                 newProduct.setInventory(inventory);
@@ -204,21 +261,35 @@ public class InventoryView extends VerticalLayout {
 
     private void showEditProductDialog(Product product) {
         Dialog dialog = new Dialog();
-        TextField nameField = new TextField("Product Name", product.getName());
-        TextField quantityField = new TextField("Quantity", String.valueOf(product.getQuantity()));
-        TextField priceField = new TextField("Price", String.valueOf(product.getPrice()));
+        TextField nameField = new TextField("Product Name");
+        nameField.setValue(product.getName());
+
+        TextField quantityField = new TextField("Quantity");
+        quantityField.setValue(String.valueOf(product.getQuantity()));
+
+        TextField priceField = new TextField("Price");
+        priceField.setValue(String.valueOf(product.getPrice()));
+
         DatePicker expirationDate = new DatePicker("Expiration Date");
 
-        // TextFields for Supplier and Category
-        TextField supplierField = new TextField("Supplier", product.getSupplier().getName());
-        TextField categoryField = new TextField("Category", product.getCategory().getName());
+        TextField supplierField = new TextField("Supplier");
+        supplierField.setValue(product.getSupplier().getName());
+
+        TextField categoryField = new TextField("Category");
+        categoryField.setValue(product.getCategory().getName());
+
 
         Button saveButton = new Button("Save", e -> {
             try {
                 product.setName(nameField.getValue());
                 product.setQuantity(Integer.parseInt(quantityField.getValue()));
                 product.setPrice(Double.parseDouble(priceField.getValue()));
-                product.setAmountOfDaysUntilExpiration(expirationDate.getValue().getDayOfYear());
+                if (expirationDate.getValue() != null) {
+                    long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
+                    product.setAmountOfDaysUntilExpiration((int) daysUntilExpiration);
+                } else {
+                    Notification.show("Please select a valid expiration date.");
+                }
 
                 // Ensure an inventory is selected
                 Inventory selectedInventory = product.getInventory();
@@ -303,6 +374,47 @@ public class InventoryView extends VerticalLayout {
         Button closeButton = new Button("Close", e -> dialog.close());
 
         dialog.add(nameField, saveButton, closeButton);
+        dialog.open();
+    }
+
+    private void showDeleteInventoryDialog() {
+        Dialog dialog = new Dialog();
+        ComboBox<Inventory> inventoryDialogComboBox = new ComboBox<>("Select Inventory");
+        inventoryDialogComboBox.setItemLabelGenerator(Inventory::getName);
+
+        String username = getCurrentUsername();
+        List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
+        inventoryDialogComboBox.setItems(inventories);
+
+        Button deleteButton = new Button("Delete", e -> {
+            Inventory inventory = inventoryDialogComboBox.getValue();
+
+            // Validation: Ensure the name is not empty
+            if (inventory == null) {
+                Notification.show("Please select an inventory.");
+                return;
+            }
+
+            try {
+                // Pass the inventory name and the current user to the InventoryService
+                inventoryService.deleteInventory(inventory);
+
+                // Update the ComboBox with the new list of inventories
+                inventoryDialogComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
+                // Update the ComboBox with the new list of inventories
+                inventoryComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
+
+                dialog.close();
+                Notification.show("Inventory deleted successfully");
+            } catch (Exception ex) {
+                // Improved error handling with the exception message
+                Notification.show("Error while deleting inventory: " + ex.getMessage());
+            }
+        });
+        // Create the Close button
+        Button closeButton = new Button("Close", e -> dialog.close());
+
+        dialog.add(inventoryDialogComboBox, deleteButton, closeButton);
         dialog.open();
     }
 
