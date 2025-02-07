@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.stockmaster3000.stockmaster3000.model.User;
 import org.stockmaster3000.stockmaster3000.repository.UserRepository;
-import org.stockmaster3000.stockmaster3000.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
