@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "paveldeg/stockmaster3000"
+        DOCKER_IMAGE = "ibudaa/stockmaster3000"
         DOCKER_TAG = "latest"
     }
 
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'pavel', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
@@ -68,6 +68,7 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials'){
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials'){
                         if (isUnix()) {
                             sh '''
