@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import org.hibernate.annotations.Type;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 
@@ -47,6 +48,13 @@ public class Product {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt; 
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt; 
+    
 
     // Constructor
     public Product() {}
