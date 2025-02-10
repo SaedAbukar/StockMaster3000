@@ -4,6 +4,8 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
+
+import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
@@ -36,6 +38,8 @@ public class InventoryView extends VerticalLayout {
     private final CategoryService categoryService;
     private final SupplierService supplierService;
 
+    private HorizontalLayout filterLayout;
+
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
@@ -49,107 +53,110 @@ public class InventoryView extends VerticalLayout {
 
         addClassName("inventory-view");
         setSizeFull();
-        createHeader();
+        add(new HeaderComponent(securityService));
         createInventorySelector();
         createFilterButtons();
         createGrid();
-        createInventoryButton();
-        createDeleteInventoryButton();
         updateGrid();
-    }
-
-    private void createHeader() {
-        // Header container
-        HorizontalLayout header = new HorizontalLayout();
-        header.addClassName("header");
-        header.setWidthFull();
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.setSpacing(true);
-
-        header.getStyle().set("background-color", "#03fc7f")
-                .set("padding", "5px")
-                .set("color", "white");
-
-        H1 title = new H1();
-        title.addClassName("logo");
-        title.getElement().setProperty("innerHTML", "StockMaster <span>3000</span>");
-        title.getStyle().set("color", "white");
-
-        HorizontalLayout authSection = new HorizontalLayout();
-        authSection.setWidthFull();
-        authSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        authSection.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-
-        Button login = new Button("Login");
-        if (securityService.getAuthenticatedUser() != null) {
-            String username = securityService.getAuthenticatedUser().getUsername();
-            Span greeting = new Span("Hello, " + username + "!");
-            greeting.getStyle().set("color", "white");
-            Button logout = new Button("Logout", click -> securityService.logout());
-            logout.getStyle().set("color", "white");
-            authSection.add(greeting, logout);
-        } else {
-            login.addClickListener(click -> login.getUI().ifPresent(ui -> ui.navigate("login")));
-            login.getStyle().set("color", "white");
-            authSection.add(login);
-        }
-
-        header.add(title, authSection);
-        add(header);
     }
 
     private void createInventorySelector() {
         inventoryComboBox = new ComboBox<>("Select Inventory");
         inventoryComboBox.setItemLabelGenerator(Inventory::getName);
-
+    
         String username = getCurrentUsername();
         List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
         inventoryComboBox.setItems(inventories);
-
+    
         inventoryComboBox.addValueChangeListener(event -> updateGrid());
-        add(inventoryComboBox);
+    
+        // Creating buttons for adding and deleting inventory
+        Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
+        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
+        deleteInventoryButton.addClassName("delete-inventory-button"); // Apply red style
+        
+    
+        // Creating a layout to align all elements horizontally
+        HorizontalLayout inventoryLayout = new HorizontalLayout(inventoryComboBox, addInventoryButton, deleteInventoryButton);
+        inventoryLayout.setAlignItems(FlexComponent.Alignment.BASELINE); // Align elements properly
+        inventoryLayout.setSpacing(true); // Add spacing between elements
+    
+        add(inventoryLayout);
     }
+    
+    
 
     private void createFilterButtons() {
-        HorizontalLayout filterLayout = new HorizontalLayout();
-        Button addButton = new Button("Add Product", e -> showAddProductDialog());
+        // Layout for filter buttons
+        HorizontalLayout filterButtons = new HorizontalLayout();
+        filterButtons.setSpacing(true);
+    
         Button allButton = createFilterButton("All", "ALL", true);
         Button expiringButton = createFilterButton("Expiring Soon", "EXPIRING", false);
         Button lowStockButton = createFilterButton("Low Stock", "LOW", false);
         Button outOfStockButton = createFilterButton("Out of Stock", "OUT", false);
+    
+        // Apply neutral color class
+        allButton.addClassName("neutral-button");
+        expiringButton.addClassName("neutral-button");
+        lowStockButton.addClassName("neutral-button");
+        outOfStockButton.addClassName("neutral-button");
+    
+        filterButtons.add(allButton, expiringButton, lowStockButton, outOfStockButton);
+    
+        // "+ Add Product" button
+        Button addButton = new Button("+ Add Product", e -> showAddProductDialog());
+        addButton.addClassName("add-button");
+    
+        // Main layout to position elements
+        filterLayout = new HorizontalLayout(filterButtons, addButton);
+        filterLayout.setWidthFull();
+        filterLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN); // Filter buttons left, Add button right
+        filterLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        filterLayout.addClassName("filter-layout");
 
-        filterLayout.add(addButton, allButton, expiringButton, lowStockButton, outOfStockButton);
+    
         add(filterLayout);
     }
-
+    
     private Button createFilterButton(String text, String filter, boolean isActive) {
         Button button = new Button(text);
         button.addClassName("filter-button");
-
+    
         if (isActive) {
             button.addClassName("active");
             currentFilter = filter;
         }
-
+    
         button.addClickListener(e -> {
             updateActiveButton(button);
             currentFilter = filter;
             updateGrid();
         });
-
+    
         return button;
     }
-
+    
     private void updateActiveButton(Button selectedButton) {
-        getChildren().forEach(component -> {
-            if (component instanceof HorizontalLayout) {
-                ((HorizontalLayout) component).getChildren()
-                        .filter(btn -> btn instanceof Button)
-                        .forEach(btn -> btn.removeClassName("active"));
-            }
-        });
+        if (filterLayout != null) {
+            // Get the filter buttons layout (first child of filterLayout)
+            filterLayout.getComponentAt(0)
+                    .getChildren()
+                    .filter(component -> component instanceof Button)
+                    .map(component -> (Button) component)
+                    .forEach(button -> {
+                        button.removeClassName("active");
+                        button.addClassName("neutral-button");
+                    });
+        }
+
+        // Mark the selected button as active
         selectedButton.addClassName("active");
+        selectedButton.removeClassName("neutral-button");
     }
+    
+    
+    
 
     private void createGrid() {
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
@@ -171,16 +178,6 @@ public class InventoryView extends VerticalLayout {
         });
 
         add(grid);
-    }
-
-    private void createInventoryButton() {
-        Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
-        add(addInventoryButton);
-    }
-
-    private void createDeleteInventoryButton() {
-        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
-        add(deleteInventoryButton);
     }
 
     private void showAddProductDialog() {

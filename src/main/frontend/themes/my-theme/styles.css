@@ -1,0 +1,154 @@
+.header {
+  background-color: #0a3c40;
+  padding: 10px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 4px auto;
+}
+
+.logo {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  white-space: nowrap; /* Ensures text stays on one line */
+}
+
+/* Default button styling */
+vaadin-button {
+  background-color: #0a3c40 !important; /* Green */
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Hover effect */
+vaadin-button:hover {
+  background-color: rgb(11, 64, 56) !important; /* Darker green on hover */
+}
+
+/* Disabled buttons */
+vaadin-button[disabled] {
+  background-color: rgb(
+    139,
+    241,
+    226
+  ) !important; /* Light green for disabled */
+  color: white !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Ensuring the inventory layout looks good */
+.inventory-layout {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Making the buttons look consistent */
+.inventory-layout vaadin-button {
+  background-color: rgb(139, 241, 226) !important; /* Same green color */
+  color: white !important;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.inventory-layout vaadin-button:hover {
+  background-color: rgb(139, 241, 226) !important;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.delete-inventory-button {
+  background-color: #dc3545 !important; /* Red */
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  margin-left: 2px;
+}
+
+/* Hover effect */
+.delete-inventory-button:hover {
+  background-color: #c82333 !important; /* Darker red */
+}
+
+.neutral-button {
+  background-color: white !important;
+  border: 2px solid #0a3c40 !important;
+  color: #0a3c40 !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-left: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out,
+    border 0.3s ease-in-out;
+}
+
+/* Active filter effect */
+.neutral-button.active {
+  background-color: #0a3c40 !important;
+  color: white !important;
+}
+
+/* Hover effect */
+.neutral-button:hover {
+  color: white !important;
+  background-color: rgb(11, 64, 56) !important;
+}
+
+.log-button {
+  border: 2px solid white !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 16px;
+  background: transparent !important;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.log-button:hover {
+  background-color: white !important;
+  color: #0a3c40 !important;
+}
+
+.add-button {
+  background-color: rgb(44, 208, 151) !important;
+  border: 2px solid !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-left: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out,
+    border 0.3s ease-in-out;
+}
+
+.add-button:hover {
+  color: white !important;
+  background-color: rgb(37, 163, 119) !important;
+}
+
+.filter-layout {
+  display: flex;
+  justify-content: space-between; /* Keeps filter buttons left & add button right */
+  align-items: center;
+  width: 100%;
+}

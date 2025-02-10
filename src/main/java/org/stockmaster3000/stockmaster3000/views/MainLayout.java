@@ -13,6 +13,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
 @Route(value = "/")
@@ -24,48 +25,8 @@ public class MainLayout extends VerticalLayout {
 
     public MainLayout(@Autowired SecurityService securityService) {
         this.securityService = securityService;
-        createHeader();
+        add(new HeaderComponent(securityService));
         createHeroSection();
-    }
-
-    private void createHeader() {
-        // Header container
-        HorizontalLayout header = new HorizontalLayout();
-        header.addClassName("header");
-        header.setWidthFull();
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.setSpacing(true);
-
-        header.getStyle().set("background-color", "#03fc7f")
-                .set("padding", "5px")
-                .set("color", "white");
-
-        H1 title = new H1();
-        title.addClassName("logo");
-        title.getElement().setProperty("innerHTML", "StockMaster <span>3000</span>");
-        title.getStyle().set("color", "white");
-
-        HorizontalLayout authSection = new HorizontalLayout();
-        authSection.setWidthFull();
-        authSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        authSection.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-
-        Button login = new Button("Login");
-        if (securityService.getAuthenticatedUser() != null) {
-            String username = securityService.getAuthenticatedUser().getUsername();
-            Span greeting = new Span("Hello, " + username + "!");
-            greeting.getStyle().set("color", "white");
-            Button logout = new Button("Logout", click -> securityService.logout());
-            logout.getStyle().set("color", "white");
-            authSection.add(greeting, logout);
-        } else {
-            login.addClickListener(click -> login.getUI().ifPresent(ui -> ui.navigate("login")));
-            login.getStyle().set("color", "white");
-            authSection.add(login);
-        }
-
-        header.add(title, authSection);
-        add(header);
     }
 
     private void createHeroSection() {
