@@ -68,8 +68,7 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials'){
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials'){
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         if (isUnix()) {
                             sh '''
                             docker buildx build --platform linux/amd64,linux/arm64 \
@@ -140,6 +139,5 @@ pipeline {
         failure {
             echo 'Build or deployment failed!'
         }
-    }
     }
 }
