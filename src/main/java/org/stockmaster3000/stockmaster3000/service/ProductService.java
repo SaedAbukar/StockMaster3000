@@ -34,6 +34,14 @@ public class ProductService {
         return productRepository.findByInventoryId(inventoryId);
     }
 
+    public List<Product> getProductsByName(Long inventoryId, String productName) {
+        if (productName != null && !productName.isEmpty()) {
+            return productRepository.findByInventoryIdAndName(inventoryId, productName);
+        } else {
+            return productRepository.findByInventoryId(inventoryId);
+        }
+    }
+
     // Get a single product by ID
     public Optional<Product> getProductById(Long productId) {
         return productRepository.findById(productId);
