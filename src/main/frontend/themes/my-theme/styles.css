@@ -275,3 +275,42 @@ vaadin-grid::part(clickable-row):hover {
   --vaadin-grid-cell-background: rgba(0, 150, 136, 0.2);
   cursor: pointer;
 }
+
+/* Search bar placement */
+.search-layout {
+  display: flex;
+  justify-content: flex-start; /* Aligns input and button to the left */
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  gap: 8px; /* Space between input and button */
+}
+
+/* Search input field */
+.searchbar {
+  width: 250px;
+}
+
+/* Search button */
+.search-button {
+  background-color: #0a3c40 !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .search-layout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchbar {
+    width: 100%;
+  }
+}

@@ -470,18 +470,20 @@ public class InventoryView extends VerticalLayout {
     }
 
     private void searchByName() {
-        TextField searchbar = new TextField("Search Product");
+        TextField searchbar = new TextField();
+        searchbar.setPlaceholder("Search Product");
+    
         Button searchButton = new Button("Search");
-
+    
         searchButton.addClickListener(event -> {
             Inventory inventory = inventoryComboBox.getValue();
-
-            // Validation: Ensure the inventory is selected
+    
+            // Validation: Ensure an inventory is selected
             if (inventory == null) {
                 Notification.show("Please select an inventory.");
                 return;
             }
-
+    
             String searchText = searchbar.getValue().trim();
             if (!searchText.isEmpty()) {
                 List<Product> products = productService.getProductsByName(inventory.getId(), searchText);
@@ -491,11 +493,20 @@ public class InventoryView extends VerticalLayout {
                 grid.setItems(products);
             }
         });
-
-
+    
+        // Add CSS classes
+        searchbar.addClassName("searchbar");
+        searchButton.addClassName("search-button");
+    
+        // **Align search bar under the inventory selection**
         HorizontalLayout searchLayout = new HorizontalLayout(searchbar, searchButton);
+        searchLayout.addClassName("search-layout");
+        searchLayout.setWidthFull();
+    
+        // ✅ Now add it **after** the inventory selection layout
         add(searchLayout);
     }
+    
 
 
 
