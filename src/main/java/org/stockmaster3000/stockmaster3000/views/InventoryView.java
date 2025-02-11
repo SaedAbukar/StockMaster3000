@@ -55,6 +55,7 @@ public class InventoryView extends VerticalLayout {
         setSizeFull();
         add(new HeaderComponent(securityService));
         createInventorySelector();
+        searchByName();
         createFilterButtons();
         createGrid();
         updateGrid();
@@ -414,6 +415,35 @@ public class InventoryView extends VerticalLayout {
         dialog.add(inventoryDialogComboBox, deleteButton, closeButton);
         dialog.open();
     }
+
+    private void searchByName() {
+        TextField searchbar = new TextField("Search Product");
+        Button searchButton = new Button("Search");
+
+        searchButton.addClickListener(event -> {
+            Inventory inventory = inventoryComboBox.getValue();
+
+            // Validation: Ensure the inventory is selected
+            if (inventory == null) {
+                Notification.show("Please select an inventory.");
+                return;
+            }
+
+            String searchText = searchbar.getValue().trim();
+            if (!searchText.isEmpty()) {
+                List<Product> products = productService.getProductsByName(inventory.getId(), searchText);
+                grid.setItems(products);
+            } else {
+                List<Product> products = productService.getProductsByInventory(inventory.getId());
+                grid.setItems(products);
+            }
+        });
+
+
+        HorizontalLayout searchLayout = new HorizontalLayout(searchbar, searchButton);
+        add(searchLayout);
+    }
+
 
 
     private void updateGrid() {

@@ -165,6 +165,47 @@ class ProductServiceTest {
     }
 
     @Test
+    void testGetProductsByName_WithProductName() {
+        // Mock repository to return products when a name is provided
+        when(productRepository.findByInventoryIdAndName(1L, "Test Product"))
+                .thenReturn(List.of(product));
+
+        // Call the method
+        List<Product> result = productService.getProductsByName(1L, "Test Product");
+
+        // Verify the result
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        verify(productRepository, times(1)).findByInventoryIdAndName(1L, "Test Product");
+    }
+
+    @Test
+    void testGetProductsByName_WithoutProductName() {
+        // Mock repository to return all products for an inventory when no name is provided
+        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+
+        // Call the method
+        List<Product> result = productService.getProductsByName(1L, "");
+
+        // Verify the result
+        assertThat(result).hasSize(1);
+        verify(productRepository, times(1)).findByInventoryId(1L);
+    }
+
+    @Test
+    void testGetProductsByName_WithNullProductName() {
+        // Mock repository to return all products when productName is null
+        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+
+        // Call the method
+        List<Product> result = productService.getProductsByName(1L, null);
+
+        // Verify the result
+        assertThat(result).hasSize(1);
+        verify(productRepository, times(1)).findByInventoryId(1L);
+    }
+
+    @Test
     void testDeleteProduct() {
         // Mock repository to perform deletion without errors
         doNothing().when(productRepository).deleteById(1L);

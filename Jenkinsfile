@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "ibudaa/stockmaster3000"
+        DOCKER_IMAGE = "saedabukar/stockmaster3000"
         DOCKER_TAG = "latest"
     }
 
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'saed', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
