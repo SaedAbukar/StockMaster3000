@@ -1,10 +1,17 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
+
+import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -32,13 +39,14 @@ public class InventoryView extends VerticalLayout {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
-    private final UserService userService;
+
+    private HorizontalLayout filterLayout;
 
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
 
-    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService, UserService userService) {
+    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
@@ -47,100 +55,184 @@ public class InventoryView extends VerticalLayout {
 
         addClassName("inventory-view");
         setSizeFull();
-
+        add(new HeaderComponent(securityService));
         createInventorySelector();
+        searchByName();
         createFilterButtons();
         createGrid();
-        createInventoryButton();
-        createDeleteInventoryButton();
         updateGrid();
-        this.userService = userService;
     }
 
     private void createInventorySelector() {
         inventoryComboBox = new ComboBox<>("Select Inventory");
         inventoryComboBox.setItemLabelGenerator(Inventory::getName);
-
+    
         String username = getCurrentUsername();
         List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
         inventoryComboBox.setItems(inventories);
-
+    
         inventoryComboBox.addValueChangeListener(event -> updateGrid());
-        add(inventoryComboBox);
+    
+        // Creating buttons for adding and deleting inventory
+        Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
+        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
+        deleteInventoryButton.addClassName("delete-inventory-button"); // Apply red style
+        
+    
+        // Creating a layout to align all elements horizontally
+        HorizontalLayout inventoryLayout = new HorizontalLayout(inventoryComboBox, addInventoryButton, deleteInventoryButton);
+        inventoryLayout.setAlignItems(FlexComponent.Alignment.BASELINE); // Align elements properly
+        inventoryLayout.setSpacing(true); // Add spacing between elements
+    
+        add(inventoryLayout);
     }
+    
+    
 
     private void createFilterButtons() {
-        HorizontalLayout filterLayout = new HorizontalLayout();
-        Button addButton = new Button("Add Product", e -> showAddProductDialog());
+        // Layout for filter buttons
+        HorizontalLayout filterButtons = new HorizontalLayout();
+        filterButtons.setSpacing(true);
+    
         Button allButton = createFilterButton("All", "ALL", true);
         Button expiringButton = createFilterButton("Expiring Soon", "EXPIRING", false);
         Button lowStockButton = createFilterButton("Low Stock", "LOW", false);
         Button outOfStockButton = createFilterButton("Out of Stock", "OUT", false);
+    
+        // Apply neutral color class
+        allButton.addClassName("neutral-button");
+        expiringButton.addClassName("neutral-button");
+        lowStockButton.addClassName("neutral-button");
+        outOfStockButton.addClassName("neutral-button");
+    
+        filterButtons.add(allButton, expiringButton, lowStockButton, outOfStockButton);
+    
+        // "+ Add Product" button
+        Button addButton = new Button("+ Add Product", e -> showAddProductDialog());
+        addButton.addClassName("add-button");
+    
+        // Main layout to position elements
+        filterLayout = new HorizontalLayout(filterButtons, addButton);
+        filterLayout.setWidthFull();
+        filterLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN); // Filter buttons left, Add button right
+        filterLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        filterLayout.addClassName("filter-layout");
 
-        filterLayout.add(addButton, allButton, expiringButton, lowStockButton, outOfStockButton);
+    
         add(filterLayout);
     }
-
+    
     private Button createFilterButton(String text, String filter, boolean isActive) {
         Button button = new Button(text);
         button.addClassName("filter-button");
-
+    
         if (isActive) {
             button.addClassName("active");
             currentFilter = filter;
         }
-
+    
         button.addClickListener(e -> {
             updateActiveButton(button);
             currentFilter = filter;
             updateGrid();
         });
-
+    
         return button;
     }
-
+    
     private void updateActiveButton(Button selectedButton) {
-        getChildren().forEach(component -> {
-            if (component instanceof HorizontalLayout) {
-                ((HorizontalLayout) component).getChildren()
-                        .filter(btn -> btn instanceof Button)
-                        .forEach(btn -> btn.removeClassName("active"));
-            }
-        });
+        if (filterLayout != null) {
+            // Get the filter buttons layout (first child of filterLayout)
+            filterLayout.getComponentAt(0)
+                    .getChildren()
+                    .filter(component -> component instanceof Button)
+                    .map(component -> (Button) component)
+                    .forEach(button -> {
+                        button.removeClassName("active");
+                        button.addClassName("neutral-button");
+                    });
+        }
+
+        // Mark the selected button as active
         selectedButton.addClassName("active");
+        selectedButton.removeClassName("neutral-button");
     }
+    
+    
+    
 
     private void createGrid() {
+        grid.addClassName("inventory-grid");
+        grid.setSelectionMode(Grid.SelectionMode.NONE); // Disable row selection
+    
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
         grid.addColumn(Product::getQuantity).setHeader("Quantity").setSortable(true);
         grid.addColumn(Product::getPrice).setHeader("Price").setSortable(true);
         grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration").setSortable(true);
         grid.addColumn(product -> product.getCategory().getName()).setHeader("Category").setSortable(true);
         grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier").setSortable(true);
-
-        // Add buttons for editing and deleting products
-        grid.addComponentColumn(product -> {
-            HorizontalLayout buttons = new HorizontalLayout();
-            Button editButton = new Button("Edit");
-            editButton.addClickListener(e -> showEditProductDialog(product));
-            Button deleteButton = new Button("Delete");
-            deleteButton.addClickListener(e -> deleteProduct(product));
-            buttons.add(editButton, deleteButton);
-            return buttons;
-        });
-
+    
+        // Add a class name to each row for styling
+        grid.setPartNameGenerator(item -> "clickable-row");
+    
+        // Apply hover effect dynamically
+        grid.getElement().executeJs(
+            "this.shadowRoot.querySelectorAll('tr').forEach(row => { " +
+            "    row.style.cursor = 'pointer'; " +
+            "    row.addEventListener('mouseover', () => row.style.backgroundColor = 'rgba(0, 150, 136, 0.1)'); " +
+            "    row.addEventListener('mouseout', () => row.style.backgroundColor = ''); " +
+            "});"
+        );
+    
+        // Make the entire row clickable
+        grid.addItemClickListener(event -> showProductActionsDialog(event.getItem()));
+    
         add(grid);
     }
+    
+    
+    private void showProductActionsDialog(Product product) {
+        Dialog dialog = new Dialog();
+        dialog.setWidth("300px");
+    
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(true);
+        layout.setPadding(true);
+    
+        H2 title = new H2("Product Actions");
+        layout.add(title);
+    
+        // Display product details
+        layout.add(new Span("Name: " + product.getName()));
+        layout.add(new Span("Quantity: " + product.getQuantity()));
+        layout.add(new Span("Price: " + product.getPrice()));
+        layout.add(new Span("Days Until Expiration: " + product.getAmountOfDaysUntilExpiration()));
+        layout.add(new Span("Category: " + product.getCategory().getName()));
+        layout.add(new Span("Supplier: " + product.getSupplier().getName()));
+    
+        Button editButton = new Button("Edit", e -> {
+            dialog.close();
+            showEditProductDialog(product);
+        });
+        editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    
+        Button deleteButton = new Button("Delete", e -> {
+            dialog.close();
+            deleteProduct(product);
+        });
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+    
+        HorizontalLayout buttonLayout = new HorizontalLayout(editButton, deleteButton);
+        buttonLayout.setSpacing(true);
+        buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+    
+        layout.add(buttonLayout);
+    
+        dialog.add(layout);
+        dialog.open();
+    }    
 
-    private void createInventoryButton() {
-        Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
-        add(addInventoryButton);
-    }
 
-    private void createDeleteInventoryButton() {
-        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
-        add(deleteInventoryButton);
-    }
 
     private void showAddProductDialog() {
         Dialog dialog = new Dialog();
@@ -376,6 +468,46 @@ public class InventoryView extends VerticalLayout {
         dialog.add(inventoryDialogComboBox, deleteButton, closeButton);
         dialog.open();
     }
+
+    private void searchByName() {
+        TextField searchbar = new TextField();
+        searchbar.setPlaceholder("Search Product");
+    
+        Button searchButton = new Button("Search");
+    
+        searchButton.addClickListener(event -> {
+            Inventory inventory = inventoryComboBox.getValue();
+    
+            // Validation: Ensure an inventory is selected
+            if (inventory == null) {
+                Notification.show("Please select an inventory.");
+                return;
+            }
+    
+            String searchText = searchbar.getValue().trim();
+            if (!searchText.isEmpty()) {
+                List<Product> products = productService.getProductsByName(inventory.getId(), searchText);
+                grid.setItems(products);
+            } else {
+                List<Product> products = productService.getProductsByInventory(inventory.getId());
+                grid.setItems(products);
+            }
+        });
+    
+        // Add CSS classes
+        searchbar.addClassName("searchbar");
+        searchButton.addClassName("search-button");
+    
+        // **Align search bar under the inventory selection**
+        HorizontalLayout searchLayout = new HorizontalLayout(searchbar, searchButton);
+        searchLayout.addClassName("search-layout");
+        searchLayout.setWidthFull();
+    
+        // ✅ Now add it **after** the inventory selection layout
+        add(searchLayout);
+    }
+    
+
 
 
     private void updateGrid() {

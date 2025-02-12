@@ -1,0 +1,316 @@
+/* Base styles (for mobile first approach) */
+.header {
+  background-color: #0a3c40;
+  padding: 10px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 4px auto;
+}
+
+.logo {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-bottom: 10px;
+}
+
+vaadin-button {
+  background-color: #0a3c40 !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.inventory-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.filter-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.neutral-button,
+.add-button,
+.delete-inventory-button,
+.log-button {
+  margin-left: 0;
+  margin-bottom: 5px;
+}
+
+/* Tablet styles */
+@media screen and (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 20px;
+  }
+
+  .logo {
+    margin-bottom: 0;
+    font-size: 22px;
+  }
+
+  vaadin-button {
+    width: auto;
+    padding: 8px 16px;
+  }
+
+  .inventory-layout {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .filter-layout {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .neutral-button,
+  .add-button,
+  .delete-inventory-button,
+  .log-button {
+    margin-left: 4px;
+    margin-bottom: 0;
+  }
+}
+
+/* Desktop styles */
+@media screen and (min-width: 1024px) {
+  .header {
+    padding: 10px 40px;
+  }
+
+  .logo {
+    font-size: 24px;
+  }
+
+  vaadin-button {
+    padding: 8px 20px;
+  }
+
+  .inventory-layout {
+    gap: 15px;
+  }
+}
+
+/* Existing styles (unchanged) */
+vaadin-button:hover {
+  background-color: rgb(11, 64, 56) !important;
+}
+
+vaadin-button[disabled] {
+  background-color: rgb(139, 241, 226) !important;
+  color: white !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.inventory-layout vaadin-button {
+  background-color: rgb(139, 241, 226) !important;
+  color: white !important;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.inventory-layout vaadin-button:hover {
+  background-color: rgb(139, 241, 226) !important;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.delete-inventory-button {
+  background-color: #dc3545 !important;
+}
+
+.delete-inventory-button:hover {
+  background-color: #c82333 !important;
+}
+
+.neutral-button {
+  background-color: white !important;
+  border: 2px solid #0a3c40 !important;
+  color: #0a3c40 !important;
+}
+
+.neutral-button.active {
+  background-color: #0a3c40 !important;
+  color: white !important;
+}
+
+.neutral-button:hover {
+  color: white !important;
+  background-color: rgb(11, 64, 56) !important;
+}
+
+.log-button {
+  border: 2px solid white !important;
+  color: white !important;
+  background: transparent !important;
+}
+
+.log-button:hover {
+  background-color: white !important;
+  color: #0a3c40 !important;
+}
+
+.add-button {
+  background-color: rgb(44, 208, 151) !important;
+  border: 2px solid !important;
+  color: white !important;
+}
+
+.add-button:hover {
+  color: white !important;
+  background-color: rgb(37, 163, 119) !important;
+}
+
+/* Add these new styles for the grid and action buttons */
+vaadin-grid {
+  width: 100%;
+  --vaadin-grid-cell-padding: 8px;
+}
+
+/* Ensure the action column stays visible */
+vaadin-grid-column[path="actions"] {
+  flex: 0 0 120px !important;
+  min-width: 120px !important;
+}
+
+/* Make table responsive */
+@media screen and (max-width: 768px) {
+  vaadin-grid {
+    font-size: 14px;
+  }
+
+  /* Adjust cell padding for mobile */
+  vaadin-grid::part(cell) {
+    padding: 8px 4px;
+  }
+
+  /* Hide less important columns on mobile */
+  vaadin-grid-column[path="category"],
+  vaadin-grid-column[path="supplier"] {
+    display: none;
+  }
+
+  /* Make action buttons smaller on mobile */
+  .edit-button,
+  .delete-button {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Ensure action buttons stay visible */
+  vaadin-grid-column[path="actions"] {
+    flex: 0 0 100px !important;
+    min-width: 100px !important;
+  }
+
+  /* Adjust other columns for better mobile display */
+  vaadin-grid-column[path="name"] {
+    flex: 1 1 100px !important;
+    min-width: 100px !important;
+  }
+
+  vaadin-grid-column[path="quantity"],
+  vaadin-grid-column[path="price"],
+  vaadin-grid-column[path="daysUntil"] {
+    flex: 0 0 80px !important;
+    min-width: 80px !important;
+  }
+}
+
+/* Existing button styles remain unchanged */
+
+/* Add these new styles for the clickable rows */
+.inventory-grid .clickable-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inventory-grid .clickable-row:hover {
+  background-color: var(--lumo-contrast-5pct);
+}
+
+/* If you want a more pronounced effect, you can use this instead:
+.inventory-grid .clickable-row:hover {
+    background-color: var(--lumo-primary-color-10pct);
+}
+*/
+
+/* Ensure the hover effect works on touch devices */
+@media (hover: none) {
+  .inventory-grid .clickable-row:active {
+    background-color: var(--lumo-contrast-5pct);
+  }
+}
+
+/* Apply pointer cursor and hover effect to Vaadin Grid rows */
+vaadin-grid::part(clickable-row) {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+vaadin-grid::part(clickable-row):hover {
+  --vaadin-grid-cell-background: rgba(0, 150, 136, 0.2);
+  cursor: pointer;
+}
+
+/* Search bar placement */
+.search-layout {
+  display: flex;
+  justify-content: flex-start; /* Aligns input and button to the left */
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  gap: 8px; /* Space between input and button */
+}
+
+/* Search input field */
+.searchbar {
+  width: 250px;
+}
+
+/* Search button */
+.search-button {
+  background-color: #0a3c40 !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  .search-layout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchbar {
+    width: 100%;
+  }
+}

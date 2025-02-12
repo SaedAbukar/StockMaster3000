@@ -15,6 +15,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // You can add custom queries here if needed
     List<Product> findByInventoryId(Long inventoryId);
 
+    List<Product> findByInventoryIdAndName(Long inventoryId, String name);
+
     List<Product> findByInventoryIdAndAmountOfDaysUntilExpirationLessThan(Long inventoryId, int i);
 
     List<Product> findByInventoryIdAndQuantityLessThan(Long inventoryId, int i);
