@@ -1,6 +1,7 @@
 package org.stockmaster3000.stockmaster3000.views;
 
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
@@ -10,6 +11,7 @@ import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -160,26 +162,77 @@ public class InventoryView extends VerticalLayout {
     
 
     private void createGrid() {
+        grid.addClassName("inventory-grid");
+        grid.setSelectionMode(Grid.SelectionMode.NONE); // Disable row selection
+    
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
         grid.addColumn(Product::getQuantity).setHeader("Quantity").setSortable(true);
         grid.addColumn(Product::getPrice).setHeader("Price").setSortable(true);
         grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration").setSortable(true);
         grid.addColumn(product -> product.getCategory().getName()).setHeader("Category").setSortable(true);
         grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier").setSortable(true);
-
-        // Add buttons for editing and deleting products
-        grid.addComponentColumn(product -> {
-            HorizontalLayout buttons = new HorizontalLayout();
-            Button editButton = new Button("Edit");
-            editButton.addClickListener(e -> showEditProductDialog(product));
-            Button deleteButton = new Button("Delete");
-            deleteButton.addClickListener(e -> deleteProduct(product));
-            buttons.add(editButton, deleteButton);
-            return buttons;
-        });
-
+    
+        // Add a class name to each row for styling
+        grid.setPartNameGenerator(item -> "clickable-row");
+    
+        // Apply hover effect dynamically
+        grid.getElement().executeJs(
+            "this.shadowRoot.querySelectorAll('tr').forEach(row => { " +
+            "    row.style.cursor = 'pointer'; " +
+            "    row.addEventListener('mouseover', () => row.style.backgroundColor = 'rgba(0, 150, 136, 0.1)'); " +
+            "    row.addEventListener('mouseout', () => row.style.backgroundColor = ''); " +
+            "});"
+        );
+    
+        // Make the entire row clickable
+        grid.addItemClickListener(event -> showProductActionsDialog(event.getItem()));
+    
         add(grid);
     }
+    
+    
+    private void showProductActionsDialog(Product product) {
+        Dialog dialog = new Dialog();
+        dialog.setWidth("300px");
+    
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(true);
+        layout.setPadding(true);
+    
+        H2 title = new H2("Product Actions");
+        layout.add(title);
+    
+        // Display product details
+        layout.add(new Span("Name: " + product.getName()));
+        layout.add(new Span("Quantity: " + product.getQuantity()));
+        layout.add(new Span("Price: " + product.getPrice()));
+        layout.add(new Span("Days Until Expiration: " + product.getAmountOfDaysUntilExpiration()));
+        layout.add(new Span("Category: " + product.getCategory().getName()));
+        layout.add(new Span("Supplier: " + product.getSupplier().getName()));
+    
+        Button editButton = new Button("Edit", e -> {
+            dialog.close();
+            showEditProductDialog(product);
+        });
+        editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    
+        Button deleteButton = new Button("Delete", e -> {
+            dialog.close();
+            deleteProduct(product);
+        });
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+    
+        HorizontalLayout buttonLayout = new HorizontalLayout(editButton, deleteButton);
+        buttonLayout.setSpacing(true);
+        buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+    
+        layout.add(buttonLayout);
+    
+        dialog.add(layout);
+        dialog.open();
+    }    
+
+
 
     private void showAddProductDialog() {
         Dialog dialog = new Dialog();
@@ -417,18 +470,20 @@ public class InventoryView extends VerticalLayout {
     }
 
     private void searchByName() {
-        TextField searchbar = new TextField("Search Product");
+        TextField searchbar = new TextField();
+        searchbar.setPlaceholder("Search Product");
+    
         Button searchButton = new Button("Search");
-
+    
         searchButton.addClickListener(event -> {
             Inventory inventory = inventoryComboBox.getValue();
-
-            // Validation: Ensure the inventory is selected
+    
+            // Validation: Ensure an inventory is selected
             if (inventory == null) {
                 Notification.show("Please select an inventory.");
                 return;
             }
-
+    
             String searchText = searchbar.getValue().trim();
             if (!searchText.isEmpty()) {
                 List<Product> products = productService.getProductsByName(inventory.getId(), searchText);
@@ -438,11 +493,20 @@ public class InventoryView extends VerticalLayout {
                 grid.setItems(products);
             }
         });
-
-
+    
+        // Add CSS classes
+        searchbar.addClassName("searchbar");
+        searchButton.addClassName("search-button");
+    
+        // **Align search bar under the inventory selection**
         HorizontalLayout searchLayout = new HorizontalLayout(searchbar, searchButton);
+        searchLayout.addClassName("search-layout");
+        searchLayout.setWidthFull();
+    
+        // ✅ Now add it **after** the inventory selection layout
         add(searchLayout);
     }
+    
 
 
 

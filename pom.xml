@@ -152,6 +152,7 @@
                         <exclude>**/security/**</exclude>
                         <exclude>**/repository/**</exclude>
                         <exclude>**/Stockmaster3000Application.class/**</exclude>
+                        <exclude>**/components/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

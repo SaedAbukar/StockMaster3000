@@ -24,7 +24,7 @@ public class HeaderComponent extends HorizontalLayout {
 
         H1 title = new H1();
         title.addClassName("logo");
-        title.getElement().setProperty("innerHTML", "StockMaster<span>3000</span>");
+        title.setText("StockMaster3000");
 
         HorizontalLayout authSection = new HorizontalLayout();
         authSection.setWidthFull();
