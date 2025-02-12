@@ -39,7 +39,7 @@ public class MainLayout extends VerticalLayout {
         H1 heroTitle = new H1("Manage Your Stocks with Ease");
         Paragraph heroDescription = new Paragraph("Stock Master 3000 provides powerful insights and inventory tracking for your business.");
         Button inventoryButton = new Button("Go to Inventory");
-        inventoryButton.addClickListener(click -> inventoryButton.getUI().ifPresent(ui -> ui.navigate("/inventory")));
+        inventoryButton.addClickListener(click -> inventoryButton.getUI().ifPresent(ui -> ui.navigate("/main")));
 
         heroSection.add(heroTitle, heroDescription, inventoryButton);
         add(heroSection);

@@ -1,13 +1,16 @@
 package org.stockmaster3000.stockmaster3000.components;
 
 import com.vaadin.flow.component.html.Div;
+
+import java.util.Arrays;
+
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 
 @Tag("canvas")
-@JsModule("https://cdn.jsdelivr.net/npm/chart.js")
+@JsModule("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js")
 public class DoughnutChart extends Div {
 
     public DoughnutChart(String[] labels, int[] values) {
@@ -17,6 +20,11 @@ public class DoughnutChart extends Div {
         getElement().getStyle().set("width", "400px");
         getElement().getStyle().set("height", "400px");
 
+        // Initialize the chart
+        initializeChart(labels, values);
+    }
+
+    private void initializeChart(String[] labels, int[] values) {
         JsonArray jsonLabels = Json.createArray();
         JsonArray jsonData = Json.createArray();
 
@@ -29,7 +37,7 @@ public class DoughnutChart extends Div {
                 "const ctx = document.getElementById('doughnutChart').getContext('2d');" +
                 "ctx.canvas.width = 300;" + 
                 "ctx.canvas.height = 300;" + 
-                "new Chart(ctx, {" +
+                "window.doughnutChart = new Chart(ctx, {" + // Store the chart instance in a global variable
                 "  type: 'doughnut'," +
                 "  data: {" +
                 "    labels: $0," +
@@ -53,8 +61,23 @@ public class DoughnutChart extends Div {
                 "}, 100);", jsonLabels, jsonData);
     }
 
-    public void updateChart(String[] productTypes, int[] productCount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateChart'");
+    public void updateChart(String[] labels, int[] values) {
+        System.out.println("Updating chart with labels: " + Arrays.toString(labels) + ", values: " + Arrays.toString(values));
+    
+        JsonArray jsonLabels = Json.createArray();
+        JsonArray jsonData = Json.createArray();
+    
+        for (int i = 0; i < labels.length; i++) {
+            jsonLabels.set(i, labels[i]);
+            jsonData.set(i, values[i]);
+        }
+    
+        getElement().executeJs("setTimeout(() => {" +
+                "if (window.doughnutChart) {" +
+                "  window.doughnutChart.data.labels = $0;" +
+                "  window.doughnutChart.data.datasets[0].data = $1;" +
+                "  window.doughnutChart.update();" + // Update the chart
+                "}" +
+                "}, 100);", jsonLabels, jsonData);
     }
 }
