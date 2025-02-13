@@ -15,7 +15,6 @@ import org.stockmaster3000.stockmaster3000.service.InventoryService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 
 public class InventorySelectorComponent extends VerticalLayout {
@@ -26,6 +25,8 @@ public class InventorySelectorComponent extends VerticalLayout {
     private final SecurityService securityService;
     private Inventory selectedInventory; // Store the selected inventory
 
+    // Component Constructor
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
     public InventorySelectorComponent(SecurityService securityService, InventoryService inventoryService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
@@ -57,6 +58,9 @@ public class InventorySelectorComponent extends VerticalLayout {
         add(inventoryLayout);
     }
 
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Displays the Delete modal for the User to choose which Inventory to Delete
     private void showDeleteInventoryDialog() {
         Dialog dialog = new Dialog();
         ComboBox<Inventory> inventoryDialogComboBox = new ComboBox<>("Select Inventory");
@@ -98,6 +102,7 @@ public class InventorySelectorComponent extends VerticalLayout {
         dialog.open();
     }
 
+    // Displays the Add Inventory modal, for User to add new Inventories
     private void showAddInventoryDialog() {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Inventory Name");
@@ -133,6 +138,7 @@ public class InventorySelectorComponent extends VerticalLayout {
         dialog.open();
     }
 
+    // Loads all of the Inventories under the User's username
     private void refreshInventories() {
         String username = securityService.getAuthenticatedUser().getUsername();
         List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);

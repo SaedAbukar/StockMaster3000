@@ -27,8 +27,6 @@ import java.util.List;
 
 @PermitAll
 public class InventoryComponent extends VerticalLayout {
-
-    private final SecurityService securityService;
     private final InventoryService inventoryService;
     private final ProductService productService;
     private final CategoryService categoryService;
@@ -37,10 +35,14 @@ public class InventoryComponent extends VerticalLayout {
 
     private HorizontalLayout filterLayout;
 
+    private SecurityService securityService;
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
+    private Inventory currentInventory;
 
+    // Component Constructor
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
     public InventoryComponent(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
@@ -54,10 +56,11 @@ public class InventoryComponent extends VerticalLayout {
         searchByName();
         createFilterButtons();
         createGrid();
-        updateGrid(inventorySelectorComponent.getSelectedInventory());
+        updateGrid(currentInventory);
     }
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+    // Creates the Layout for the buttons
     private void createFilterButtons() {
         // Layout for filter buttons
         HorizontalLayout filterButtons = new HorizontalLayout();
@@ -90,6 +93,7 @@ public class InventoryComponent extends VerticalLayout {
         add(filterLayout);
     }
     
+    // Creating individual filter buttons
     private Button createFilterButton(String text, String filter, boolean isActive) {
         Button button = new Button(text);
         button.addClassName("filter-button");
@@ -102,7 +106,7 @@ public class InventoryComponent extends VerticalLayout {
         button.addClickListener(e -> {
             updateActiveButton(button);
             currentFilter = filter;
-            updateGrid(inventorySelectorComponent.getSelectedInventory());
+            updateGrid(currentInventory);
         });
     
         return button;
@@ -126,6 +130,7 @@ public class InventoryComponent extends VerticalLayout {
         selectedButton.removeClassName("neutral-button");
     }
     
+    // Creating the inventory GRID
     private void createGrid() {
         grid.addClassName("inventory-grid");
         grid.setSelectionMode(Grid.SelectionMode.NONE); // Disable row selection
@@ -155,6 +160,7 @@ public class InventoryComponent extends VerticalLayout {
         add(grid);
     }
     
+    // Displaying the modal when the customer clicks on the specific Product row
     private void showProductActionsDialog(Product product) {
         Dialog dialog = new Dialog();
         dialog.setWidth("300px");
@@ -196,6 +202,7 @@ public class InventoryComponent extends VerticalLayout {
         dialog.open();
     }    
 
+    // Displaying the Add Product Modal 
     private void showAddProductDialog() {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Product Name");
@@ -208,7 +215,7 @@ public class InventoryComponent extends VerticalLayout {
         TextField categoryField = new TextField("Category");
 
         // Get selected inventory
-        Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
+        Inventory selectedInventory = currentInventory;
         if (selectedInventory == null) {
             Notification.show("Please select an inventory first");
             return;
@@ -257,9 +264,8 @@ public class InventoryComponent extends VerticalLayout {
                 newProduct.setSupplier(supplier);
                 newProduct.setCategory(category);
 
-
                 productService.addProduct(newProduct);
-                updateGrid(inventorySelectorComponent.getSelectedInventory());
+                updateGrid(currentInventory);
                 dialog.close();
                 Notification.show("Product added successfully");
             } catch (NumberFormatException ex) {
@@ -271,6 +277,7 @@ public class InventoryComponent extends VerticalLayout {
         dialog.open();
     }
 
+    // Displaying the Edit modal
     private void showEditProductDialog(Product product) {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Product Name");
@@ -336,7 +343,7 @@ public class InventoryComponent extends VerticalLayout {
 
                 // Update the product in the database
                 productService.updateProduct(product);
-                updateGrid(inventorySelectorComponent.getSelectedInventory());
+                updateGrid(currentInventory);
                 dialog.close();
                 Notification.show("Product updated successfully");
             } catch (NumberFormatException ex) {
@@ -351,10 +358,11 @@ public class InventoryComponent extends VerticalLayout {
     // Deleting the Product from inventory and updates the grid
     private void deleteProduct(Product product) {
         productService.deleteProduct(product.getId());
-        updateGrid(inventorySelectorComponent.getSelectedInventory());
+        updateGrid(currentInventory);
         Notification.show("Product deleted successfully");
     }
 
+    // Searchbox for searching the Product by Name
     private void searchByName() {
         TextField searchbar = new TextField();
         searchbar.setPlaceholder("Search Product");
@@ -362,9 +370,8 @@ public class InventoryComponent extends VerticalLayout {
         Button searchButton = new Button("Search");
     
         searchButton.addClickListener(event -> {
-            Inventory inventory = inventorySelectorComponent.getSelectedInventory();
+            Inventory inventory = currentInventory;
     
-            // Validation: Ensure an inventory is selected
             if (inventory == null) {
                 Notification.show("Please select an inventory.");
                 return;
@@ -380,22 +387,22 @@ public class InventoryComponent extends VerticalLayout {
             }
         });
     
-        // Add CSS classes
+        // CSS
         searchbar.addClassName("searchbar");
         searchButton.addClassName("search-button");
     
-        // **Align search bar under the inventory selection**
         HorizontalLayout searchLayout = new HorizontalLayout(searchbar, searchButton);
         searchLayout.addClassName("search-layout");
         searchLayout.setWidthFull();
     
-        // ✅ Now add it **after** the inventory selection layout
         add(searchLayout);
     }
 
+    // Updating the grid according to the current Inventory
     public void updateGrid(Inventory selectedInventory) {
+        currentInventory = selectedInventory;
         if (selectedInventory != null) {
-            List<Product> products = getFilteredProducts(currentFilter, selectedInventory);
+            List<Product> products = getFilteredProducts(currentFilter, currentInventory);
             grid.setItems(products);
         } else {
             grid.setItems();

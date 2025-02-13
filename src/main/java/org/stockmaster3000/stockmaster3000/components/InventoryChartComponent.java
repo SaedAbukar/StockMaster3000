@@ -15,6 +15,8 @@ public class InventoryChartComponent extends VerticalLayout {
     private final InventoryService inventoryService;
     private DoughnutChart doughnutChart;
 
+    // Component Constructor
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
     public InventoryChartComponent(SecurityService securityService, ProductService productService, InventoryService inventoryService) {
         this.productService = productService;
         this.inventoryService = inventoryService;
@@ -23,6 +25,8 @@ public class InventoryChartComponent extends VerticalLayout {
         doughnutChart = new DoughnutChart(new String[]{}, new int[]{});
         add(doughnutChart);
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
     public void updateDoughnutChart(Inventory selectedInventory) {
         if (selectedInventory != null) {
