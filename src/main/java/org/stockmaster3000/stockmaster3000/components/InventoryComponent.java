@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.views;
+package org.stockmaster3000.stockmaster3000.components;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -6,7 +6,6 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
 
-import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
@@ -19,76 +18,49 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.notification.Notification;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
-@Route("inventory")
-@PageTitle("Inventory Management")
+
 @PermitAll
-public class InventoryView extends VerticalLayout {
-
-    private final SecurityService securityService;
+public class InventoryComponent extends VerticalLayout {
     private final InventoryService inventoryService;
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
+    private final InventorySelectorComponent inventorySelectorComponent;
 
     private HorizontalLayout filterLayout;
 
+    private SecurityService securityService;
     private Grid<Product> grid = new Grid<>(Product.class, false);
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
+    private Inventory currentInventory;
 
-    public InventoryView(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
+    // Component Constructor
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    public InventoryComponent(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
         this.categoryService = categoryService;
         this.supplierService = supplierService;
 
+        this.inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
+
         addClassName("inventory-view");
-        setSizeFull();
-        add(new HeaderComponent(securityService));
-        createInventorySelector();
         searchByName();
         createFilterButtons();
         createGrid();
-        updateGrid();
+        updateGrid(currentInventory);
     }
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    private void createInventorySelector() {
-        inventoryComboBox = new ComboBox<>("Select Inventory");
-        inventoryComboBox.setItemLabelGenerator(Inventory::getName);
-    
-        String username = getCurrentUsername();
-        List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
-        inventoryComboBox.setItems(inventories);
-    
-        inventoryComboBox.addValueChangeListener(event -> updateGrid());
-    
-        // Creating buttons for adding and deleting inventory
-        Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
-        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
-        deleteInventoryButton.addClassName("delete-inventory-button"); // Apply red style
-        
-    
-        // Creating a layout to align all elements horizontally
-        HorizontalLayout inventoryLayout = new HorizontalLayout(inventoryComboBox, addInventoryButton, deleteInventoryButton);
-        inventoryLayout.setAlignItems(FlexComponent.Alignment.BASELINE); // Align elements properly
-        inventoryLayout.setSpacing(true); // Add spacing between elements
-    
-        add(inventoryLayout);
-    }
-    
-    
-
+    // Creates the Layout for the buttons
     private void createFilterButtons() {
         // Layout for filter buttons
         HorizontalLayout filterButtons = new HorizontalLayout();
@@ -117,11 +89,11 @@ public class InventoryView extends VerticalLayout {
         filterLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN); // Filter buttons left, Add button right
         filterLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         filterLayout.addClassName("filter-layout");
-
     
         add(filterLayout);
     }
     
+    // Creating individual filter buttons
     private Button createFilterButton(String text, String filter, boolean isActive) {
         Button button = new Button(text);
         button.addClassName("filter-button");
@@ -134,7 +106,7 @@ public class InventoryView extends VerticalLayout {
         button.addClickListener(e -> {
             updateActiveButton(button);
             currentFilter = filter;
-            updateGrid();
+            updateGrid(currentInventory);
         });
     
         return button;
@@ -158,9 +130,7 @@ public class InventoryView extends VerticalLayout {
         selectedButton.removeClassName("neutral-button");
     }
     
-    
-    
-
+    // Creating the inventory GRID
     private void createGrid() {
         grid.addClassName("inventory-grid");
         grid.setSelectionMode(Grid.SelectionMode.NONE); // Disable row selection
@@ -190,7 +160,7 @@ public class InventoryView extends VerticalLayout {
         add(grid);
     }
     
-    
+    // Displaying the modal when the customer clicks on the specific Product row
     private void showProductActionsDialog(Product product) {
         Dialog dialog = new Dialog();
         dialog.setWidth("300px");
@@ -232,8 +202,7 @@ public class InventoryView extends VerticalLayout {
         dialog.open();
     }    
 
-
-
+    // Displaying the Add Product Modal 
     private void showAddProductDialog() {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Product Name");
@@ -246,7 +215,7 @@ public class InventoryView extends VerticalLayout {
         TextField categoryField = new TextField("Category");
 
         // Get selected inventory
-        Inventory selectedInventory = inventoryComboBox.getValue();
+        Inventory selectedInventory = currentInventory;
         if (selectedInventory == null) {
             Notification.show("Please select an inventory first");
             return;
@@ -295,9 +264,8 @@ public class InventoryView extends VerticalLayout {
                 newProduct.setSupplier(supplier);
                 newProduct.setCategory(category);
 
-
                 productService.addProduct(newProduct);
-                updateGrid();
+                updateGrid(currentInventory);
                 dialog.close();
                 Notification.show("Product added successfully");
             } catch (NumberFormatException ex) {
@@ -309,7 +277,7 @@ public class InventoryView extends VerticalLayout {
         dialog.open();
     }
 
-
+    // Displaying the Edit modal
     private void showEditProductDialog(Product product) {
         Dialog dialog = new Dialog();
         TextField nameField = new TextField("Product Name");
@@ -375,7 +343,7 @@ public class InventoryView extends VerticalLayout {
 
                 // Update the product in the database
                 productService.updateProduct(product);
-                updateGrid();
+                updateGrid(currentInventory);
                 dialog.close();
                 Notification.show("Product updated successfully");
             } catch (NumberFormatException ex) {
@@ -387,88 +355,14 @@ public class InventoryView extends VerticalLayout {
         dialog.open();
     }
 
-
+    // Deleting the Product from inventory and updates the grid
     private void deleteProduct(Product product) {
         productService.deleteProduct(product.getId());
-        updateGrid();
+        updateGrid(currentInventory);
         Notification.show("Product deleted successfully");
     }
-    private void showAddInventoryDialog() {
-        Dialog dialog = new Dialog();
-        TextField nameField = new TextField("Inventory Name");
 
-        Button saveButton = new Button("Save", e -> {
-            String inventoryName = nameField.getValue();
-
-            // Validation: Ensure the name is not empty
-            if (inventoryName == null || inventoryName.trim().isEmpty()) {
-                Notification.show("Please provide a valid inventory name.");
-                return;
-            }
-
-            try {
-                // Pass the inventory name and the current user to the InventoryService
-                Inventory newInventory = inventoryService.addInventory(inventoryName, securityService.getAuthenticatedUser().getUsername());
-
-                // Update the ComboBox with the new list of inventories
-                inventoryComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
-                inventoryComboBox.setValue(newInventory); // Select the newly created inventory
-
-                dialog.close();
-                Notification.show("Inventory added successfully");
-            } catch (Exception ex) {
-                // Improved error handling with the exception message
-                Notification.show("Error while creating inventory: " + ex.getMessage());
-            }
-        });
-        // Create the Close button
-        Button closeButton = new Button("Close", e -> dialog.close());
-
-        dialog.add(nameField, saveButton, closeButton);
-        dialog.open();
-    }
-
-    private void showDeleteInventoryDialog() {
-        Dialog dialog = new Dialog();
-        ComboBox<Inventory> inventoryDialogComboBox = new ComboBox<>("Select Inventory");
-        inventoryDialogComboBox.setItemLabelGenerator(Inventory::getName);
-
-        String username = getCurrentUsername();
-        List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
-        inventoryDialogComboBox.setItems(inventories);
-
-        Button deleteButton = new Button("Delete", e -> {
-            Inventory inventory = inventoryDialogComboBox.getValue();
-
-            // Validation: Ensure the name is not empty
-            if (inventory == null) {
-                Notification.show("Please select an inventory.");
-                return;
-            }
-
-            try {
-                // Pass the inventory name and the current user to the InventoryService
-                inventoryService.deleteInventory(inventory);
-
-                // Update the ComboBox with the new list of inventories
-                inventoryDialogComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
-                // Update the ComboBox with the new list of inventories
-                inventoryComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
-
-                dialog.close();
-                Notification.show("Inventory deleted successfully");
-            } catch (Exception ex) {
-                // Improved error handling with the exception message
-                Notification.show("Error while deleting inventory: " + ex.getMessage());
-            }
-        });
-        // Create the Close button
-        Button closeButton = new Button("Close", e -> dialog.close());
-
-        dialog.add(inventoryDialogComboBox, deleteButton, closeButton);
-        dialog.open();
-    }
-
+    // Searchbox for searching the Product by Name
     private void searchByName() {
         TextField searchbar = new TextField();
         searchbar.setPlaceholder("Search Product");
@@ -476,9 +370,8 @@ public class InventoryView extends VerticalLayout {
         Button searchButton = new Button("Search");
     
         searchButton.addClickListener(event -> {
-            Inventory inventory = inventoryComboBox.getValue();
+            Inventory inventory = currentInventory;
     
-            // Validation: Ensure an inventory is selected
             if (inventory == null) {
                 Notification.show("Please select an inventory.");
                 return;
@@ -494,26 +387,22 @@ public class InventoryView extends VerticalLayout {
             }
         });
     
-        // Add CSS classes
+        // CSS
         searchbar.addClassName("searchbar");
         searchButton.addClassName("search-button");
     
-        // **Align search bar under the inventory selection**
         HorizontalLayout searchLayout = new HorizontalLayout(searchbar, searchButton);
         searchLayout.addClassName("search-layout");
         searchLayout.setWidthFull();
     
-        // ✅ Now add it **after** the inventory selection layout
         add(searchLayout);
     }
-    
 
-
-
-    private void updateGrid() {
-        Inventory selectedInventory = inventoryComboBox.getValue();
+    // Updating the grid according to the current Inventory
+    public void updateGrid(Inventory selectedInventory) {
+        currentInventory = selectedInventory;
         if (selectedInventory != null) {
-            List<Product> products = getFilteredProducts(currentFilter, selectedInventory);
+            List<Product> products = getFilteredProducts(currentFilter, currentInventory);
             grid.setItems(products);
         } else {
             grid.setItems();
@@ -539,9 +428,5 @@ public class InventoryView extends VerticalLayout {
         }
 
         return filteredProducts;
-    }
-
-    private String getCurrentUsername() {
-        return securityService.getAuthenticatedUser().getUsername();
     }
 }

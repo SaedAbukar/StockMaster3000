@@ -11,8 +11,13 @@ import org.stockmaster3000.stockmaster3000.repository.InventoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.ProductRepository;
 import org.stockmaster3000.stockmaster3000.repository.SupplierRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -22,12 +27,14 @@ public class ProductService {
     private final InventoryRepository inventoryRepository;
     private final CategoryRepository categoryRepository;
 
+
     public ProductService(ProductRepository productRepository, SupplierRepository supplierRepository, InventoryRepository inventoryRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.supplierRepository = supplierRepository;
         this.inventoryRepository = inventoryRepository;
         this.categoryRepository = categoryRepository;
     }
+
 
     // Get all products in a specific inventory
     public List<Product> getProductsByInventory(Long inventoryId) {
@@ -92,4 +99,20 @@ public class ProductService {
     public List<Product> getOutOfStockItems(Long id) {
         return productRepository.findByInventoryIdAndQuantityLessThan(id, 1);
     }
+
+    // Method to fetch product data categorized by inventory
+    public Map<Category, Integer> getProductDataByInventory(Long inventoryId) {
+        List<Product> products = productRepository.findByInventoryId(inventoryId);
+        Map<Category, Integer> productData = new HashMap<>();
+
+        // Loop through products and categorize them by category
+        for (Product product : products) {
+            Category category = product.getCategory();
+            // Update the count of products in this category
+            productData.put(category, productData.getOrDefault(category, 0) + 1);
+        }
+
+        return productData;
+    }
+
 }
