@@ -1,6 +1,8 @@
 package org.stockmaster3000.stockmaster3000.client;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.annotation.security.PermitAll;
+
 import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,6 +13,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Component
+@PermitAll
 public class OpenAIClient {
 
     private static final Dotenv dotenv = Dotenv.load();
@@ -18,31 +21,19 @@ public class OpenAIClient {
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Calling this function would return the nutritions
-    public String generateFoodNutrition(String instructions) throws Exception {
-        // Create the JSON payload
+    public String generateResponse(String prompt) throws Exception {
         Map<String, Object> payload = new HashMap<>();
         payload.put("model", "gpt-4-turbo");
-
-        // Prepare the list of messages (system and user roles)
+        
         List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of(
-            "role", "system",
-            "content", "You are an expert nutritionist. Provide nutrition information in JSON format."
-        ));
-        messages.add(Map.of(
-            "role", "user",
-            "content", instructions
-        ));
-
-        // Add the messages to the payload
+        messages.add(Map.of("role", "system", "content", "You are an expert in inventory and meal planning. This prompt is for my inventory application report so I need you to generate only what I request."));
+        messages.add(Map.of("role", "user", "content", prompt));
+        
         payload.put("messages", messages);
         payload.put("max_tokens", 500);
-
-        // Convert the payload to JSON String
+        
         String requestBody = objectMapper.writeValueAsString(payload);
 
-        // Send the request to OpenAI API
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(API_URL))
             .header("Content-Type", "application/json")
@@ -52,25 +43,56 @@ public class OpenAIClient {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Parse the response to extract only the nutrition information
-        return extractNutritionJson(response.body());
+        
+        return extractContent(response.body());
     }
 
-    private String extractNutritionJson(String apiResponse) throws JsonProcessingException {
-        // Parse the API response to extract the content
+    private String extractContent(String apiResponse) throws JsonProcessingException {
         Map<String, Object> responseMap = objectMapper.readValue(apiResponse, Map.class);
-        
-        // Cast choices to List<Map<String, Object>>
         List<Map<String, Object>> choices = (List<Map<String, Object>>) responseMap.get("choices");
-        
-        // Extract the content from the first choice
-        String content = (String) ((Map<String, Object>) choices.get(0).get("message")).get("content");
-    
-        // Return the content (which should be JSON)
-        return content;
+        return (String) ((Map<String, Object>) choices.get(0).get("message")).get("content");
     }
 
-    // TODO: Create the rest of the logic from ReportService 1 & 2
-    
+    public String generateInventoryPlanningSuggestions(String consumptionHistory, String currentMonth) throws Exception {
+        String prompt = String.format(
+            "Analyse and generate a shopping list for the next 7 days based on the following consumption history: %s. Also, suggest seasonal ingredients for the current month %s.",
+            consumptionHistory, currentMonth
+        );
+        return generateResponse(prompt);
+    }
+
+    public String generateMealPlansFor7Days(String shoppingList) throws Exception {
+        String prompt = String.format(
+            "Generate a meal suggestion plan for the next 7 days based on the following shopping list: %s.",
+            shoppingList
+        );
+        return generateResponse(prompt);
+    }
+
+    public String generateInventoryHealthinessAnalysis(String consumptionHistory) throws Exception {
+        String prompt = String.format(
+            "Analyse the provided inventory food from the past 30 days and write a report based on its healthiness: %s.",
+            consumptionHistory
+        );
+        return generateResponse(prompt);
+    }
+
+    public String generateMealPlanBasedOnInventory(List<Map<String, Object>> currentIngredients) throws Exception {
+        String prompt = String.format(
+            "Generate meal suggestions based on the current ingredients in the fridge and their quantities: %s." + 
+            " Please return in a JSON string without anything extra for example like this: {\n" + //
+                                "  \"mealSuggestions\": [\"Meal 1\", \"Meal 2\", \"Meal 3\"]\n" + //
+                                "}",
+            currentIngredients
+        );
+        return generateResponse(prompt);
+    }
+
+    public String getNutritions(String ingredient) throws Exception {
+        String prompt = String.format(
+            "Generate the nutritions for %s and specificly provide it in this form and only the requested fields without anything extra: { \\\"calories\\\": int, \\\"protein\\\": double, \\\"fat\\\": double, \\\"carbohydrates\\\": double}",
+            ingredient
+        );
+        return generateResponse(prompt);
+    }
 }
