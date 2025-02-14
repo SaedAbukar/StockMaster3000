@@ -14,28 +14,48 @@ public class ReportService {
         this.openAIClient = openAIClient;
     }
 
+    // 1. Generates food ingredients and amount of them suggestions for the next 7 days based on the previous 30 days data 
     public String generateInventoryPlanningSuggestions1(String consumptionHistory, String currentMonth) throws Exception {
         String prompt = String.format(
-            "Generate a shopping list (ingredients and amount to purchase) and meal plan based on your suggested ingredients for the next 7 days based on the following consumption history: %s. Also, suggest seasonal ingredients for the current month %s. Generate the response no longer than the size of 1 A4 paper.",
+            "This prompt is for my inventory application report so I need you to generate only what I request. Analyse and generate a shopping list for the next 7 days based on the following consumption history: %s. Also, suggest seasonal ingredients for the current month %s. Generate the response no longer than the half size of A4 paper.",
             consumptionHistory, currentMonth
         );
-        return openAIClient.generateReport(prompt);
+        return openAIClient.generateFoodNutrition(prompt);
     }
 
-    // TODO: Implement 2 other generations based on the instructions
-    public String generateShoppingList(String consumptionHistory, String currentMonth) throws Exception {
+    // Compining with the above generation - Generates meal plans for the next 7 days based on the suggested shopping list by OpenAi response
+    public String generateMealPlansFor7Days(String shoppingListByGPT) throws Exception {
         String prompt = String.format(
-            "Generate a shopping list for the next 7 days based on the following consumption history: %s. Also, suggest seasonal ingredients for %s.",
-            consumptionHistory, currentMonth
+            "This prompt is for my inventory application report so I need you to generate only what I request. Generate a meal suggestion plan for the next 7 days based on the following shopping list: %s. Generate the response no longer than half the size of A4 paper.",
+            shoppingListByGPT
         );
-        return openAIClient.generateReport(prompt);
+        return openAIClient.generateFoodNutrition(prompt);
     }
 
-    public String generateMealPlan(String ingredients, String currentMonth) throws Exception {
+    // 2. Analyse the past 30 days ingredients healthiness
+    public String generateInventoryHealthinessForThePast30Days(String consumptionHistory) throws Exception {
         String prompt = String.format(
-            "Create a 7-day meal plan using the following ingredients: %s. Include recipes for each meal and consider seasonal ingredients for %s.",
-            ingredients, currentMonth
+            "This prompt is for my inventory application report so I need you to generate only what I request. Analyse the provided inventory food from the past 30 days and write a report according to nutrition score: %s",
+            consumptionHistory
         );
-        return openAIClient.generateReport(prompt);
+        return openAIClient.generateFoodNutrition(prompt);
+    }
+
+    // 3. Generating meal suggestions based on the leftovers or what is currently in the inventory
+    public String generateMealPlan(String currentIngredients) throws Exception {
+        String prompt = String.format(
+            "This prompt is for my inventory application report so I need you to generate only what I request. Generate some meal suggestions based on these current food/leftovers in the fridge and also take into accound the quantity of them: %s.",
+            currentIngredients
+        );
+        return openAIClient.generateFoodNutrition(prompt);
+    }
+
+    // Generates the nutritions for the placed parameter
+    public String generateNutritions(String food) throws Exception {
+        String prompt = String.format(
+            "This prompt is for my inventory application report so I need you to generate only what I request and do not generate anything excess other than the JSON. Generate the nutritions for %s and specificly provide it in this form and only the requested fields: { \"calories\": int, \"protein\": double, \"fat\": double, \"carbohydrates\": double}",
+            food
+        );
+        return openAIClient.generateFoodNutrition(prompt);
     }
 }

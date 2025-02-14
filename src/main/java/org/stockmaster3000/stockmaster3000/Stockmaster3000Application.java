@@ -3,8 +3,12 @@ package org.stockmaster3000.stockmaster3000;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
+
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 
 /**
  * The entry point of the Spring Boot application.
