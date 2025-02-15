@@ -77,12 +77,11 @@ public class OpenAIClient {
         return generateResponse(prompt);
     }
 
-    public String generateMealPlanBasedOnInventory(List<Map<String, Object>> currentIngredients) throws Exception {
+    // 3. Generates the Meal suggestion based on the current inventory ingredients
+    public String generateMealPlanBasedOnCurrentInventoryIngredients(String currentIngredients) throws Exception {
         String prompt = String.format(
-            "Generate meal suggestions based on the current ingredients in the fridge and their quantities: %s." + 
-            " Please return in a JSON string without anything extra for example like this: {\n" + //
-                                "  \"mealSuggestions\": [\"Meal 1\", \"Meal 2\", \"Meal 3\"]\n" + //
-                                "}",
+            "Generate 1-8 meal suggestions based on the current ingredients in the fridge and take into consideration the quantities if the meal is possible to prepare: %s." + 
+            " Please return in a JSON String without anything extra for example like this: '{mealSuggestions: [Meal 1, Meal 2, Meal 3]}'",
             currentIngredients
         );
         return generateResponse(prompt);

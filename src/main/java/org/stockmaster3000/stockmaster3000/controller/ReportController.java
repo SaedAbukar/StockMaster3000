@@ -44,17 +44,17 @@ public class ReportController {
     }
 
 
-    @PostMapping("/generateMeals")
-    public ResponseEntity<String> generateMealPlanBasedOnInventory(@RequestBody List<Map<String, Object>> currentIngredients) throws Exception {
-        String mealSuggestions = client.generateMealPlanBasedOnInventory(currentIngredients);
+    // @PostMapping("/generateMeals")
+    // public ResponseEntity<String> generateMealPlanBasedOnInventory(@RequestBody List<Map<String, Object>> currentIngredients) throws Exception {
+    //     String mealSuggestions = client.generateMealPlanBasedOnInventory(currentIngredients);
 
-        // Log the raw response for debugging
-        System.out.println("Suggested meals based on current ingredients: " + mealSuggestions);
+    //     // Log the raw response for debugging
+    //     System.out.println("Suggested meals based on current ingredients: " + mealSuggestions);
 
-        // Return the JSON response
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)  // Explicitly set the content type
-                .body(mealSuggestions);
-    }
+    //     // Return the JSON response
+    //     return ResponseEntity.ok()
+    //             .contentType(MediaType.APPLICATION_JSON)  // Explicitly set the content type
+    //             .body(mealSuggestions);
+    // }
 
 }
