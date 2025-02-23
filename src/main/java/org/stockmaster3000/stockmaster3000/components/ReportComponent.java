@@ -28,27 +28,44 @@ public class ReportComponent extends VerticalLayout {
         resultTextArea.setReadOnly(true);
 
         // Initializing the buttons
-        Button button1 = new Button("Get shopping list for the next 7 days + meal plan");
+        Button button1 = new Button("Get shopping list for the next 7 days + Meal Plan");
         Button button2 = new Button("Analyze your past 30 days ingredients healthiness!");
         Button button3 = new Button("Generate meal suggestions based on the current fridge ingredients!");
         Button PDFGeneratorButton = new Button("Download as PDF");
 
         // Click listeners for each button
         button1.addClickListener(event -> {
-            Notification.show("Button 1 clicked!");
+            // TODO: Implement the query to the database
+            String currentIngredients = "[{Chicken: 5, Meat: 8, Brocolli: 6}]"; 
+            String currentMonth = "October";
+            try {
+                resultTextArea.setValue("");
+                String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth);
+                resultTextArea.setValue(plan);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         button2.addClickListener(event -> {
-            Notification.show("Button 2 clicked!");
+            // TODO: Implement the query to the database
+            String currentIngredients = "[{Chicken: 5, Meat: 8, Brocolli: 6}]"; 
+            try {
+                resultTextArea.setValue("");
+                String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients);
+                resultTextArea.setValue(analysedInventory);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         button3.addClickListener(event -> {
+            // TODO: Implement the query to the database
             String currentIngredients = "[{Chicken: 5, Meat: 8, Brocolli: 6}]"; 
             try {
                 resultTextArea.setValue("");
                 String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients);
                 resultTextArea.setValue(mealPlan);
-                System.out.println("asdafqsa: " + mealPlan);
             } catch (Exception e) {
                 e.printStackTrace();
             }
