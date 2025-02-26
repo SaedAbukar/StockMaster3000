@@ -119,7 +119,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         if (isUnix()) {
                             sh '''
-                            export OPENAI_API_KEY=$OPENAI_API_KEY
+                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
                             docker-compose -f docker-compose.yml down
                             docker-compose -f docker-compose.yml up -d
                             docker-compose ps
@@ -127,7 +127,7 @@ pipeline {
                             '''
                         } else {
                             bat '''
-                            set OPENAI_API_KEY=%OPENAI_API_KEY%
+                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
                             docker-compose -f docker-compose.yml down
                             docker-compose -f docker-compose.yml up -d
                             docker-compose ps
