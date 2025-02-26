@@ -68,7 +68,6 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
-                    // Inject the OPENAI_API_KEY securely using Jenkins credentials
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                             if (isUnix()) {
@@ -139,7 +138,7 @@ pipeline {
                 }
             }
         }
-
+    }
 
     post {
         success {
