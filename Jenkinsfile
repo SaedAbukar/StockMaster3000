@@ -69,7 +69,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             if (isUnix()) {
                                 sh '''
                                 docker buildx build --platform linux/amd64,linux/arm64 \
