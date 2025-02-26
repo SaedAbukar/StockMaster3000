@@ -20,5 +20,8 @@ COPY --from=build /app/target/*.jar app.jar
 # Expose port 8081 (to match docker-compose.yml)
 EXPOSE 8081
 
+# Set the environment variable OPENAI_API_KEY inside the container
+# ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+
 # Set the entry point to run the JAR file
 ENTRYPOINT ["java", "-jar", "/app.jar"]
