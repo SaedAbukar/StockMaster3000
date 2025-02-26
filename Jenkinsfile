@@ -127,7 +127,7 @@ pipeline {
                             '''
                         } else {
                             bat '''
-                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                            echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
                             docker-compose -f docker-compose.yml down
                             docker-compose -f docker-compose.yml up -d
                             docker-compose ps
