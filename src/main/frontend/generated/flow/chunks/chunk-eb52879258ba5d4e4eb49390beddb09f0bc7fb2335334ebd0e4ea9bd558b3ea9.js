@@ -23,6 +23,7 @@ import 'Frontend/generated/jar-resources/gridConnector.ts';
 import '@vaadin/text-field/theme/lumo/vaadin-text-field.js';
 import '@vaadin/date-picker/theme/lumo/vaadin-date-picker.js';
 import 'Frontend/generated/jar-resources/datepickerConnector.js';
+import '@vaadin/text-area/theme/lumo/vaadin-text-area.js';
 import '@vaadin/tabs/theme/lumo/vaadin-tabs.js';
 import 'Frontend/generated/jar-resources/lit-renderer.ts';
 import '@vaadin/notification/theme/lumo/vaadin-notification.js';
