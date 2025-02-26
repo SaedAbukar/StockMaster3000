@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "ibudaa/stockmaster3000"
+        DOCKER_IMAGE = "viettranni/stockmaster3000"
         DOCKER_TAG = "latest"
     }
 
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'viet2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
@@ -53,7 +53,7 @@ pipeline {
             }
         }
 
-        stage('Enable Docker Buildx') {  // ✅ Moved up before Docker build
+        stage('Enable Docker Buildx') {
             steps {
                 script {
                     if (isUnix()) {
@@ -68,17 +68,21 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        if (isUnix()) {
-                            sh '''
-                            docker buildx build --platform linux/amd64,linux/arm64 \
-                                -t $DOCKER_IMAGE:$DOCKER_TAG --push .
-                            '''
-                        } else {
-                            bat '''
-                            docker buildx build --platform linux/amd64,linux/arm64 ^
-                                -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
-                            '''
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                            if (isUnix()) {
+                                sh '''
+                                docker buildx build --platform linux/amd64,linux/arm64 \
+                                    --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                    -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                                '''
+                            } else {
+                                bat '''
+                                docker buildx build --platform linux/amd64,linux/arm64 ^
+                                    --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                    -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                                '''
+                            }
                         }
                     }
                 }
@@ -112,20 +116,24 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh '''
-                        docker-compose -f docker-compose.yml down
-                        docker-compose -f docker-compose.yml up -d
-                        docker-compose ps
-                        docker-compose logs
-                        '''
-                    } else {
-                        bat '''
-                        docker-compose -f docker-compose.yml down
-                        docker-compose -f docker-compose.yml up -d
-                        docker-compose ps
-                        docker-compose logs
-                        '''
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        if (isUnix()) {
+                            sh '''
+                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                            docker-compose -f docker-compose.yml down
+                            docker-compose -f docker-compose.yml up -d
+                            docker-compose ps
+                            docker-compose logs
+                            '''
+                        } else {
+                            bat '''
+                            echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
+                            docker-compose -f docker-compose.yml down
+                            docker-compose -f docker-compose.yml up -d
+                            docker-compose ps
+                            docker-compose logs
+                            '''
+                        }
                     }
                 }
             }
