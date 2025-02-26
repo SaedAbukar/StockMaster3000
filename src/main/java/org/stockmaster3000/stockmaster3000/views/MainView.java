@@ -1,6 +1,8 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
+import org.stockmaster3000.stockmaster3000.components.DoughnutChart;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
@@ -37,7 +39,7 @@ public class MainView extends VerticalLayout {
         this.client = client;
         
         // Instantiate the reusable components
-        inventoryChartComponent = new InventoryChartComponent(securityService, productService, inventoryService);
+        inventoryChartComponent = new InventoryChartComponent(securityService, productService);
         inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
         headerComponent = new HeaderComponent(securityService);
