@@ -104,22 +104,30 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh '''
-                        docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
-                        docker ps -a
-                        docker logs test-container
-                        docker stop test-container
-                        docker rm test-container
-                        '''
-                    } else {
-                        bat '''
-                        docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
-                        docker ps -a
-                        docker logs test-container
-                        docker stop test-container
-                        docker rm test-container
-                        '''
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        if (isUnix()) {
+                            sh '''
+                            docker run -d --name test-container \
+                                -e OPENAI_API_KEY=$OPENAI_API_KEY \
+                                "$DOCKER_IMAGE:$DOCKER_TAG"
+
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                            '''
+                        } else {
+                            bat '''
+                            docker run -d --name test-container ^
+                                -e OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                "%DOCKER_IMAGE%:%DOCKER_TAG%"
+
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                            '''
+                        }
                     }
                 }
             }
@@ -131,16 +139,15 @@ pipeline {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         if (isUnix()) {
                             sh '''
-                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                            docker-compose -f docker-compose.yml down
-                            docker-compose -f docker-compose.yml up -d
+                            docker-compose down
+                            OPENAI_API_KEY=$OPENAI_API_KEY docker-compose up -d
                             docker-compose ps
                             docker-compose logs
                             '''
                         } else {
                             bat '''
-                            echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
                             docker-compose -f docker-compose.yml down
+                            set OPENAI_API_KEY=%OPENAI_API_KEY%
                             docker-compose -f docker-compose.yml up -d
                             docker-compose ps
                             docker-compose logs
