@@ -117,25 +117,29 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh '''
-                        docker-compose -f docker-compose.yml down
-                        docker-compose -f docker-compose.yml up -d
-                        docker-compose ps
-                        docker-compose logs
-                        '''
-                    } else {
-                        bat '''
-                        docker-compose -f docker-compose.yml down
-                        docker-compose -f docker-compose.yml up -d
-                        docker-compose ps
-                        docker-compose logs
-                        '''
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        if (isUnix()) {
+                            sh '''
+                            export OPENAI_API_KEY=$OPENAI_API_KEY
+                            docker-compose -f docker-compose.yml down
+                            docker-compose -f docker-compose.yml up -d
+                            docker-compose ps
+                            docker-compose logs
+                            '''
+                        } else {
+                            bat '''
+                            set OPENAI_API_KEY=%OPENAI_API_KEY%
+                            docker-compose -f docker-compose.yml down
+                            docker-compose -f docker-compose.yml up -d
+                            docker-compose ps
+                            docker-compose logs
+                            '''
+                        }
                     }
                 }
             }
         }
-    }
+
 
     post {
         success {
