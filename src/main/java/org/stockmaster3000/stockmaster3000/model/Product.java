@@ -12,12 +12,18 @@ import jakarta.persistence.Table;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.AuditTable;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
 @Entity
+@Audited
+@AuditTable(value = "product_AUD")
 @Table(name = "products")
 public class Product {
     @Id
@@ -39,13 +45,16 @@ public class Product {
     // Relationships
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)
+    @Audited(targetAuditMode = NOT_AUDITED)
     private Supplier supplier;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
+    @Audited(targetAuditMode = NOT_AUDITED)
     private Category category;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @Audited(targetAuditMode = NOT_AUDITED)
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 
@@ -141,6 +150,22 @@ public class Product {
 
     public void setInventory(Inventory inventory) {
         this.inventory = inventory;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     // hashCode and equals
