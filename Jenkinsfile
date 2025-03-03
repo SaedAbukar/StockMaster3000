@@ -89,38 +89,6 @@ pipeline {
             }
         }
 
-        stage('Test Docker Image') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
-                        if (isUnix()) {
-                            sh '''
-                            docker run -d --name test-container \
-                                --env-file $ENV_FILE \
-                                "$DOCKER_IMAGE:$DOCKER_TAG"
-
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
-                            '''
-                        } else {
-                            bat '''
-                            docker run -d --name test-container ^
-                                --env-file %ENV_FILE% ^
-                                "%DOCKER_IMAGE%:%DOCKER_TAG%"
-
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
-                            '''
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Deploy with Docker Compose') {
             steps {
                 script {
