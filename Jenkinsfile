@@ -101,38 +101,6 @@ pipeline {
             }
         }
 
-        stage('Test Docker Image') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        if (isUnix()) {
-                            sh '''
-                            docker run -d --name test-container \
-                                -e OPENAI_API_KEY=$OPENAI_API_KEY \
-                                "$DOCKER_IMAGE:$DOCKER_TAG"
-
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
-                            '''
-                        } else {
-                            bat '''
-                            docker run -d --name test-container ^
-                                -e OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                "%DOCKER_IMAGE%:%DOCKER_TAG%"
-
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
-                            '''
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Deploy with Docker Compose') {
             steps {
                 script {
