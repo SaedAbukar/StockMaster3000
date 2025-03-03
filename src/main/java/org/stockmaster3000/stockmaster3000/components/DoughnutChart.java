@@ -1,9 +1,7 @@
 package org.stockmaster3000.stockmaster3000.components;
 
 import com.vaadin.flow.component.html.Div;
-
 import java.util.Arrays;
-
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import elemental.json.Json;
@@ -16,9 +14,9 @@ public class DoughnutChart extends Div {
     public DoughnutChart(String[] labels, int[] values) {
         getElement().setAttribute("id", "doughnutChart");
 
-        // Add inline CSS for width & height
-        getElement().getStyle().set("width", "400px");
-        getElement().getStyle().set("height", "400px");
+        // Increase the size for better visibility
+        getElement().getStyle().set("width", "450px");
+        getElement().getStyle().set("height", "450px");
 
         // Initialize the chart
         initializeChart(labels, values);
@@ -35,27 +33,45 @@ public class DoughnutChart extends Div {
 
         getElement().executeJs("setTimeout(() => {" +
                 "const ctx = document.getElementById('doughnutChart').getContext('2d');" +
-                "ctx.canvas.width = 300;" + 
-                "ctx.canvas.height = 300;" + 
-                "window.doughnutChart = new Chart(ctx, {" + // Store the chart instance in a global variable
+                "ctx.canvas.width = 350;" + 
+                "ctx.canvas.height = 350;" + 
+                "window.doughnutChart = new Chart(ctx, {" + 
                 "  type: 'doughnut'," +
                 "  data: {" +
                 "    labels: $0," +
                 "    datasets: [{" +
-                "      label: 'Product Types'," +
+                "      label: 'Category Distribution'," +
                 "      data: $1," +
-                "      backgroundColor: [\n" + //
-                                        "    '#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#BA68C8', '#FF5722', '#795548',\n" + //
-                                        "    '#E91E63', '#9C27B0', '#2196F3', '#4CAF50', '#FF9800', '#9E9E9E', '#607D8B',\n" + //
-                                        "    '#F44336', '#03A9F4', '#8BC34A', '#FFEB3B', '#FF4081', '#673AB7', '#CDDC39',\n" + //
-                                        "    '#FF5722', '#9C27B0', '#00BCD4', '#FFC107', '#FF9800', '#9E9E9E', '#607D8B'\n" + //
-                                        "]\n" + //
-                                        "" +
+                "      backgroundColor: [" +
+                "        '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#9B59B6', '#1ABC9C', '#F39C12'" +
+                "      ]," +
+                "      hoverOffset: 8" +
                 "    }]" +
                 "  }," +
                 "  options: {" +
                 "    responsive: false," +  
-                "    maintainAspectRatio: false" + 
+                "    maintainAspectRatio: false," +
+                "    plugins: {" +
+                "      legend: {" +
+                "        position: 'top'," +
+                "        labels: {" +
+                "          font: { size: 14 }," +
+                "          color: '#333'" +
+                "        }" +
+                "      }," +
+                "      title: {" +
+                "        display: true," +
+                "        text: 'Food Category Distribution'," +
+                "        font: { size: 18 }," +
+                "        padding: 15" +
+                "      }," +
+                "      tooltip: {" +
+                "        enabled: true," +
+                "        backgroundColor: 'rgba(0, 0, 0, 0.8)'," +
+                "        titleFont: { size: 14 }," +
+                "        bodyFont: { size: 12 }" +
+                "      }" +
+                "    }" +
                 "  }" +
                 "});" +
                 "}, 100);", jsonLabels, jsonData);
@@ -76,7 +92,7 @@ public class DoughnutChart extends Div {
                 "if (window.doughnutChart) {" +
                 "  window.doughnutChart.data.labels = $0;" +
                 "  window.doughnutChart.data.datasets[0].data = $1;" +
-                "  window.doughnutChart.update();" + // Update the chart
+                "  window.doughnutChart.update();" + 
                 "}" +
                 "}, 100);", jsonLabels, jsonData);
     }
