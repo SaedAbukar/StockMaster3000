@@ -21,10 +21,6 @@ services:
   springboot-app:
     image: paveldeg/stockmaster3000:latest  # Your Spring Boot image
     container_name: springboot-app
-    env_file:
-      - .env
-    volumes:
-      - ./.env:/.env
     ports:
       - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
