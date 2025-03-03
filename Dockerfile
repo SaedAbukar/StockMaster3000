@@ -25,3 +25,4 @@ EXPOSE 8081
 
 # Run the application
 CMD ["sh", "-c", "if [ -f /app.jar ]; then java -jar /app.jar; else echo 'ERROR: JAR file missing'; exit 1; fi"]
+ 
