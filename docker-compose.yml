@@ -24,7 +24,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./.env:/app/.env
+      - ./.env:/.env
     ports:
       - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
