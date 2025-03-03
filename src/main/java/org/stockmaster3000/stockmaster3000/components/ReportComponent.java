@@ -8,15 +8,29 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
+import org.stockmaster3000.stockmaster3000.model.Inventory;
+import org.stockmaster3000.stockmaster3000.model.Product;
+import org.stockmaster3000.stockmaster3000.service.ProductLogService;
+import org.stockmaster3000.stockmaster3000.service.ProductService;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 
 public class ReportComponent extends VerticalLayout {
 
     @Autowired
     private OpenAIClient client;
+    private InventorySelectorComponent inventorySelectorComponent;
+    private ProductService productService;
+    private ProductLogService productLogService;
 
-    public ReportComponent(OpenAIClient client) {
+    public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, ProductService productService, ProductLogService productLogService) {
         this.client = client;
+        this.inventorySelectorComponent = inventorySelectorComponent;
+        this.productService = productService;
+        this.productLogService = productLogService;
 
         // Giving the Report tab topic
         H3 topic = new H3("Generate Reports with AI!");
@@ -32,12 +46,20 @@ public class ReportComponent extends VerticalLayout {
         Button button2 = new Button("Analyze your past 30 days ingredients healthiness!");
         Button button3 = new Button("Generate meal suggestions based on the current fridge ingredients!");
         Button PDFGeneratorButton = new Button("Download as PDF");
+        LocalDate date = LocalDate.now();
 
         // Click listeners for each button
         button1.addClickListener(event -> {
             // TODO: Implement the query to the database
-            String currentIngredients = "[{Chicken: 5, Meat: 8, Brocolli: 6}]"; 
-            String currentMonth = "October";
+            Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
+            if (currentInventory == null) {
+                Notification.show("Select an Inventory");
+                return;
+            }
+
+            List<Product> products = productService.getProductsByInventory(currentInventory.getId());
+            String currentIngredients = products.toString();
+            String currentMonth = date.getMonth().toString();
             try {
                 resultTextArea.setValue("");
                 String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth);
@@ -49,7 +71,13 @@ public class ReportComponent extends VerticalLayout {
 
         button2.addClickListener(event -> {
             // TODO: Implement the query to the database
-            String currentIngredients = "[{Chicken: 5, Meat: 8, Brocolli: 6}]"; 
+            Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
+            if (currentInventory == null) {
+                Notification.show("Select an Inventory");
+                return;
+            }
+            List<Map<String, Object>> products = productLogService.getProductDetailsByInventory(currentInventory.getId());
+            String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
                 String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients);
@@ -61,7 +89,13 @@ public class ReportComponent extends VerticalLayout {
 
         button3.addClickListener(event -> {
             // TODO: Implement the query to the database
-            String currentIngredients = "[{Chicken: 5, Meat: 8, Brocolli: 6}]"; 
+            Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
+            if (currentInventory == null) {
+                Notification.show("Select an Inventory");
+                return;
+            }
+            List<Product> products = productService.getProductsByInventory(currentInventory.getId());
+            String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
                 String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients);
