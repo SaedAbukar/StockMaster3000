@@ -1,4 +1,3 @@
-version: "3.8"
 
 services:
   # MariaDB Database
@@ -6,9 +5,9 @@ services:
     image: mariadb:10.5
     container_name: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword # Root password for MariaDB
+      MYSQL_ROOT_PASSWORD: root # Root password for MariaDB
       MYSQL_DATABASE: stockmaster3000 # Database to create
-      MYSQL_USER: ivan # User for the app
+      MYSQL_USER: viet
       MYSQL_PASSWORD: root # User password
     ports:
       - "3307:3306" # Expose MariaDB port (can be used for local testing)
@@ -19,13 +18,13 @@ services:
 
   # Vaadin Spring Boot Application
   springboot-app:
-    image: ibudaa/stockmaster3000:latest # Your Spring Boot image
+    image: viettranni/stockmaster3000:latest # Your Spring Boot image
     container_name: springboot-app
     ports:
       - "8081:8081" # Expose Spring Boot app on port 8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000 # Point to the MariaDB database
-      SPRING_DATASOURCE_USERNAME: ivan # MariaDB username
+      SPRING_DATASOURCE_USERNAME: viet # MariaDB username
       SPRING_DATASOURCE_PASSWORD: root # MariaDB password
     depends_on:
       - mariadb
