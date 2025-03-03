@@ -23,10 +23,11 @@ services:
     container_name: springboot-app
     env_file:
       - .env
+    volumes:
+      - ./.env:/.env
     ports:
       - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
-      SPRING_CONFIG_IMPORT: "optional:file:.env[.properties]"
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000  # Point to the MariaDB database
       SPRING_DATASOURCE_USERNAME: pavel  # MariaDB username
       SPRING_DATASOURCE_PASSWORD: pavel  # MariaDB password
