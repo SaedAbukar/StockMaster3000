@@ -44,7 +44,13 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                bat 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
+                    } else {
+                        bat 'mvn test jacoco:report'
+                    }
+                }
             }
             post {
                 always {
