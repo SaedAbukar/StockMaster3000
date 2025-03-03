@@ -68,18 +68,18 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                    withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                             if (isUnix()) {
                                 sh '''
                                 docker buildx build --platform linux/amd64,linux/arm64 \
-                                    --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                    --secret id=env,src=$ENV_FILE \
                                     -t $DOCKER_IMAGE:$DOCKER_TAG --push .
                                 '''
                             } else {
                                 bat '''
                                 docker buildx build --platform linux/amd64,linux/arm64 ^
-                                    --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                    --secret id=env,src=%ENV_FILE% ^
                                     -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
@@ -92,11 +92,11 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                    withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
                         if (isUnix()) {
                             sh '''
                             docker run -d --name test-container \
-                                -e OPENAI_API_KEY=$OPENAI_API_KEY \
+                                --env-file $ENV_FILE \
                                 "$DOCKER_IMAGE:$DOCKER_TAG"
 
                             docker ps -a
@@ -107,7 +107,7 @@ pipeline {
                         } else {
                             bat '''
                             docker run -d --name test-container ^
-                                -e OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                --env-file %ENV_FILE% ^
                                 "%DOCKER_IMAGE%:%DOCKER_TAG%"
 
                             docker ps -a
@@ -124,19 +124,19 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                    withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
                         if (isUnix()) {
                             sh '''
                             docker-compose down
-                            OPENAI_API_KEY=$OPENAI_API_KEY docker-compose up -d
+                            docker-compose --env-file $ENV_FILE up -d
                             docker-compose ps
                             docker-compose logs
                             '''
                         } else {
                             bat '''
                             docker-compose -f docker-compose.yml down
-                            set OPENAI_API_KEY=%OPENAI_API_KEY%
-                            docker-compose -f docker-compose.yml up -d
+                            set ENV_FILE=%ENV_FILE%
+                            docker-compose -f docker-compose.yml --env-file %ENV_FILE% up -d
                             docker-compose ps
                             docker-compose logs
                             '''
