@@ -41,6 +41,7 @@ pipeline {
             }
         }
 
+
         stage('Test & Coverage') {
             steps {
                 bat 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
@@ -49,8 +50,10 @@ pipeline {
                 always {
                     junit 'target/surefire-reports/*.xml' // Publish JUnit test results
 
+                    // Discover reference build for comparison
                     discoverReferenceBuild()
 
+                    // Record Coverage using Coverage Plugin
                     recordCoverage(
                         tools: [[parser: 'JACOCO']],
                         id: 'jacoco',
