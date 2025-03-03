@@ -24,18 +24,19 @@ services:
     env_file:
       - .env
     volumes:
-      - ./.env:/.env # Mount to container's working directory
+      - ./.env:/.env
     ports:
       - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/stockmaster3000  # Point to the MariaDB database
       SPRING_DATASOURCE_USERNAME: pavel  # MariaDB username
       SPRING_DATASOURCE_PASSWORD: pavel  # MariaDB password
+      OPENAI_API_KEY: ${OPENAI_API_KEY}   # Access the OPENAI_API_KEY from the .env file
     depends_on:
       - mariadb
     networks:
       - my-network
-    restart: unless-stopped # Automatically restart unless stopped manually
+    restart: unless-stopped  # Automatically restart unless stopped manually
 
 # Volumes to persist MariaDB data
 volumes:
