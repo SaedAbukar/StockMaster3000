@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword  # Root password for MariaDB
       MYSQL_DATABASE: stockmaster3000     # Database to create
       MYSQL_USER: pavel                   # User for the app
-      MYSQL_PASSWORD: pavel           # User password
+      MYSQL_PASSWORD: pavel               # User password
     ports:
       - "3307:3306"  # Expose MariaDB port (can be used for local testing)
     volumes:
@@ -22,9 +22,7 @@ services:
     image: paveldeg/stockmaster3000:latest  # Your Spring Boot image
     container_name: springboot-app
     env_file:
-      - .env
-    volumes:
-      - ./.env:/.env
+      - .env  # Use the environment file
     ports:
       - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
