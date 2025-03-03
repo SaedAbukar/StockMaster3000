@@ -41,14 +41,28 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test & Coverage') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'mvn test'
-                    } else {
-                        bat 'mvn test'
-                    }
+                bat 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml' // Publish JUnit test results
+
+                    // Discover reference build for comparison
+                    discoverReferenceBuild()
+
+                    // Record Coverage using Coverage Plugin
+                    recordCoverage(
+                        tools: [[parser: 'JACOCO']],
+                        id: 'jacoco',
+                        name: 'JaCoCo Coverage',
+                        sourceCodeRetention: 'EVERY_BUILD',
+                        qualityGates: [
+                            [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                            [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]
+                        ]
+                    )
                 }
             }
         }
@@ -72,15 +86,15 @@ pipeline {
                         docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                             if (isUnix()) {
                                 sh '''
-                                docker buildx build --platform linux/amd64,linux/arm64 \
-                                    --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                    -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                                    docker buildx build --platform linux/amd64,linux/arm64 \
+                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
                                 '''
                             } else {
                                 bat '''
-                                docker buildx build --platform linux/amd64,linux/arm64 ^
-                                    --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                    -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                                    docker buildx build --platform linux/amd64,linux/arm64 ^
+                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
                         }
@@ -94,19 +108,19 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh '''
-                        docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
-                        docker ps -a
-                        docker logs test-container
-                        docker stop test-container
-                        docker rm test-container
+                            docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
                         '''
                     } else {
                         bat '''
-                        docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
-                        docker ps -a
-                        docker logs test-container
-                        docker stop test-container
-                        docker rm test-container
+                            docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
                         '''
                     }
                 }
@@ -119,19 +133,19 @@ pipeline {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         if (isUnix()) {
                             sh '''
-                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                            docker-compose -f docker-compose.yml down
-                            docker-compose -f docker-compose.yml up -d
-                            docker-compose ps
-                            docker-compose logs
+                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                                docker-compose -f docker-compose.yml down
+                                docker-compose -f docker-compose.yml up -d
+                                docker-compose ps
+                                docker-compose logs
                             '''
                         } else {
                             bat '''
-                            echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
-                            docker-compose -f docker-compose.yml down
-                            docker-compose -f docker-compose.yml up -d
-                            docker-compose ps
-                            docker-compose logs
+                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
+                                docker-compose -f docker-compose.yml down
+                                docker-compose -f docker-compose.yml up -d
+                                docker-compose ps
+                                docker-compose logs
                             '''
                         }
                     }
