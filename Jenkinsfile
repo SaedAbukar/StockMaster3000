@@ -116,16 +116,17 @@ pipeline {
                     withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
                         if (isUnix()) {
                             sh '''
+                            cp $ENV_FILE .env  # Ensure the .env file is placed in the workspace
                             docker-compose down
-                            docker-compose --env-file $ENV_FILE up -d
+                            docker-compose up -d
                             docker-compose ps
                             docker-compose logs
                             '''
                         } else {
                             bat '''
+                            copy %ENV_FILE% .env  # Ensure the .env file is placed in the workspace
                             docker-compose -f docker-compose.yml down
-                            set ENV_FILE=%ENV_FILE%
-                            docker-compose -f docker-compose.yml --env-file %ENV_FILE% up -d
+                            docker-compose -f docker-compose.yml up -d
                             docker-compose ps
                             docker-compose logs
                             '''
