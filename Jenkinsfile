@@ -8,7 +8,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = "ibudaa/stockmaster3000"
         DOCKER_TAG = "latest"
-        WORKDIR = "$WORKSPACE/StockMaster3000" // Adjust workspace for Jenkins
     }
 
     stages {
@@ -26,19 +25,17 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'ibudaa', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    dir(WORKDIR) {
-                        if (isUnix()) {
-                            sh 'mvn clean package -Pproduction -DskipTests'
-                        } else {
-                            bat 'mvn clean package -Pproduction -DskipTests'
-                        }
+                    if (isUnix()) {
+                        sh 'mvn clean package -Pproduction -DskipTests'
+                    } else {
+                        bat 'mvn clean package -Pproduction -DskipTests'
                     }
                 }
             }
@@ -47,12 +44,10 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    dir(WORKDIR) {
-                        if (isUnix()) {
-                            sh 'mvn test'
-                        } else {
-                            bat 'mvn test'
-                        }
+                    if (isUnix()) {
+                        sh 'mvn test'
+                    } else {
+                        bat 'mvn test'
                     }
                 }
             }
@@ -75,20 +70,18 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                            dir(WORKDIR) {
-                                if (isUnix()) {
-                                    sh '''
-                                    docker buildx build --platform linux/amd64 \
-                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
-                                    '''
-                                } else {
-                                    bat '''
-                                    docker buildx build --platform linux/amd64 ^
-                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
-                                    '''
-                                }
+                            if (isUnix()) {
+                                sh '''
+                                docker buildx build --platform linux/amd64,linux/arm64 \
+                                    --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                    -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                                '''
+                            } else {
+                                bat '''
+                                docker buildx build --platform linux/amd64,linux/arm64 ^
+                                    --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                    -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                                '''
                             }
                         }
                     }
@@ -124,24 +117,22 @@ pipeline {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        dir(WORKDIR) {
-                            if (isUnix()) {
-                                sh '''
-                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                                docker-compose --env-file .env -f docker-compose.yml down
-                                docker-compose --env-file .env -f docker-compose.yml up -d
-                                docker-compose ps
-                                docker-compose logs
-                                '''
-                            } else {
-                                bat '''
-                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
-                                docker-compose --env-file .env -f docker-compose.yml down
-                                docker-compose --env-file .env -f docker-compose.yml up -d
-                                docker-compose ps
-                                docker-compose logs
-                                '''
-                            }
+                        if (isUnix()) {
+                            sh '''
+                            echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                            docker-compose -f docker-compose.yml down
+                            docker-compose -f docker-compose.yml up -d
+                            docker-compose ps
+                            docker-compose logs
+                            '''
+                        } else {
+                            bat '''
+                            echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
+                            docker-compose -f docker-compose.yml down
+                            docker-compose -f docker-compose.yml up -d
+                            docker-compose ps
+                            docker-compose logs
+                            '''
                         }
                     }
                 }
@@ -151,10 +142,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build and deployment completed successfully! 🎉'
+            echo 'Build and deployment completed successfully!'
         }
         failure {
-            echo 'Build or deployment failed! ❌'
+            echo 'Build or deployment failed!'
         }
     }
 }
