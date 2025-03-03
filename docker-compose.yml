@@ -19,7 +19,7 @@ services:
   # Vaadin Spring Boot Application
   springboot-app:
     image: viettranni/stockmaster3000:latest # Your Spring Boot image
-    container_name: springboot-app
+    container_name: stockmaster3000_container
     ports:
       - "8081:8081" # Expose Spring Boot app on port 8081
     environment:
