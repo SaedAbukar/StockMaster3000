@@ -8,6 +8,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "ibudaa/stockmaster3000"
         DOCKER_TAG = "latest"
+        WORKDIR = "$WORKSPACE/StockMaster3000/StockMaster3000" // Ensure correct directory
     }
 
     stages {
@@ -25,30 +26,54 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'ibudaa', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh 'mvn clean package -Pproduction -DskipTests'
-                    } else {
-                        bat 'mvn clean package -Pproduction -DskipTests'
+                    dir(WORKDIR) {
+                        if (isUnix()) {
+                            sh 'mvn clean package -Pproduction -DskipTests'
+                        } else {
+                            bat 'mvn clean package -Pproduction -DskipTests'
+                        }
                     }
                 }
             }
         }
 
-        stage('Test') {
+        stage('Test & Coverage') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh 'mvn test'
-                    } else {
-                        bat 'mvn test'
+                    dir(WORKDIR) {
+                        if (isUnix()) {
+                            sh 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
+                        } else {
+                            bat 'mvn test jacoco:report'
+                        }
                     }
+                }
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml' // Publish JUnit test results
+
+                    // Discover reference build for comparison
+                    discoverReferenceBuild()
+
+                    // Record Coverage using Coverage Plugin
+                    recordCoverage(
+                        tools: [[parser: 'JACOCO']],
+                        id: 'jacoco',
+                        name: 'JaCoCo Coverage',
+                        sourceCodeRetention: 'EVERY_BUILD',
+                        qualityGates: [
+                            [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                            [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]
+                        ]
+                    )
                 }
             }
         }
@@ -142,10 +167,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build and deployment completed successfully!'
+            echo '✅ Build and deployment completed successfully! 🎉'
         }
         failure {
-            echo 'Build or deployment failed!'
+            echo '❌ Build or deployment failed!'
         }
     }
 }
