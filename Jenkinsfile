@@ -41,6 +41,7 @@ pipeline {
             }
         }
 
+
         stage('Test & Coverage') {
             steps {
                 script {
@@ -53,7 +54,7 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/*.xml' // Publish JUnit test results
+                    junit 'target/surefire-reports/*.xml' // Publish JUnit test results
 
                     // Discover reference build for comparison
                     discoverReferenceBuild()
@@ -137,10 +138,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build and deployment completed successfully! 🎉'
+            echo 'Build and deployment completed successfully!'
         }
         failure {
-            echo '❌ Build or deployment failed!'
+            echo 'Build or deployment failed!'
         }
     }
 }
