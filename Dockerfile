@@ -1,5 +1,5 @@
 # Stage 1: Build the JAR file using Maven
-FROM --platform=linux/amd64 maven:3.8.8-eclipse-temurin-17 AS build
+FROM maven:3.8.8-eclipse-temurin-17 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN mkdir -p /app/target
 RUN ["/bin/bash", "-c", "mvn clean package -Pproduction -DskipTests"]
 
 # Stage 2: Run the JAR file
-FROM --platform=linux/amd64 eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre
 
 # Copy the JAR file from the build stage
 COPY --from=build /app/target/*.jar /app.jar

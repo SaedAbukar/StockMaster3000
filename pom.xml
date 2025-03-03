@@ -111,6 +111,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>stockmaster3000</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
