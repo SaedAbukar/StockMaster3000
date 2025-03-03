@@ -7,7 +7,6 @@ WORKDIR /app
 # Copy the pom.xml and the src folder to the container
 COPY pom.xml .
 COPY src ./src
-COPY . .
 
 # Run the Maven build to create the JAR file
 RUN mvn clean package -Pproduction -DskipTests
