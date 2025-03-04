@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy the pom.xml and the src folder to the container
 COPY pom.xml .
 COPY src ./src
+COPY .env .env
 
 # Ensure target directory exists before build
 RUN mkdir -p /app/target

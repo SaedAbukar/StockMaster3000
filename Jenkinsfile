@@ -103,29 +103,23 @@ stage('Build & Push Multi-Arch Image') {
 }
 
 
-        stage('Test Docker Image') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh '''
-                            docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
-                        '''
-                    } else {
-                        bat '''
-                            docker run -d --name test-container --env-file .env "%DOCKER_IMAGE%:%DOCKER_TAG%"
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
-                        '''
-                    }
-                }
+stage('Test Docker Image') {
+    steps {
+        script {
+            withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                sh '''
+                    echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                    docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
+                    docker ps -a
+                    docker logs test-container
+                    docker stop test-container
+                    docker rm test-container
+                '''
             }
         }
+    }
+}
+
 
         stage('Deploy with Docker Compose') {
             steps {
