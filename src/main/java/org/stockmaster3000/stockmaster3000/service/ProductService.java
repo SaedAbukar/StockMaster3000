@@ -66,10 +66,18 @@ public class ProductService {
         Category category = categoryRepository.findById(product.getCategory().getId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
+        LocalDateTime firstCreatedAt = product.getCreatedAt();
+
+        if (firstCreatedAt == null) {
+            firstCreatedAt = LocalDateTime.now();
+        }
+
         // Attach managed entities
         product.setInventory(inventory);
         product.setSupplier(supplier);
         product.setCategory(category);
+        product.setCreatedAt(firstCreatedAt);
+        product.setUpdatedAt(LocalDateTime.now());
 
         return productRepository.save(product);
     }

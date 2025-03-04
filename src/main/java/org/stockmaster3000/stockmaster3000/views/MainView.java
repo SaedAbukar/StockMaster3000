@@ -1,24 +1,18 @@
 package org.stockmaster3000.stockmaster3000.views;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
-import org.stockmaster3000.stockmaster3000.components.DoughnutChart;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
 import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
 import org.stockmaster3000.stockmaster3000.components.ReportComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
-import org.stockmaster3000.stockmaster3000.service.CategoryService;
-import org.stockmaster3000.stockmaster3000.service.InventoryService;
-import org.stockmaster3000.stockmaster3000.service.ProductService;
-import org.stockmaster3000.stockmaster3000.service.SupplierService;
+import org.stockmaster3000.stockmaster3000.service.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import jakarta.annotation.security.PermitAll;
 
 @Route("main")
@@ -34,7 +28,7 @@ public class MainView extends VerticalLayout {
 
     public MainView(SecurityService securityService, InventoryService inventoryService, 
                     ProductService productService, CategoryService categoryService, 
-                    SupplierService supplierService, OpenAIClient client) {
+                    SupplierService supplierService, OpenAIClient client, ProductLogService productLogService) {
 
         this.client = client;
         
@@ -43,10 +37,11 @@ public class MainView extends VerticalLayout {
         inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
         headerComponent = new HeaderComponent(securityService);
-        reportComponent = new ReportComponent(client);
+        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService);
 
         // Set to take up all the available space 100%
         setSizeFull();
+        setSpacing(true); // Adds spacing between elements
 
         // Add the header and inventory selector at the top
         add(headerComponent, inventorySelectorComponent);
@@ -54,7 +49,7 @@ public class MainView extends VerticalLayout {
         // Set up inventory selection listener
         inventorySelectorComponent.setSelectionListener(selectedInventory -> {
             inventoryComponent.updateGrid(selectedInventory); // Update InventoryComponent
-            inventoryChartComponent.updateDoughnutChart(selectedInventory); // Update InventoryChartComponent
+            inventoryChartComponent.updateCharts(selectedInventory); // Update ALL charts
         });
 
         // Create tabs
@@ -68,7 +63,12 @@ public class MainView extends VerticalLayout {
         VerticalLayout insightsContent = new VerticalLayout(inventoryChartComponent);
         VerticalLayout reportContent = new VerticalLayout(reportComponent);
 
-        // Initially show the dashboard content and hide the insights content
+        // Add margin and padding for better UI
+        dashboardContent.getStyle().set("padding", "20px");
+        insightsContent.getStyle().set("padding", "20px");
+        reportContent.getStyle().set("padding", "20px");
+
+        // Initially show the dashboard content and hide the insights & reports content
         dashboardContent.setVisible(true);
         insightsContent.setVisible(false);
         reportContent.setVisible(false);
@@ -90,9 +90,9 @@ public class MainView extends VerticalLayout {
                 insightsContent.setVisible(true);
                 reportContent.setVisible(false);
 
-                // Update the chart with the currently selected inventory
+                // Update the charts with the currently selected inventory
                 Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
-                inventoryChartComponent.updateDoughnutChart(selectedInventory);
+                inventoryChartComponent.updateCharts(selectedInventory);
 
             } else if (event.getSelectedTab().equals(tab3)) {
                 // Show report content and hide other content
@@ -103,7 +103,7 @@ public class MainView extends VerticalLayout {
         });
 
         // Add the tabs and content to the layout
-        add(headerComponent, inventorySelectorComponent, tabs, dashboardContent, insightsContent, reportContent);
+        add(tabs, dashboardContent, insightsContent, reportContent);
 
         // Select the default tab
         tabs.setSelectedTab(tab1);

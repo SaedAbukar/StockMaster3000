@@ -15,7 +15,9 @@ import org.stockmaster3000.stockmaster3000.repository.InventoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.ProductRepository;
 import org.stockmaster3000.stockmaster3000.repository.SupplierRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,6 +153,32 @@ class ProductServiceTest {
     }
 
     @Test
+    void testAddProduct_WithNonNullCreatedAt() {
+        // Set the createdAt field to a specific date and time for this test
+        LocalDateTime existingCreatedAt = LocalDateTime.of(2023, 3, 1, 10, 0, 0, 0);
+        product.setCreatedAt(existingCreatedAt);
+
+        // Mock repositories to return existing inventory, supplier, and category
+        when(inventoryRepository.findById(1L)).thenReturn(Optional.of(inventory));
+        when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
+
+        // Call the method to add a product
+        Product savedProduct = productService.addProduct(product);
+
+        // Verify that the createdAt remains the same and is not overwritten
+        assertThat(savedProduct).isNotNull();
+        assertThat(savedProduct.getCreatedAt()).isEqualTo(existingCreatedAt); // Ensure createdAt is not modified
+        assertThat(savedProduct.getUpdatedAt()).isNotNull(); // Ensure updatedAt is set to the current time
+
+        verify(productRepository, times(1)).save(any(Product.class));
+        verify(inventoryRepository, times(1)).findById(1L);
+        verify(supplierRepository, times(1)).findById(1L);
+        verify(categoryRepository, times(1)).findById(1L);
+    }
+
+    @Test
     void testUpdateProduct() {
         // Mock repository to return the updated product
         when(productRepository.save(any(Product.class))).thenReturn(product);
@@ -254,5 +282,18 @@ class ProductServiceTest {
         // Verify the result
         assertThat(result).hasSize(1);
         verify(productRepository, times(1)).findByInventoryIdAndQuantityLessThan(1L, 1);
+    }
+
+    @Test
+    void testGetProductDataByInventory() {
+        // Mock repository to return a list of products associated with an inventory ID
+        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+
+        // Call the method to fetch product data by inventory
+        Map<Category, Integer> result = productService.getProductDataByInventory(1L);
+
+        // Verify the result
+        assertThat(result).isNotEmpty();
+        verify(productRepository, times(1)).findByInventoryId(1L);
     }
 }

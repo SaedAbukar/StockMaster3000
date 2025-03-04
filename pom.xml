@@ -96,6 +96,13 @@
         <artifactId>pdfbox</artifactId>
         <version>2.0.30</version> <!-- Use the latest version -->
     </dependency>
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-envers -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-envers</artifactId>
+            <version>6.6.5.Final</version>
+        </dependency>
+
 
     </dependencies>
     <dependencyManagement>
@@ -168,6 +175,8 @@
                         <exclude>**/views/**</exclude>
                         <exclude>**/security/**</exclude>
                         <exclude>**/repository/**</exclude>
+                        <exclude>**/client/**</exclude>
+                        <exclude>**/service/ProductLogService.class/**</exclude>
                         <exclude>**/Stockmaster3000Application.class/**</exclude>
                         <exclude>**/components/**</exclude>
                     </excludes>

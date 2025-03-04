@@ -9,12 +9,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.hibernate.envers.Audited;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
 @Entity
+@Audited
 @Table(name = "inventories")
 public class Inventory {
     @Id
@@ -28,10 +32,12 @@ public class Inventory {
     private List<Product> products = new ArrayList<>();
 
     @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Audited
     private List<Report> reports = new ArrayList<>();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @Audited(targetAuditMode = NOT_AUDITED)
     private User user;
 
     // Constructor

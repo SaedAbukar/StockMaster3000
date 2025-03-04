@@ -57,7 +57,6 @@ public class InventorySelectorComponent extends VerticalLayout {
         // Add the layout to the component
         add(inventoryLayout);
     }
-
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
     // Displays the Delete modal for the User to choose which Inventory to Delete

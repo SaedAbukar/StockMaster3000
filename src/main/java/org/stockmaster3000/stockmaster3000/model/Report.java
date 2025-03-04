@@ -12,11 +12,13 @@ import java.time.LocalDate;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import java.util.Map;
 import java.util.Objects;
 
 @Entity
+@Audited
 @Table(name = "reports")
 public class Report {
     @Id
