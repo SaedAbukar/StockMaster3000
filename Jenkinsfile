@@ -8,6 +8,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = "viettranni/stockmaster3000"
         DOCKER_TAG = "latest"
+        DOCKER_BIN = '/usr/local/bin/docker'
     }
 
     stages {
@@ -20,6 +21,24 @@ pipeline {
                         env.DOCKER_HOST = 'npipe:////./pipe/docker_engine'
                     }
                 }
+            }
+        }
+
+        stage('Debug Docker') {
+            steps {
+                sh 'echo $PATH'
+                sh 'which docker'
+                sh 'docker --version'
+            }
+        }
+
+        stage('Test Docker') {
+            steps {
+                sh 'whoami'
+                sh 'groups'
+                sh 'ls -l /Users/viettran/.docker/run/docker.sock'
+                sh 'docker --version'
+                sh 'docker ps'
             }
         }
 
@@ -41,31 +60,43 @@ pipeline {
             }
         }
 
-        stage('Build & Push Image') {
+        stage('Test') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
-                            if (isUnix()) {
-                                sh '''
-                                    # Build the Docker image (without buildx)
-                                    docker build --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                        -t $DOCKER_IMAGE:$DOCKER_TAG .
-                                    
-                                    # Push the image to Docker Hub
-                                    docker push $DOCKER_IMAGE:$DOCKER_TAG
-                                '''
-                            } else {
-                                bat '''
-                                    REM Build the Docker image (without buildx)
-                                    docker build --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% .
-                                    
-                                    REM Push the image to Docker Hub
-                                    docker push %DOCKER_IMAGE%:%DOCKER_TAG%
-                                '''
-                            }
-                        }
+                    if (isUnix()) {
+                        sh 'mvn test'
+                    } else {
+                        bat 'mvn test'
+                    }
+                }
+            }
+        }
+
+        stage('Enable Docker Buildx') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'docker buildx create --use'
+                    } else {
+                        bat 'docker buildx create --use'
+                    }
+                }
+            }
+        }
+
+        stage('Build & Push Multi-Arch Image') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                        docker buildx build --platform linux/amd64,linux/arm64 \
+                            -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                        '''
+                    } else {
+                        bat '''
+                        docker buildx build --platform linux/amd64,linux/arm64 ^
+                            -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                        '''
                     }
                 }
             }
@@ -76,19 +107,19 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh '''
-                            docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
+                        docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
+                        docker ps -a
+                        docker logs test-container
+                        docker stop test-container
+                        docker rm test-container
                         '''
                     } else {
                         bat '''
-                            docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
-                            docker ps -a
-                            docker logs test-container
-                            docker stop test-container
-                            docker rm test-container
+                        docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                        docker ps -a
+                        docker logs test-container
+                        docker stop test-container
+                        docker rm test-container
                         '''
                     }
                 }
@@ -98,24 +129,20 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        if (isUnix()) {
-                            sh '''
-                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                                docker-compose -f docker-compose.yml down
-                                docker-compose -f docker-compose.yml up -d
-                                docker-compose ps
-                                docker-compose logs
-                            '''
-                        } else {
-                            bat '''
-                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
-                                docker-compose -f docker-compose.yml down
-                                docker-compose -f docker-compose.yml up -d
-                                docker-compose ps
-                                docker-compose logs
-                            '''
-                        }
+                    if (isUnix()) {
+                        sh '''
+                        docker-compose -f docker-compose.yml down
+                        docker-compose -f docker-compose.yml up -d
+                        docker-compose ps
+                        docker-compose logs
+                        '''
+                    } else {
+                        bat '''
+                        docker-compose -f docker-compose.yml down
+                        docker-compose -f docker-compose.yml up -d
+                        docker-compose ps
+                        docker-compose logs
+                        '''
                     }
                 }
             }
