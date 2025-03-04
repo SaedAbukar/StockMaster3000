@@ -54,7 +54,7 @@ public class Product {
     private Category category;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @Audited(targetAuditMode = NOT_AUDITED)
+    @Audited
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 
@@ -189,4 +189,17 @@ public class Product {
                 Objects.equals(category, product.category) &&
                 Objects.equals(inventory, product.inventory);
     }
+
+    @Override
+    public String toString() {
+        return "name='" + name + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", nutritions=" + nutritions +
+                ", amountOfDaysUntilExpiration=" + amountOfDaysUntilExpiration +
+                ", supplier=" + (supplier != null ? supplier.getName() : "null") +
+                ", category=" + (category != null ? category.getName() : "null") +
+                ", inventory=" + (inventory != null ? inventory.getName() : "null");
+    }
+
 }

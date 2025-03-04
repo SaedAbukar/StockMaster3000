@@ -34,36 +34,8 @@ public class ProductLogService {
 
         List<Object[]> results = auditReader.createQuery()
                 .forRevisionsOfEntity(Product.class, false, true)
-                .add(AuditEntity.property("inventory.id").eq(inventoryId))
+                .add(AuditEntity.property("inventory_id").eq(inventoryId))
                 .add(AuditEntity.revisionProperty("timestamp").ge(thirtyDaysAgoTimestamp))
-                .addProjection(AuditEntity.property("name"))
-                .addProjection(AuditEntity.property("quantity"))
-                .addProjection(AuditEntity.property("price"))
-                .getResultList();
-
-        // Convert the results into Map objects with key-value pairs
-        return results.stream()
-                .map(result -> {
-                    Map<String, Object> productDetails = new HashMap<>();
-                    productDetails.put("name", result[0]);
-                    productDetails.put("quantity", result[1]);
-                    productDetails.put("price", result[2]);
-                    return productDetails;
-                })
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public List<Map<String, Object>> getProductDetailsByTimeSpan(LocalDateTime startTime, LocalDateTime endTime) {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
-
-        long startTimestamp = startTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-        long endTimestamp = endTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-
-        List<Object[]> results = auditReader.createQuery()
-                .forRevisionsOfEntity(Product.class, false, true)
-                .add(AuditEntity.revisionProperty("timestamp").ge(startTimestamp))
-                .add(AuditEntity.revisionProperty("timestamp").le(endTimestamp))
                 .addProjection(AuditEntity.property("name"))
                 .addProjection(AuditEntity.property("quantity"))
                 .addProjection(AuditEntity.property("price"))
@@ -90,7 +62,7 @@ public class ProductLogService {
 
         List<Object[]> results = auditReader.createQuery()
                 .forRevisionsOfEntity(Product.class, false, true)
-                .add(AuditEntity.property("inventory.id").eq(inventoryId))
+                .add(AuditEntity.property("inventory_id").eq(inventoryId))
                 .add(AuditEntity.revisionProperty("timestamp").ge(startTimestamp))
                 .add(AuditEntity.revisionProperty("timestamp").le(endTimestamp))
                 .addProjection(AuditEntity.property("name"))

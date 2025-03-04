@@ -7,10 +7,7 @@ import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
 import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
 import org.stockmaster3000.stockmaster3000.components.ReportComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
-import org.stockmaster3000.stockmaster3000.service.CategoryService;
-import org.stockmaster3000.stockmaster3000.service.InventoryService;
-import org.stockmaster3000.stockmaster3000.service.ProductService;
-import org.stockmaster3000.stockmaster3000.service.SupplierService;
+import org.stockmaster3000.stockmaster3000.service.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -31,7 +28,7 @@ public class MainView extends VerticalLayout {
 
     public MainView(SecurityService securityService, InventoryService inventoryService, 
                     ProductService productService, CategoryService categoryService, 
-                    SupplierService supplierService, OpenAIClient client) {
+                    SupplierService supplierService, OpenAIClient client, ProductLogService productLogService) {
 
         this.client = client;
         
@@ -40,7 +37,7 @@ public class MainView extends VerticalLayout {
         inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
         headerComponent = new HeaderComponent(securityService);
-        reportComponent = new ReportComponent(client);
+        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService);
 
         // Set to take up all the available space 100%
         setSizeFull();
