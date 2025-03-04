@@ -49,8 +49,10 @@ pipeline {
                 always {
                     junit 'target/surefire-reports/*.xml' // Publish JUnit test results
 
+                    // Discover reference build for comparison
                     discoverReferenceBuild()
 
+                    // Record Coverage using Coverage Plugin
                     recordCoverage(
                         tools: [[parser: 'JACOCO']],
                         id: 'jacoco',
@@ -92,8 +94,7 @@ pipeline {
                                 bat '''
                                     docker buildx build --platform linux/amd64,linux/arm64 ^
                                         --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% ^
-                                        --push .
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
                         }
@@ -105,26 +106,22 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        if (isUnix()) {
-                            sh '''
-                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                                docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
-                                docker ps -a
-                                docker logs test-container
-                                docker stop test-container
-                                docker rm test-container
-                            '''
-                        } else {
-                            bat '''
-                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
-                                docker run -d --name test-container --env-file .env "%DOCKER_IMAGE%:%DOCKER_TAG%"
-                                docker ps -a
-                                docker logs test-container
-                                docker stop test-container
-                                docker rm test-container
-                            '''
-                        }
+                    if (isUnix()) {
+                        sh '''
+                            docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                        '''
+                    } else {
+                        bat '''
+                            docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                        '''
                     }
                 }
             }
@@ -137,16 +134,16 @@ pipeline {
                         if (isUnix()) {
                             sh '''
                                 echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                                docker-compose down
-                                docker-compose up -d
+                                docker-compose -f docker-compose.yml down
+                                docker-compose -f docker-compose.yml up -d
                                 docker-compose ps
                                 docker-compose logs
                             '''
                         } else {
                             bat '''
                                 echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
-                                docker-compose down
-                                docker-compose up -d
+                                docker-compose -f docker-compose.yml down
+                                docker-compose -f docker-compose.yml up -d
                                 docker-compose ps
                                 docker-compose logs
                             '''
@@ -155,7 +152,7 @@ pipeline {
                 }
             }
         }
-    } // ✅ Properly closing the "stages" block before "post"
+    }
 
     post {
         success {
