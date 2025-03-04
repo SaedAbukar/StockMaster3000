@@ -22,7 +22,9 @@ services:
     image: paveldeg/stockmaster3000:latest  # Your Spring Boot image
     container_name: springboot-app
     env_file:
-      - .env  # Use the environment file
+      - .env  # Reference the .env file in the same directory as docker-compose.yml
+    volumes:
+      - ./.env:/.env  # Mount to container's working directory
     ports:
       - "8081:8081"  # Expose Spring Boot app on port 8081
     environment:
