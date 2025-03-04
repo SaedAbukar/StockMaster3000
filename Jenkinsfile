@@ -10,6 +10,7 @@ pipeline {
         DOCKER_TAG = "latest"
         DOCKER_BUILDKIT = '1'
         COMPOSE_DOCKER_CLI_BUILD = '1'
+        DOCKER_CLI_EXPERIMENTAL = 'enabled' 
     }
 
     stages {
@@ -47,9 +48,11 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
+                        sh 'docker buildx version'
                         sh 'docker buildx create --use'
                         sh 'docker buildx inspect --bootstrap'
                     } else {
+                        bat 'docker buildx version'
                         bat 'docker buildx create --use'
                     }
                 }
