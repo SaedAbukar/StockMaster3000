@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'pavel2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'pavel', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
@@ -41,7 +41,6 @@ pipeline {
             }
         }
 
-
         stage('Test & Coverage') {
             steps {
                 script {
@@ -56,10 +55,8 @@ pipeline {
                 always {
                     junit 'target/surefire-reports/*.xml' // Publish JUnit test results
 
-                    // Discover reference build for comparison
                     discoverReferenceBuild()
 
-                    // Record Coverage using Coverage Plugin
                     recordCoverage(
                         tools: [[parser: 'JACOCO']],
                         id: 'jacoco',
@@ -104,6 +101,34 @@ pipeline {
                                     -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        if (isUnix()) {
+                            sh '''
+                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                                docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
+                                docker ps -a
+                                docker logs test-container
+                                docker stop test-container
+                                docker rm test-container
+                            '''
+                        } else {
+                            bat '''
+                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
+                                docker run -d --name test-container --env-file .env "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                                docker ps -a
+                                docker logs test-container
+                                docker stop test-container
+                                docker rm test-container
+                            '''
                         }
                     }
                 }
