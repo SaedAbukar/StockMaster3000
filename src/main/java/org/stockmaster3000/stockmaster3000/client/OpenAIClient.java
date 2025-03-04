@@ -16,10 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @PermitAll
 public class OpenAIClient {
 
-    private static final Dotenv dotenv = Dotenv.configure()
-            .directory("C:/Users/Käyttäjä/Desktop/StockMaster3000/StockMaster3000")
-            .filename(".env") // Load the .env file
-            .load();
+    private static final Dotenv dotenv = Dotenv.load();
     private static final String API_KEY = dotenv.get("OPENAI_API_KEY");
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
     private static final ObjectMapper objectMapper = new ObjectMapper();
