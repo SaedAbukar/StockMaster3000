@@ -113,22 +113,22 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         if (isUnix()) {
                             sh '''
-                            cp $ENV_FILE .env  # Ensure the .env file is placed in the workspace
-                            docker-compose down
-                            docker-compose up -d
-                            docker-compose ps
-                            docker-compose logs
+                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                                docker-compose -f docker-compose.yml down
+                                docker-compose -f docker-compose.yml up -d
+                                docker-compose ps
+                                docker-compose logs
                             '''
                         } else {
                             bat '''
-                            copy %ENV_FILE% .env  # Ensure the .env file is placed in the workspace
-                            docker-compose -f docker-compose.yml down
-                            docker-compose -f docker-compose.yml up -d
-                            docker-compose ps
-                            docker-compose logs
+                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
+                                docker-compose -f docker-compose.yml down
+                                docker-compose -f docker-compose.yml up -d
+                                docker-compose ps
+                                docker-compose logs
                             '''
                         }
                     }
