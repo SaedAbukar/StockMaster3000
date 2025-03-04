@@ -59,22 +59,26 @@ pipeline {
             }
         }
 
-        stage('Build & Push Multi-Arch Image') {
+        stage('Build & Push Image') {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             if (isUnix()) {
                                 sh '''
-                                    docker buildx build --platform linux/amd64,linux/arm64 \
-                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                                    # Build and push the image (without buildx)
+                                    docker build --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                        -t $DOCKER_IMAGE:$DOCKER_TAG .
+                                    
+                                    docker push $DOCKER_IMAGE:$DOCKER_TAG
                                 '''
                             } else {
                                 bat '''
-                                    docker buildx build --platform linux/amd64,linux/arm64 ^
-                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                                    REM Build and push the image (without buildx)
+                                    docker build --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% .
+                                    
+                                    docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                                 '''
                             }
                         }
@@ -82,6 +86,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Test Docker Image') {
             steps {
