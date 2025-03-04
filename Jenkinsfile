@@ -29,22 +29,6 @@ pipeline {
             }
         }
 
-        stage('Clean Up Old Containers') {
-            steps {
-                script {
-                    sh 'docker ps -a -q --filter "ancestor=ibudaa/stockmaster3000" | xargs -r docker rm -f'
-                }
-            }
-        }
-
-        stage('Clean Docker Cache') {
-            steps {
-                script {
-                    sh 'docker system prune -af'
-                }
-            }
-        }
-
         stage('Build') {
             steps {
                 script {
