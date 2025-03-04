@@ -48,6 +48,7 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh 'docker buildx create --use'
+                        sh 'docker buildx inspect --bootstrap'
                     } else {
                         bat 'docker buildx create --use'
                     }
