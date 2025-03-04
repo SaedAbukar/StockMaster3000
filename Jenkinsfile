@@ -8,6 +8,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = "viettranni/stockmaster3000"
         DOCKER_TAG = "latest"
+        DOCKER_BUILDKIT = '1'
+        COMPOSE_DOCKER_CLI_BUILD = '1'
+        DOCKER_CLI_EXPERIMENTAL = 'enabled' 
     }
 
     stages {
@@ -41,28 +44,37 @@ pipeline {
             }
         }
 
-        stage('Build & Push Image') {
+        stage('Enable Docker Buildx') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'docker buildx version'
+                        sh 'docker buildx create --use'
+                        sh 'docker buildx inspect --bootstrap'
+                    } else {
+                        bat 'docker buildx version'
+                        bat 'docker buildx create --use'
+                    }
+                }
+            }
+        }
+
+        stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             if (isUnix()) {
                                 sh '''
-                                    # Build the Docker image (without buildx)
-                                    docker build --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                        -t $DOCKER_IMAGE:$DOCKER_TAG .
-                                    
-                                    # Push the image to Docker Hub
-                                    docker push $DOCKER_IMAGE:$DOCKER_TAG
+                                    docker buildx build --platform linux/amd64,linux/arm64 \
+                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
                                 '''
                             } else {
                                 bat '''
-                                    REM Build the Docker image (without buildx)
-                                    docker build --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% .
-                                    
-                                    REM Push the image to Docker Hub
-                                    docker push %DOCKER_IMAGE%:%DOCKER_TAG%
+                                    docker buildx build --platform linux/amd64,linux/arm64 ^
+                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
                         }
