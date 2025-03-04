@@ -44,21 +44,6 @@ pipeline {
             }
         }
 
-        stage('Enable Docker Buildx') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'docker buildx version'
-                        sh 'docker buildx create --use'
-                        sh 'docker buildx inspect --bootstrap'
-                    } else {
-                        bat 'docker buildx version'
-                        bat 'docker buildx create --use'
-                    }
-                }
-            }
-        }
-
         stage('Build & Push Image') {
             steps {
                 script {
@@ -66,18 +51,20 @@ pipeline {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             if (isUnix()) {
                                 sh '''
-                                    # Build and push the image (without buildx)
+                                    # Build the Docker image (without buildx)
                                     docker build --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
                                         -t $DOCKER_IMAGE:$DOCKER_TAG .
                                     
+                                    # Push the image to Docker Hub
                                     docker push $DOCKER_IMAGE:$DOCKER_TAG
                                 '''
                             } else {
                                 bat '''
-                                    REM Build and push the image (without buildx)
+                                    REM Build the Docker image (without buildx)
                                     docker build --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
                                         -t %DOCKER_IMAGE%:%DOCKER_TAG% .
                                     
+                                    REM Push the image to Docker Hub
                                     docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                                 '''
                             }
@@ -86,7 +73,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Test Docker Image') {
             steps {
