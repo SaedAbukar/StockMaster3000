@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "ibudaa/stockmaster3000"
+        DOCKER_IMAGE = "saedabukar/stockmaster3000"
         DOCKER_TAG = "latest"
     }
 
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'saed2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
@@ -41,16 +41,9 @@ pipeline {
             }
         }
 
-
         stage('Test & Coverage') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
-                    } else {
-                        bat 'mvn test jacoco:report'
-                    }
-                }
+                bat 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
             }
             post {
                 always {
@@ -89,22 +82,46 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'env3000', variable: 'ENV_FILE')]) {
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                             if (isUnix()) {
                                 sh '''
-                                docker buildx build --platform linux/amd64,linux/arm64 \
-                                    --secret id=env,src=$ENV_FILE \
-                                    -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                                    docker buildx build --platform linux/amd64,linux/arm64 \
+                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
                                 '''
                             } else {
                                 bat '''
-                                docker buildx build --platform linux/amd64,linux/arm64 ^
-                                    --secret id=env,src=%ENV_FILE% ^
-                                    -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                                    docker buildx build --platform linux/amd64,linux/arm64 ^
+                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                        '''
+                    } else {
+                        bat '''
+                            docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                        '''
                     }
                 }
             }
