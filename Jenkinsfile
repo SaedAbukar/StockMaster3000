@@ -77,49 +77,58 @@ pipeline {
             }
         }
 
-stage('Build & Push Multi-Arch Image') {
-    steps {
-        script {
-            withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                    if (isUnix()) {
-                        sh '''
-                            docker buildx build --platform linux/amd64,linux/arm64 \
-                                --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                -t $DOCKER_IMAGE:$DOCKER_TAG --push .
-                        '''
-                    } else {
-                        bat '''
-                            docker buildx build --platform linux/amd64,linux/arm64 ^
-                                --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                -t %DOCKER_IMAGE%:%DOCKER_TAG% ^
-                                --push .
-                        '''
+        stage('Build & Push Multi-Arch Image') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                            if (isUnix()) {
+                                sh '''
+                                    docker buildx build --platform linux/amd64,linux/arm64 \
+                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
+                                '''
+                            } else {
+                                bat '''
+                                    docker buildx build --platform linux/amd64,linux/arm64 ^
+                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% ^
+                                        --push .
+                                '''
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-}
 
-
-stage('Test Docker Image') {
-    steps {
-        script {
-            withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                sh '''
-                    echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                    docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
-                    docker ps -a
-                    docker logs test-container
-                    docker stop test-container
-                    docker rm test-container
-                '''
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                        if (isUnix()) {
+                            sh '''
+                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
+                                docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
+                                docker ps -a
+                                docker logs test-container
+                                docker stop test-container
+                                docker rm test-container
+                            '''
+                        } else {
+                            bat '''
+                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
+                                docker run -d --name test-container --env-file .env "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                                docker ps -a
+                                docker logs test-container
+                                docker stop test-container
+                                docker rm test-container
+                            '''
+                        }
+                    }
+                }
             }
         }
-    }
-}
-
 
         stage('Deploy with Docker Compose') {
             steps {
@@ -146,7 +155,7 @@ stage('Test Docker Image') {
                 }
             }
         }
-    }  // ✅ Properly closing the "stages" block
+    } // ✅ Properly closing the "stages" block before "post"
 
     post {
         success {
