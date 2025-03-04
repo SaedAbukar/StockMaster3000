@@ -29,6 +29,15 @@ pipeline {
             }
         }
 
+        stage('Pull Latest Image') {
+            steps {
+                script {
+                    sh 'docker pull viettranni/stockmaster3000:latest'
+                }
+            }
+        }
+
+
         stage('Build') {
             steps {
                 script {
