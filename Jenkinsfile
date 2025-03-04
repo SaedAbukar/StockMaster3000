@@ -29,14 +29,21 @@ pipeline {
             }
         }
 
-        stage('Pull Latest Image') {
+        stage('Clean Up Old Containers') {
             steps {
                 script {
-                    sh 'docker pull viettranni/stockmaster3000:latest'
+                    sh 'docker ps -a -q --filter "ancestor=ibudaa/stockmaster3000" | xargs -r docker rm -f'
                 }
             }
         }
 
+        stage('Clean Docker Cache') {
+            steps {
+                script {
+                    sh 'docker system prune -af'
+                }
+            }
+        }
 
         stage('Build') {
             steps {
