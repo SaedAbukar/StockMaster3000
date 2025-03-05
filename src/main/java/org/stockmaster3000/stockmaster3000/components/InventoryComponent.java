@@ -44,8 +44,7 @@ public class InventoryComponent extends VerticalLayout {
     private Inventory currentInventory;
 
     OpenAIClient aiClient = new OpenAIClient();
-
-    private String generatedNutritions = "";
+    
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -10,12 +10,17 @@ import org.stockmaster3000.stockmaster3000.repository.InventoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.CategoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.SupplierRepository;
 import org.stockmaster3000.stockmaster3000.repository.UserRepository;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.stockmaster3000.stockmaster3000.model.Category;
 import org.stockmaster3000.stockmaster3000.model.Supplier;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.model.User;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Map;
 
 
 @DataJpaTest
@@ -64,6 +69,15 @@ public class ProductRepositoryTest {
         inventory.setUser(user);
         inventory = inventoryRepository.save(inventory);
 
+        // Mock Nutrition JSON
+        String mockNutritionsJson = "{"
+        + "\"calories\": 250,"
+        + "\"protein\": 26.0,"
+        + "\"fat\": 15.0,"
+        + "\"carbohydrates\": 0.0"
+        + "}";
+
+
         // Create the product
         product = new Product();
         product.setName("Chocolate");
@@ -73,6 +87,7 @@ public class ProductRepositoryTest {
         product.setSupplier(supplier);
         product.setCategory(category);
         product.setInventory(inventory);
+        product.setNutritions(mockNutritionsJson);
     }
 
     @Test
@@ -93,5 +108,20 @@ public class ProductRepositoryTest {
         // Verify that the supplier is set correctly
         assertNotNull(savedProduct.getSupplier(), "The product should have a supplier set");
         assertEquals("Fazer", savedProduct.getSupplier().getName(), "The supplier name should be 'Fazer'");
+    }
+
+    @Test
+    public void testGetNutritions() {
+        Product savedProduct = productRepository.save(product);
+
+        String expected = savedProduct.getNutritions();
+        String result = "{"
+        + "\"calories\": 250,"
+        + "\"protein\": 26.0,"
+        + "\"fat\": 15.0,"
+        + "\"carbohydrates\": 0.0"
+        + "}";
+
+        assertEquals(expected, result);
     }
 }
