@@ -69,7 +69,7 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,                 -- Name of the product
     price DOUBLE NOT NULL,                      -- Price of the product
     quantity INT NOT NULL,                      -- Quantity of the product
-    nutritions JSON,                            -- JSON data type for storing nutritional values (depends on DB)
+    nutritions TEXT,                            -- TEXT data type for storing nutritional values (depends on DB)
     amountOfDaysUntilExpiration INT,            -- Expiration days for the product
     supplier_id BIGINT NOT NULL,                -- Foreign key for the supplier
     category_id BIGINT NOT NULL,                -- Foreign key for the category

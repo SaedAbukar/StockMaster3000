@@ -6,6 +6,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
 
+import org.aspectj.weaver.SignatureUtils;
+import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
@@ -40,6 +42,10 @@ public class InventoryComponent extends VerticalLayout {
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
     private Inventory currentInventory;
+
+    OpenAIClient aiClient = new OpenAIClient();
+
+    private String generatedNutritions = "";
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -223,10 +229,30 @@ public class InventoryComponent extends VerticalLayout {
 
         Button saveButton = new Button("Save", e -> {
             try {
+                // Fetch nutrition data when the user clicks Save
+                String productName = nameField.getValue().trim();
+                if (productName.isEmpty()) {
+                    Notification.show("Product name cannot be empty");
+                    return;
+                }
+
+                // Fetch the nutrition data based on the user-provided product name
+                String generatedNutritions = "";
+                try {
+                    generatedNutritions = aiClient.getNutritions(productName);
+                    System.out.println("Nutritions for product: " + productName + " is " + generatedNutritions); 
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.err.println("Error fetching nutrition data: " + ex.getMessage());
+                    Notification.show("Error fetching nutrition data.");
+                    return;  // Exit if nutrition data couldn't be fetched
+                }
                 Product newProduct = new Product();
                 newProduct.setName(nameField.getValue());
                 newProduct.setQuantity(Integer.parseInt(quantityField.getValue()));
                 newProduct.setPrice(Double.parseDouble(priceField.getValue()));
+                
+                newProduct.setNutritions(generatedNutritions);
 
                 if (expirationDate.getValue() != null) {
                     long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
