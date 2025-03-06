@@ -52,16 +52,14 @@ INSERT INTO suppliers (name) VALUES ('Fazer'), ('Valio'), ('Rainbow');
 -- Create the Reports table
 CREATE TABLE reports (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,       -- Auto-incrementing primary key
-    start_date DATE,                            -- Start date of the report
-    end_date DATE,                              -- End date of the report
-    summary VARCHAR(255),                       -- Summary of the report
-    summary_data JSON,                          -- JSON column for detailed report data (if supported)
+    summary TEXT NOT NULL,                       -- Summary of the report
     inventory_id BIGINT NOT NULL,               -- Foreign key referencing the inventory
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Track when the report was created
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Track updates
 
     CONSTRAINT fk_reports_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
+
 
 -- Create the Products table
 CREATE TABLE products (

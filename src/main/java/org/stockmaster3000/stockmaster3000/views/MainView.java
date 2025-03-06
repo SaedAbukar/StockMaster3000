@@ -28,7 +28,7 @@ public class MainView extends VerticalLayout {
 
     public MainView(SecurityService securityService, InventoryService inventoryService, 
                     ProductService productService, CategoryService categoryService, 
-                    SupplierService supplierService, OpenAIClient client, ProductLogService productLogService) {
+                    SupplierService supplierService, OpenAIClient client, ProductLogService productLogService, ReportService reportService) {
 
         this.client = client;
         
@@ -37,7 +37,7 @@ public class MainView extends VerticalLayout {
         inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
         headerComponent = new HeaderComponent(securityService);
-        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService);
+        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService, reportService);
 
         // Set to take up all the available space 100%
         setSizeFull();

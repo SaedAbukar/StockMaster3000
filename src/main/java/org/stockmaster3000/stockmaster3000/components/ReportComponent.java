@@ -12,6 +12,7 @@ import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.model.Product;
 import org.stockmaster3000.stockmaster3000.service.ProductLogService;
 import org.stockmaster3000.stockmaster3000.service.ProductService;
+import org.stockmaster3000.stockmaster3000.service.ReportService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,12 +26,14 @@ public class ReportComponent extends VerticalLayout {
     private InventorySelectorComponent inventorySelectorComponent;
     private ProductService productService;
     private ProductLogService productLogService;
+    private ReportService reportService;
 
-    public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, ProductService productService, ProductLogService productLogService) {
+    public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, ProductService productService, ProductLogService productLogService, ReportService reportService) {
         this.client = client;
         this.inventorySelectorComponent = inventorySelectorComponent;
         this.productService = productService;
         this.productLogService = productLogService;
+        this.reportService = reportService;
 
         // Giving the Report tab topic
         H3 topic = new H3("Generate Reports with AI!");
@@ -45,18 +48,17 @@ public class ReportComponent extends VerticalLayout {
         Button button1 = new Button("Get shopping list for the next 7 days + Meal Plan");
         Button button2 = new Button("Analyze your past 30 days ingredients healthiness!");
         Button button3 = new Button("Generate meal suggestions based on the current fridge ingredients!");
-        Button PDFGeneratorButton = new Button("Download as PDF");
         LocalDate date = LocalDate.now();
 
         // Click listeners for each button
         button1.addClickListener(event -> {
-            // TODO: Implement the query to the database
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
                 Notification.show("Select an Inventory");
                 return;
             }
 
+            // Fetching the products from inventory
             List<Product> products = productService.getProductsByInventory(currentInventory.getId());
             String currentIngredients = products.toString();
             String currentMonth = date.getMonth().toString();
@@ -64,31 +66,34 @@ public class ReportComponent extends VerticalLayout {
                 resultTextArea.setValue("");
                 String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth);
                 resultTextArea.setValue(plan);
+                reportService.saveReport(plan, currentInventory);
+                System.out.println("Report saved to the database");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
         button2.addClickListener(event -> {
-            // TODO: Implement the query to the database
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
                 Notification.show("Select an Inventory");
                 return;
             }
+
             List<Map<String, Object>> products = productLogService.getProductDetailsByInventory(currentInventory.getId());
             String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
                 String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients);
                 resultTextArea.setValue(analysedInventory);
+                reportService.saveReport(analysedInventory, currentInventory);
+                System.out.println("Report saved to the database");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
         button3.addClickListener(event -> {
-            // TODO: Implement the query to the database
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
                 Notification.show("Select an Inventory");
@@ -100,23 +105,16 @@ public class ReportComponent extends VerticalLayout {
                 resultTextArea.setValue("");
                 String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients);
                 resultTextArea.setValue(mealPlan);
+                reportService.saveReport(mealPlan, currentInventory);
+                System.out.println("Report saved to the database");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        PDFGeneratorButton.addClickListener(event -> {
-            String getResultTextToSave = resultTextArea.getValue();
-            PDFGenerator.saveTextToPDF(getResultTextToSave, "StockMasterReport.pdf");
-            System.out.println("Saving the Plan: " + getResultTextToSave);
-            String succesfulAnnouncement = "You've downloaded the PDF file to your Download folder!";
-            Notification.show(succesfulAnnouncement);
-        });
-        
 
         // Add buttons to the layout
-        add(topic, button1, button2, button3, resultTextArea, PDFGeneratorButton);
-
+        add(topic, button1, button2, button3, resultTextArea);
 
         setJustifyContentMode(JustifyContentMode.CENTER);
         setSizeFull();
