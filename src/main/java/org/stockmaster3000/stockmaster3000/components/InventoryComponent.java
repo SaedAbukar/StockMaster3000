@@ -44,7 +44,6 @@ public class InventoryComponent extends VerticalLayout {
     private Inventory currentInventory;
 
     OpenAIClient aiClient = new OpenAIClient();
-    
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------

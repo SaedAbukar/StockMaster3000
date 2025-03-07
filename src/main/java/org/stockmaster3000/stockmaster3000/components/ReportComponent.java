@@ -10,6 +10,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.model.Product;
+import org.stockmaster3000.stockmaster3000.model.Report;
+import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.ProductLogService;
 import org.stockmaster3000.stockmaster3000.service.ProductService;
 import org.stockmaster3000.stockmaster3000.service.ReportService;
@@ -23,17 +25,25 @@ public class ReportComponent extends VerticalLayout {
 
     @Autowired
     private OpenAIClient client;
+
     private InventorySelectorComponent inventorySelectorComponent;
     private ProductService productService;
     private ProductLogService productLogService;
     private ReportService reportService;
+    private ReportSelectorComponent reportSelectorComponent;
+    private SecurityService securityService;
 
-    public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, ProductService productService, ProductLogService productLogService, ReportService reportService) {
+    public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, 
+    ProductService productService, ProductLogService productLogService, ReportService reportService, 
+    ReportSelectorComponent reportSelectorComponent, SecurityService securityService) {
+
         this.client = client;
         this.inventorySelectorComponent = inventorySelectorComponent;
+        this.reportSelectorComponent = reportSelectorComponent;
         this.productService = productService;
         this.productLogService = productLogService;
         this.reportService = reportService;
+        this.securityService = securityService;
 
         // Giving the Report tab topic
         H3 topic = new H3("Generate Reports with AI!");
@@ -112,9 +122,29 @@ public class ReportComponent extends VerticalLayout {
             }
         });
 
+        reportSelectorComponent.addClickListener(event -> {
+            Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
+            if (currentInventory == null) {
+                Notification.show("Select an Inventory");
+                return;
+            }
+            Report selectedReport = reportSelectorComponent.getSelectedReport(); 
+            if (selectedReport == null) {
+                Notification.show("Select a valid report");
+                return;
+            }
+            try {
+                resultTextArea.setValue("");
+                String reportDetails = selectedReport.getSummary(); 
+                resultTextArea.setValue(reportDetails);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
 
         // Add buttons to the layout
-        add(topic, button1, button2, button3, resultTextArea);
+        add(topic, button1, button2, button3, reportSelectorComponent, resultTextArea);
 
         setJustifyContentMode(JustifyContentMode.CENTER);
         setSizeFull();
