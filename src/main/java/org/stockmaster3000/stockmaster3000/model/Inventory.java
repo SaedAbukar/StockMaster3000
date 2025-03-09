@@ -32,7 +32,7 @@ public class Inventory {
     private List<Product> products = new ArrayList<>();
 
     @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Audited
+    @Audited(targetAuditMode = NOT_AUDITED)
     private List<Report> reports = new ArrayList<>();
 
     @ManyToOne(optional = false)
