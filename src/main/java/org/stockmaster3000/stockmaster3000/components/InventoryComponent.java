@@ -196,7 +196,7 @@ public class InventoryComponent extends VerticalLayout {
             dialog.close();
             deleteProduct(product);
         });
-        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClassName("close-button");
     
         HorizontalLayout buttonLayout = new HorizontalLayout(editButton, deleteButton);
         buttonLayout.setSpacing(true);
@@ -299,7 +299,21 @@ public class InventoryComponent extends VerticalLayout {
             }
         });
 
-        dialog.add(nameField, quantityField, priceField, expirationDate, supplierField, categoryField, saveButton);
+        // Create a wrapper for the Category field and add spacing after it
+        VerticalLayout categoryWrapper = new VerticalLayout(categoryField);
+        categoryWrapper.setPadding(false);
+        categoryWrapper.getStyle().set("margin-bottom", "15px");
+
+        // Create a layout for form elements
+        VerticalLayout formLayout = new VerticalLayout(nameField, quantityField, priceField, expirationDate, supplierField, categoryWrapper);
+        formLayout.setPadding(false);
+        formLayout.setSpacing(false);
+
+        // Add Save button separately
+        VerticalLayout contentLayout = new VerticalLayout(formLayout, saveButton);
+        contentLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        dialog.add(contentLayout);
         dialog.open();
     }
 
@@ -377,7 +391,22 @@ public class InventoryComponent extends VerticalLayout {
             }
         });
 
-        dialog.add(nameField, quantityField, priceField, expirationDate, supplierField, categoryField, saveButton);
+        // Wrapper for Category field to add bottom spacing
+        VerticalLayout categoryWrapper = new VerticalLayout(categoryField);
+        categoryWrapper.setPadding(false);
+        categoryWrapper.getStyle().set("margin-bottom", "15px");
+
+        // Layout for form fields (no extra spacing between them)
+        VerticalLayout formLayout = new VerticalLayout(nameField, quantityField, priceField, expirationDate, supplierField, categoryWrapper);
+        formLayout.setPadding(false);
+        formLayout.setSpacing(false);
+
+        // Center the Save button
+        VerticalLayout buttonWrapper = new VerticalLayout(saveButton);
+        buttonWrapper.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        // Add everything to dialog
+        dialog.add(formLayout, buttonWrapper);
         dialog.open();
     }
 

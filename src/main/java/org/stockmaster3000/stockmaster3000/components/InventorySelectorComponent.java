@@ -96,8 +96,18 @@ public class InventorySelectorComponent extends VerticalLayout {
         });
         // Create the Close button
         Button closeButton = new Button("Close", e -> dialog.close());
+        closeButton.addClassName("close-button");
 
-        dialog.add(inventoryDialogComboBox, deleteButton, closeButton);
+        // Create a HorizontalLayout for buttons with spacing
+        HorizontalLayout buttonLayout = new HorizontalLayout(deleteButton, closeButton);
+        buttonLayout.setSpacing(true); // Enable spacing between buttons
+        buttonLayout.addClassName("modal-button-layout"); // Custom CSS for fine-tuning
+
+        // Wrap everything in a VerticalLayout
+        VerticalLayout contentLayout = new VerticalLayout(inventoryDialogComboBox, buttonLayout);
+        contentLayout.setSpacing(true); // Add spacing between dropdown and buttons
+
+        dialog.add(contentLayout);
         dialog.open();
     }
 
@@ -130,10 +140,30 @@ public class InventorySelectorComponent extends VerticalLayout {
                 Notification.show("Error while creating inventory: " + ex.getMessage());
             }
         });
+        // add CSS to button
+        saveButton.addClassName("save-button");
+
         // Create the Close button
         Button closeButton = new Button("Close", e -> dialog.close());
 
-        dialog.add(nameField, saveButton, closeButton);
+        // add CSS to button
+        closeButton.addClassName("close-button");
+
+        // Create button layout to place them side by side
+        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, closeButton);
+        buttonLayout.setSpacing(true);  // Enable default spacing between buttons
+        buttonLayout.setPadding(false);
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+
+        // Wrap everything in a VerticalLayout
+        VerticalLayout buttonWrapper = new VerticalLayout(nameField, buttonLayout);
+        buttonWrapper.setSpacing(true);  // Add spacing between input and button section
+        buttonWrapper.setPadding(false);
+        buttonWrapper.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        dialog.add(buttonWrapper);
+
+   
         dialog.open();
     }
 

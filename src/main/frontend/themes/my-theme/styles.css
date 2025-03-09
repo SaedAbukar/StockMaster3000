@@ -33,7 +33,7 @@ vaadin-button {
   background-color: #0a3c40 !important;
   color: white !important;
   font-weight: bold;
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 8px 12px;
   border: none;
   cursor: pointer;
@@ -453,4 +453,48 @@ vaadin-login-submit {
   background: none !important;
   color: #072e30 !important;
   text-decoration: none;
+}
+
+// SAVE AND CLOSE BUTTONS
+
+/* Save Button */
+.save-button {
+  background-color: rgb(7, 182, 195) !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  min-width: 100px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.save-button:hover {
+  background-color: rgb(37, 188, 163) !important;
+}
+
+/* Close Button */
+.close-button {
+  background-color: #c01a1a !important;
+  color: white !important;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  min-width: 100px;
+  text-align: center;
+}
+
+.close-button:hover {
+  background-color: rgb(148, 10, 10) !important;
+}
+
+/* Extra spacing before the Save button */
+.extra-spacing {
+  height: 15px; /* Adjust this value as needed */
 }
