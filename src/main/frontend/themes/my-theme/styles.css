@@ -1,3 +1,12 @@
+body {
+  background-color: white;
+}
+
+.login-view,
+.registration-view {
+  background: linear-gradient(to bottom, #87f4b5, #93cbf1);
+}
+
 /* Base styles (for mobile first approach) */
 .header {
   background-color: #0a3c40;
@@ -51,8 +60,7 @@ vaadin-button {
 
 .neutral-button,
 .add-button,
-.delete-inventory-button,
-.log-button {
+.delete-inventory-button {
   margin-left: 0;
   margin-bottom: 5px;
 }
@@ -87,8 +95,7 @@ vaadin-button {
 
   .neutral-button,
   .add-button,
-  .delete-inventory-button,
-  .log-button {
+  .delete-inventory-button {
     margin-left: 4px;
     margin-bottom: 0;
   }
@@ -313,4 +320,137 @@ vaadin-grid::part(clickable-row):hover {
   .searchbar {
     width: 100%;
   }
+}
+
+// REGISTRATION !!!!!!!!!!!!!!!!!
+
+/* REGISTRATION STYLES */
+
+/* Center the form card */
+vaadin-vertical-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style the text fields */
+vaadin-text-field,
+vaadin-password-field {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Registration Button */
+.register-button {
+  background-color: #0a3c40 !important;
+  color: white !important;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  width: 30%;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.register-button:hover {
+  background-color: #094037 !important;
+}
+
+/* Card container */
+.registration-card {
+  background: white;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+// LOGIN !!!!!!!!!!!!!!!!
+
+/* LOGIN PAGE STYLES */
+
+/* Center and widen the form */
+.login-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wider login form */
+.login-card {
+  background: white;
+  padding: 32px;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* App title */
+.app-title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* Log in & Register buttons - Not too wide */
+vaadin-login-form {
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+vaadin-login-submit {
+  color: white !important;
+}
+
+.signup-button {
+  background: none !important;
+  border: none !important;
+  color: #0a3c40 !important;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 10px;
+}
+
+.signup-button:hover {
+  background: none !important;
+  color: #072e30 !important;
+  text-decoration: none;
+}
+
+/* "Already have an account?" type text */
+.plain-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: black;
+  text-align: center;
+  padding: 0px;
+}
+
+// text-button (for login/signup buttons)
+
+.text-button {
+  background: none !important;
+  border: none !important;
+  color: #0a3c40 !important;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 10px;
+  display: block;
+  margin: 0 auto;
+}
+
+.text-button:hover {
+  background: none !important;
+  color: #072e30 !important;
+  text-decoration: none;
 }
