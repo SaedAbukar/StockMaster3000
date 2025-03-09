@@ -81,14 +81,14 @@ CREATE TABLE products (
     CONSTRAINT fk_products_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
 
--- Drop the user account 'viet' if it exists
-DROP USER IF EXISTS 'viet'@'localhost';
+-- Drop the user account 'ivan' if it exists
+DROP USER IF EXISTS 'ivan'@'localhost';
 
--- Create the 'viet' account with a secure password
-CREATE USER 'viet'@'localhost' IDENTIFIED BY 'root';
+-- Create the 'ivan' account with a secure password
+CREATE USER 'ivan'@'localhost' IDENTIFIED BY 'root';
 
--- Grant appropriate privileges to 'viet'
-GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'viet'@'localhost';
+-- Grant appropriate privileges to 'ivan'
+GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'ivan'@'localhost';
 
 -- Flush privileges to apply the changes
 FLUSH PRIVILEGES;
