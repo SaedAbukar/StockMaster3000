@@ -11,15 +11,18 @@ import org.stockmaster3000.stockmaster3000.repository.ReportRepository;
 public class ReportService {
     private final ReportRepository reportRepository;
 
+    // ReportService constructor
     public ReportService(ReportRepository reportRepository) {
         this.reportRepository = reportRepository;
     }
 
+    // Placing the parameters into new Report Object and saving it to reports
     public Report saveReport(String summary, Inventory inventory) {
         Report report = new Report(summary, inventory);
         return reportRepository.save(report);
     }
 
+    // Fetching Reports by Inventory Id
     public List<Report> getReportsByInventoryId(Long inventoryId) {
         return reportRepository.getReportsByInventoryId(inventoryId);
     }

@@ -142,6 +142,7 @@ public class InventoryComponent extends VerticalLayout {
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
         grid.addColumn(Product::getQuantity).setHeader("Quantity").setSortable(true);
         grid.addColumn(Product::getPrice).setHeader("Price").setSortable(true);
+        grid.addColumn(Product::getNutritions).setHeader("Nutritions").setSortable(true);
         grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration").setSortable(true);
         grid.addColumn(product -> product.getCategory().getName()).setHeader("Category").setSortable(true);
         grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier").setSortable(true);
@@ -180,6 +181,7 @@ public class InventoryComponent extends VerticalLayout {
         layout.add(new Span("Name: " + product.getName()));
         layout.add(new Span("Quantity: " + product.getQuantity()));
         layout.add(new Span("Price: " + product.getPrice()));
+        layout.add(new Span("Nutritions: " + product.getNutritions()));
         layout.add(new Span("Days Until Expiration: " + product.getAmountOfDaysUntilExpiration()));
         layout.add(new Span("Category: " + product.getCategory().getName()));
         layout.add(new Span("Supplier: " + product.getSupplier().getName()));
@@ -238,7 +240,7 @@ public class InventoryComponent extends VerticalLayout {
                 String generatedNutritions = "";
                 try {
                     generatedNutritions = aiClient.getNutritions(productName);
-                    System.out.println("Nutritions for product: " + productName + " is " + generatedNutritions); 
+                    System.out.println("Nutritions for " + productName + ": " + generatedNutritions); 
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     System.err.println("Error fetching nutrition data: " + ex.getMessage());

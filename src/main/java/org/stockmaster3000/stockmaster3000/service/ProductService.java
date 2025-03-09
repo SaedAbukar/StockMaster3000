@@ -27,7 +27,7 @@ public class ProductService {
     private final InventoryRepository inventoryRepository;
     private final CategoryRepository categoryRepository;
 
-
+    // ProductService constructor
     public ProductService(ProductRepository productRepository, SupplierRepository supplierRepository, InventoryRepository inventoryRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.supplierRepository = supplierRepository;
@@ -41,6 +41,7 @@ public class ProductService {
         return productRepository.findByInventoryId(inventoryId);
     }
 
+    // Fetching Product by Name
     public List<Product> getProductsByName(Long inventoryId, String productName) {
         if (productName != null && !productName.isEmpty()) {
             return productRepository.findByInventoryIdAndName(inventoryId, productName);
@@ -103,7 +104,7 @@ public class ProductService {
         return productRepository.findByInventoryIdAndQuantityLessThan(inventoryId, 5);
     }
 
-
+    // Get products that are out of stock (e.g., less than 1 units)
     public List<Product> getOutOfStockItems(Long id) {
         return productRepository.findByInventoryIdAndQuantityLessThan(id, 1);
     }

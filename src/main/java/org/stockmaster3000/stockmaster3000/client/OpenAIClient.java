@@ -48,6 +48,7 @@ public class OpenAIClient {
         throw new RuntimeException("❌ ERROR: OPENAI_API_KEY not found in any expected .env locations.");
     }
 
+    // Every other method query calls this method at the end for generating the respond to API
     public String generateResponse(String prompt) throws Exception {
         Map<String, Object> payload = new HashMap<>();
         payload.put("model", "gpt-4-turbo");
@@ -80,6 +81,7 @@ public class OpenAIClient {
         return (String) ((Map<String, Object>) choices.get(0).get("message")).get("content");
     }
 
+    // Instructions for generating Invnetory Planning Suggestions & Meal Plans
     public String generateInventoryPlanningSuggestionsAndMealPlans(String consumptionHistory, String currentMonth) throws Exception {
         String prompt = String.format(
             "Analyse and generate a shopping list for the next 7 days based on the following consumption history: %s. Also, suggest seasonal ingredients for the current month %s and Generate the Meal Plan suggestion based on the ingredients you provided." + 
@@ -89,6 +91,7 @@ public class OpenAIClient {
         return generateResponse(prompt);
     }
 
+    // Instructions for Analysing Inventory Healthiness
     public String generateInventoryHealthinessAnalysis(String consumptionHistory) throws Exception {
         String prompt = String.format(
             "Analyse the provided inventory food from the past 30 days and write a report based on its healthiness: %s. Your job is to return only the analysis part and conclusion, do not generate anything extra and no need to add # and ** marks since it will show raw on the report.",
@@ -97,6 +100,7 @@ public class OpenAIClient {
         return generateResponse(prompt);
     }
 
+    // Instructions for generating Food suggestions based on the current inventory products
     public String generateMealPlanBasedOnCurrentInventoryIngredients(String currentIngredients) throws Exception {
         String prompt = String.format(
             "Generate 1-8 meal suggestions based on the current ingredients in the fridge and take into consideration the quantities if the meal is possible to prepare: %s." +
@@ -106,9 +110,10 @@ public class OpenAIClient {
         return generateResponse(prompt);
     }
 
+    // Generates the Nutritions upon product creation
     public String getNutritions(String ingredient) throws Exception {
         String prompt = String.format(
-            "Generate the nutrition for %s and specifically provide it in this form and only the requested fields without anything extra: { \\\"calories\\\": int, \\\"protein\\\": double, \\\"fat\\\": double, \\\"carbohydrates\\\": double}",
+            "Generate the nutrition for %s and specifically provide it in this form and only the requested fields without anything extra: Calories: int, Protein: double, Fat: double, Carbohydrates: double",
             ingredient
         );
         return generateResponse(prompt);

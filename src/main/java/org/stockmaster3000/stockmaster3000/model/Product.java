@@ -36,7 +36,7 @@ public class Product {
 
     private Integer quantity;
 
-    @Column(name = "nutritions", columnDefinition = "json", nullable = true)
+    @Column(name = "nutritions", columnDefinition = "LONGTEXT", nullable = true)
     @Type(JsonType.class)
     private String nutritions;
 

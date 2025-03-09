@@ -20,10 +20,12 @@ public class ProductLogService {
 
     private final EntityManager entityManager;
 
+    // ProductLogService constructor
     public ProductLogService(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
+    // Fetching Product Details by Inventory Id
     @Transactional
     public List<Map<String, Object>> getProductDetailsByInventory(Long inventoryId) {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -39,6 +41,7 @@ public class ProductLogService {
                 .addProjection(AuditEntity.property("name"))
                 .addProjection(AuditEntity.property("quantity"))
                 .addProjection(AuditEntity.property("price"))
+                .addProjection(AuditEntity.property("summary"))
                 .getResultList();
 
         // Convert the results into Map objects with key-value pairs
@@ -48,11 +51,13 @@ public class ProductLogService {
                     productDetails.put("name", result[0]);
                     productDetails.put("quantity", result[1]);
                     productDetails.put("price", result[2]);
+                    productDetails.put("summary", result[3]);
                     return productDetails;
                 })
                 .collect(Collectors.toList());
     }
 
+    // Fetching the Product Details by Inventory and TimeSpan
     @Transactional
     public List<Map<String, Object>> getProductDetailsByInventoryAndTimeSpan(Long inventoryId, LocalDateTime startTime, LocalDateTime endTime) {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);

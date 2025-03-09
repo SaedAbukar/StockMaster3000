@@ -15,6 +15,7 @@ public class InventoryService {
     private final UserRepository userRepository;
     private final InventoryRepository inventoryRepository;
 
+    // InventoryService Constructor
     public InventoryService(UserRepository userRepository, InventoryRepository inventoryRepository) {
         this.userRepository = userRepository;
         this.inventoryRepository = inventoryRepository;
@@ -56,6 +57,7 @@ public class InventoryService {
         inventoryRepository.deleteById(inventoryId);
     }
 
+    // Deleting the invnetory by Inventory object
     public void deleteInventory(Inventory inventory) {
         inventoryRepository.delete(inventory);
     }
@@ -70,6 +72,7 @@ public class InventoryService {
                 .toList();
     }
 
+    // Finding inventory by ID
     public Optional<Inventory> findById(Long id) {
         return inventoryRepository.findById(id);
     }
