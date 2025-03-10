@@ -149,8 +149,6 @@ mysql -u your_db_username -p -h localhost -P 3306
 
 - If the build fails, try running `mvn clean` and then `mvn install -Pproduction` to resolve any build issues.
 
-```
-
 ---
 ## **Problem Statement**
 We assume that peoples often struggle to keep track of the items in their refrigerator and pantry, leading to food waste, overspending,
