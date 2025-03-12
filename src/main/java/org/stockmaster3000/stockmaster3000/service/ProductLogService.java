@@ -41,7 +41,6 @@ public class ProductLogService {
                 .addProjection(AuditEntity.property("name"))
                 .addProjection(AuditEntity.property("quantity"))
                 .addProjection(AuditEntity.property("price"))
-                .addProjection(AuditEntity.property("summary"))
                 .getResultList();
 
         // Convert the results into Map objects with key-value pairs
@@ -51,7 +50,6 @@ public class ProductLogService {
                     productDetails.put("name", result[0]);
                     productDetails.put("quantity", result[1]);
                     productDetails.put("price", result[2]);
-                    productDetails.put("summary", result[3]);
                     return productDetails;
                 })
                 .collect(Collectors.toList());
