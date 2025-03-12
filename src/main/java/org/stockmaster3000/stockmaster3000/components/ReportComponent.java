@@ -129,10 +129,6 @@ public class ReportComponent extends VerticalLayout {
                 return;
             }
             Report selectedReport = reportSelectorComponent.getSelectedReport(); 
-            if (selectedReport == null) {
-                Notification.show("Select a valid report");
-                return;
-            }
             try {
                 resultTextArea.setValue("");
                 String reportDetails = selectedReport.getSummary(); 
