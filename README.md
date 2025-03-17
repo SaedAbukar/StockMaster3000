@@ -11,6 +11,11 @@ Before running this application, ensure you have the following installed:
 - **MariaDB** (for database functionality)
 - **OpenAI API Key** (for integration with OpenAI API)
 - **Docker** (optional for Docker Compose)
+- **Jenkins** (optional)
+
+Here is visualisation of required development environment for our project:
+
+![Development environment](deliverables/StructureDiagrams/DevelopmentEnvironmentDiagram.png)
 
 ### Installing MariaDB
 If you don't have MariaDB installed, you can install it using the following instructions based on your operating system:
@@ -198,3 +203,18 @@ Our vision is to simplify the way people manage and understand their food consum
 inventory tracking with actionable insights, StockMaster3000 empowers users to make healthier, more sustainable,
 and cost-effective food choices. We aim to reduce food waste and foster smarter shopping habits
 for a better tomorrow.
+
+---
+## **Overview Of Project structure**
+
+1. **Package Diagram**
+
+![Picture of Packages](deliverables/StructureDiagrams/PackageDiagram.png)
+
+2. **Large Scale Class Diagram**
+
+![Picture of All Classes](deliverables/StructureDiagrams/ProjectPackaging.png)
+
+3. **Main Classes Diagram**
+
+![Picture of Main Classes](deliverables/StructureDiagrams/ClassDiagram.png)
