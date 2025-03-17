@@ -16,12 +16,12 @@ import com.vladmihalcea.hibernate.type.json.JsonType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import java.util.Map;
 import java.util.Objects;
 
 @Entity
-@Audited
 @Table(name = "reports")
 public class Report {
     @Id
@@ -33,6 +33,7 @@ public class Report {
 
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = false)
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private Inventory inventory;
 
     @CreationTimestamp
