@@ -11,15 +11,17 @@ import java.util.Optional;
 public class SupplierService {
     private final SupplierRepository supplierRepository;
 
-    // Constructor for dependency injection
+    // Constructor 
     public SupplierService(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
 
+    // Finding the Supplier by Name
     public Optional<Supplier> findByName(String name) {
         return supplierRepository.findByName(name);
     }
 
+    // Saving the Supplier
     public Supplier save(Supplier supplier) {
         return supplierRepository.save(supplier);
     }

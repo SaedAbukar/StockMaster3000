@@ -36,9 +36,9 @@ public class Product {
 
     private Integer quantity;
 
-    @Column(name = "json_summary", columnDefinition = "json")
+    @Column(name = "nutritions", columnDefinition = "LONGTEXT", nullable = true)
     @Type(JsonType.class)
-    private Map<String, Double> nutritions;
+    private String nutritions;
 
     private Integer amountOfDaysUntilExpiration;
 
@@ -68,7 +68,7 @@ public class Product {
     // Constructor
     public Product() {}
 
-    public Product(String name, Double price, Integer quantity, Map<String, Double> nutritions, Integer amountOfDaysUntilExpiration, Supplier supplier, Category category, Inventory inventory) {
+    public Product(String name, Double price, Integer quantity, String nutritions, Integer amountOfDaysUntilExpiration, Supplier supplier, Category category, Inventory inventory) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
@@ -112,11 +112,11 @@ public class Product {
         this.quantity = quantity;
     }
 
-    public Map<String, Double> getNutritions() {
+    public String getNutritions() {
         return nutritions;
     }
 
-    public void setNutritions(Map<String, Double> nutritions) {
+    public void setNutritions(String nutritions) {
         this.nutritions = nutritions;
     }
 

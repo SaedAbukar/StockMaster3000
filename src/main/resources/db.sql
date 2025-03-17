@@ -52,10 +52,7 @@ INSERT INTO suppliers (name) VALUES ('Fazer'), ('Valio'), ('Rainbow');
 -- Create the Reports table
 CREATE TABLE reports (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,       -- Auto-incrementing primary key
-    start_date DATE,                            -- Start date of the report
-    end_date DATE,                              -- End date of the report
-    summary VARCHAR(255),                       -- Summary of the report
-    summary_data JSON,                          -- JSON column for detailed report data (if supported)
+    summary TEXT NOT NULL,                       -- Summary of the report
     inventory_id BIGINT NOT NULL,               -- Foreign key referencing the inventory
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Track when the report was created
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Track updates
@@ -63,13 +60,14 @@ CREATE TABLE reports (
     CONSTRAINT fk_reports_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
 
+
 -- Create the Products table
 CREATE TABLE products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,      -- Auto-incrementing primary key
     name VARCHAR(255) NOT NULL,                 -- Name of the product
     price DOUBLE NOT NULL,                      -- Price of the product
     quantity INT NOT NULL,                      -- Quantity of the product
-    nutritions JSON,                            -- JSON data type for storing nutritional values (depends on DB)
+    nutritions TEXT,                            -- TEXT data type for storing nutritional values (depends on DB)
     amountOfDaysUntilExpiration INT,            -- Expiration days for the product
     supplier_id BIGINT NOT NULL,                -- Foreign key for the supplier
     category_id BIGINT NOT NULL,                -- Foreign key for the category
@@ -83,14 +81,14 @@ CREATE TABLE products (
     CONSTRAINT fk_products_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
 
--- Drop the user account 'viet' if it exists
-DROP USER IF EXISTS 'ivan'@'localhost';
+-- Drop the user account 'ivan' if it exists
+DROP USER IF EXISTS 'saed'@'localhost';
 
--- Create the 'viet' account with a secure password
-CREATE USER 'ivan'@'localhost' IDENTIFIED BY 'root';
+-- Create the 'ivan' account with a secure password
+CREATE USER 'saed'@'localhost' IDENTIFIED BY '12345678';
 
--- Grant appropriate privileges to 'viet'
-GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'ivan'@'localhost';
+-- Grant appropriate privileges to 'ivan'
+GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'saed'@'localhost';
 
 -- Flush privileges to apply the changes
 FLUSH PRIVILEGES;

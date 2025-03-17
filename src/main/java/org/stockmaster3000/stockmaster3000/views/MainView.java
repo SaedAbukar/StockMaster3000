@@ -6,6 +6,7 @@ import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
 import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
 import org.stockmaster3000.stockmaster3000.components.ReportComponent;
+import org.stockmaster3000.stockmaster3000.components.ReportSelectorComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.service.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
@@ -25,10 +26,12 @@ public class MainView extends VerticalLayout {
     private final HeaderComponent headerComponent;
     private final ReportComponent reportComponent;
     private final OpenAIClient client;
+    private final ReportSelectorComponent reportSelectorComponent;
 
     public MainView(SecurityService securityService, InventoryService inventoryService, 
                     ProductService productService, CategoryService categoryService, 
-                    SupplierService supplierService, OpenAIClient client, ProductLogService productLogService) {
+                    SupplierService supplierService, OpenAIClient client, 
+                    ProductLogService productLogService, ReportService reportService) {
 
         this.client = client;
         
@@ -36,8 +39,9 @@ public class MainView extends VerticalLayout {
         inventoryChartComponent = new InventoryChartComponent(securityService, productService);
         inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
+        reportSelectorComponent = new ReportSelectorComponent(securityService, reportService, inventorySelectorComponent);
         headerComponent = new HeaderComponent(securityService);
-        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService);
+        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService, reportService, reportSelectorComponent, securityService);
 
         // Set to take up all the available space 100%
         setSizeFull();

@@ -9,93 +9,65 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
+
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import java.util.Map;
 import java.util.Objects;
 
 @Entity
-@Audited
 @Table(name = "reports")
 public class Report {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    private LocalDate endDate;
-
+    @Column(columnDefinition = "TEXT")
     private String summary;
 
-    @Column(name = "json_summary", columnDefinition = "json")
-    @Type(JsonType.class)
-    private Map<String, Double> json_summary;
-
-    // Relationships
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = false)
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private Inventory inventory;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
     // Constructor
     public Report() {}
 
-    public Report(LocalDate startDate, LocalDate endDate, String summary, Map<String, Double> json_summary, Inventory inventory) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public Report(String summary, Inventory inventory) {
         this.summary = summary;
-        this.json_summary = json_summary;
         this.inventory = inventory;
     }
 
-    // Getters and Setters
+    // Getters
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
     }
 
     public String getSummary() {
         return summary;
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public Map<String, Double> getJson_summary() {
-        return json_summary;
-    }
-
-    public void setJson_summary(Map<String, Double> json_summary) {
-        this.json_summary = json_summary;
-    }
-
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    // Setters
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public void setInventory(Inventory inventory) {
@@ -105,7 +77,7 @@ public class Report {
     // hashCode and equals
     @Override
     public int hashCode() {
-        return Objects.hash(id, startDate, endDate, summary, json_summary, inventory);
+        return Objects.hash(id, summary, inventory, createdAt);
     }
 
     @Override
@@ -114,10 +86,8 @@ public class Report {
         if (o == null || getClass() != o.getClass()) return false;
         Report report = (Report) o;
         return Objects.equals(id, report.id) &&
-                Objects.equals(startDate, report.startDate) &&
-                Objects.equals(endDate, report.endDate) &&
                 Objects.equals(summary, report.summary) &&
-                Objects.equals(json_summary, report.json_summary) &&
-                Objects.equals(inventory, report.inventory);
+                Objects.equals(inventory, report.inventory) &&
+                Objects.equals(createdAt, report.createdAt);
     }
 }

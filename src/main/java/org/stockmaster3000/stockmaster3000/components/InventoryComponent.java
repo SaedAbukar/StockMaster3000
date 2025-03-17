@@ -6,6 +6,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import jakarta.annotation.security.PermitAll;
 
+import org.aspectj.weaver.SignatureUtils;
+import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
@@ -40,6 +42,8 @@ public class InventoryComponent extends VerticalLayout {
     private ComboBox<Inventory> inventoryComboBox;
     private String currentFilter = "ALL";
     private Inventory currentInventory;
+
+    OpenAIClient aiClient = new OpenAIClient();
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -138,6 +142,7 @@ public class InventoryComponent extends VerticalLayout {
         grid.addColumn(Product::getName).setHeader("Name").setSortable(true);
         grid.addColumn(Product::getQuantity).setHeader("Quantity").setSortable(true);
         grid.addColumn(Product::getPrice).setHeader("Price").setSortable(true);
+        grid.addColumn(Product::getNutritions).setHeader("Nutritions").setSortable(true);
         grid.addColumn(Product::getAmountOfDaysUntilExpiration).setHeader("Days Until Expiration").setSortable(true);
         grid.addColumn(product -> product.getCategory().getName()).setHeader("Category").setSortable(true);
         grid.addColumn(product -> product.getSupplier().getName()).setHeader("Supplier").setSortable(true);
@@ -176,6 +181,7 @@ public class InventoryComponent extends VerticalLayout {
         layout.add(new Span("Name: " + product.getName()));
         layout.add(new Span("Quantity: " + product.getQuantity()));
         layout.add(new Span("Price: " + product.getPrice()));
+        layout.add(new Span("Nutritions: " + product.getNutritions()));
         layout.add(new Span("Days Until Expiration: " + product.getAmountOfDaysUntilExpiration()));
         layout.add(new Span("Category: " + product.getCategory().getName()));
         layout.add(new Span("Supplier: " + product.getSupplier().getName()));
@@ -190,7 +196,7 @@ public class InventoryComponent extends VerticalLayout {
             dialog.close();
             deleteProduct(product);
         });
-        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClassName("close-button");
     
         HorizontalLayout buttonLayout = new HorizontalLayout(editButton, deleteButton);
         buttonLayout.setSpacing(true);
@@ -223,10 +229,30 @@ public class InventoryComponent extends VerticalLayout {
 
         Button saveButton = new Button("Save", e -> {
             try {
+                // Fetch nutrition data when the user clicks Save
+                String productName = nameField.getValue().trim();
+                if (productName.isEmpty()) {
+                    Notification.show("Product name cannot be empty");
+                    return;
+                }
+
+                // Fetch the nutrition data based on the user-provided product name
+                String generatedNutritions = "";
+                try {
+                    generatedNutritions = aiClient.getNutritions(productName);
+                    System.out.println("Nutritions for " + productName + ": " + generatedNutritions); 
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.err.println("Error fetching nutrition data: " + ex.getMessage());
+                    Notification.show("Error fetching nutrition data.");
+                    return;  // Exit if nutrition data couldn't be fetched
+                }
                 Product newProduct = new Product();
                 newProduct.setName(nameField.getValue());
                 newProduct.setQuantity(Integer.parseInt(quantityField.getValue()));
                 newProduct.setPrice(Double.parseDouble(priceField.getValue()));
+                
+                newProduct.setNutritions(generatedNutritions);
 
                 if (expirationDate.getValue() != null) {
                     long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
@@ -273,7 +299,21 @@ public class InventoryComponent extends VerticalLayout {
             }
         });
 
-        dialog.add(nameField, quantityField, priceField, expirationDate, supplierField, categoryField, saveButton);
+        // Create a wrapper for the Category field and add spacing after it
+        VerticalLayout categoryWrapper = new VerticalLayout(categoryField);
+        categoryWrapper.setPadding(false);
+        categoryWrapper.getStyle().set("margin-bottom", "15px");
+
+        // Create a layout for form elements
+        VerticalLayout formLayout = new VerticalLayout(nameField, quantityField, priceField, expirationDate, supplierField, categoryWrapper);
+        formLayout.setPadding(false);
+        formLayout.setSpacing(false);
+
+        // Add Save button separately
+        VerticalLayout contentLayout = new VerticalLayout(formLayout, saveButton);
+        contentLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        dialog.add(contentLayout);
         dialog.open();
     }
 
@@ -351,7 +391,22 @@ public class InventoryComponent extends VerticalLayout {
             }
         });
 
-        dialog.add(nameField, quantityField, priceField, expirationDate, supplierField, categoryField, saveButton);
+        // Wrapper for Category field to add bottom spacing
+        VerticalLayout categoryWrapper = new VerticalLayout(categoryField);
+        categoryWrapper.setPadding(false);
+        categoryWrapper.getStyle().set("margin-bottom", "15px");
+
+        // Layout for form fields (no extra spacing between them)
+        VerticalLayout formLayout = new VerticalLayout(nameField, quantityField, priceField, expirationDate, supplierField, categoryWrapper);
+        formLayout.setPadding(false);
+        formLayout.setSpacing(false);
+
+        // Center the Save button
+        VerticalLayout buttonWrapper = new VerticalLayout(saveButton);
+        buttonWrapper.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        // Add everything to dialog
+        dialog.add(formLayout, buttonWrapper);
         dialog.open();
     }
 
