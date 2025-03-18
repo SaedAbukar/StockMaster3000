@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "paveldeg/stockmaster3000"
+        DOCKER_IMAGE = "ibudaa/stockmaster3000"
         DOCKER_TAG = "latest"
     }
 
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'pavel', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'ivan', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
@@ -43,20 +43,16 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
-                    } else {
-                        bat 'mvn test jacoco:report'
-                    }
-                }
+                bat 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
             }
             post {
                 always {
                     junit 'target/surefire-reports/*.xml' // Publish JUnit test results
 
+                    // Discover reference build for comparison
                     discoverReferenceBuild()
 
+                    // Record Coverage using Coverage Plugin
                     recordCoverage(
                         tools: [[parser: 'JACOCO']],
                         id: 'jacoco',
@@ -96,9 +92,9 @@ pipeline {
                                 '''
                             } else {
                                 bat '''
-                                docker buildx build --platform linux/amd64,linux/arm64 ^
-                                    --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                    -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
+                                    docker buildx build --platform linux/amd64,linux/arm64 ^
+                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
+                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
                                 '''
                             }
                         }
@@ -110,26 +106,22 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
-                        if (isUnix()) {
-                            sh '''
-                                echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
-                                docker run -d --name test-container --env-file .env "$DOCKER_IMAGE:$DOCKER_TAG"
-                                docker ps -a
-                                docker logs test-container
-                                docker stop test-container
-                                docker rm test-container
-                            '''
-                        } else {
-                            bat '''
-                                echo OPENAI_API_KEY=%OPENAI_API_KEY% > .env
-                                docker run -d --name test-container --env-file .env "%DOCKER_IMAGE%:%DOCKER_TAG%"
-                                docker ps -a
-                                docker logs test-container
-                                docker stop test-container
-                                docker rm test-container
-                            '''
-                        }
+                    if (isUnix()) {
+                        sh '''
+                            docker run -d --name test-container "$DOCKER_IMAGE:$DOCKER_TAG"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                        '''
+                    } else {
+                        bat '''
+                            docker run -d --name test-container "%DOCKER_IMAGE%:%DOCKER_TAG%"
+                            docker ps -a
+                            docker logs test-container
+                            docker stop test-container
+                            docker rm test-container
+                        '''
                     }
                 }
             }
