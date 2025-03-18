@@ -203,18 +203,3 @@ mysql -u your_db_username -p -h localhost -P 3306
 ```
 
 - If the build fails, try running `mvn clean` and then `mvn install -Pproduction` to resolve any build issues.
-
----
-## **Overview Of Project structure**
-
-1. **Package Diagram**
-
-![Picture of Packages](deliverables/StructureDiagrams/PackageDiagram.png)
-
-2. **Large Scale Class Diagram**
-
-![Picture of All Classes](deliverables/StructureDiagrams/ProjectPackaging.png)
-
-3. **Main Classes Diagram**
-
-![Picture of Main Classes](deliverables/StructureDiagrams/ClassDiagram.png)
