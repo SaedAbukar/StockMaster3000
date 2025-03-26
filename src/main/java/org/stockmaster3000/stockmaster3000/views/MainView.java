@@ -1,5 +1,7 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
@@ -18,7 +20,7 @@ import jakarta.annotation.security.PermitAll;
 
 @Route("main")
 @PermitAll
-public class MainView extends VerticalLayout {
+public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
     private final InventoryChartComponent inventoryChartComponent;
     private final InventoryComponent inventoryComponent;
@@ -111,5 +113,12 @@ public class MainView extends VerticalLayout {
 
         // Select the default tab
         tabs.setSelectedTab(tab1);
+    }
+
+    @Override
+    public void localeChange(LocaleChangeEvent localeChangeEvent) {
+        // Update text when the locale changes
+        headerComponent.updateTexts();
+        inventoryComponent.updateTexts();
     }
 }
