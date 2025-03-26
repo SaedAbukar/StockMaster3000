@@ -24,4 +24,4 @@ EXPOSE 8081
 # ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
 # Set the entry point to run the JAR file
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/stockmaster3000.jar"]

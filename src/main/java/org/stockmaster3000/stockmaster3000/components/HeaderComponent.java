@@ -58,7 +58,7 @@ public class HeaderComponent extends HorizontalLayout {
     private void addLanguageSelector() {
         ComboBox<Locale> languageSelector = new ComboBox<>();
 
-        // Define Locales with language and country codes
+        // Use Locale with both language and country codes
         Locale russian = new Locale("ru", "RU"); // Russian (Russia)
         Locale greek = new Locale("el", "GR"); // Greek (Greece)
         Locale finnish = new Locale("fi", "FI"); // Finnish (Finland)
@@ -69,34 +69,31 @@ public class HeaderComponent extends HorizontalLayout {
         languageSelector.setItemLabelGenerator(locale -> {
             switch (locale.getLanguage()) {
                 case "ru":
-                    return "🇷🇺 Russian";
+                    return "🇷🇺"; // Flag for Russia
                 case "el":
-                    return "🇬🇷 Greek";
+                    return "🇬🇷"; // Flag for Greece
                 case "fi":
-                    return "🇫🇮 Finnish";
+                    return "🇫🇮"; // Flag for Finland
                 default:
-                    return "🇬🇧 English";
+                    return "🇬🇧"; // Flag for English
             }
         });
 
-        // Handle case where UI.getCurrent() is null
-        Locale currentLocale = (UI.getCurrent() != null) ? UI.getCurrent().getLocale() : Locale.ENGLISH;
-        languageSelector.setValue(currentLocale); // Set current UI locale or default to English
+        languageSelector.setValue(UI.getCurrent().getLocale()); // Set current UI locale
 
         languageSelector.addValueChangeListener(event -> {
-            if (event.getValue() != null && UI.getCurrent() != null) {
-                UI.getCurrent().setLocale(event.getValue()); // Change locale
+            if (event.getValue() != null) {
+                UI.getCurrent().setLocale(event.getValue()); // Change locale, triggers localeChange()
             }
         });
 
-        // Set styling
+        // Set background color to white, text color to black, and cursor to pointer
         languageSelector.getElement().getStyle()
-                .set("color", "white") // Text color
-                .set("cursor", "pointer"); // Pointer cursor
+                .set("color", "white") // Set text color to black (or any color you want)
+                .set("cursor", "pointer"); // Change mouse cursor to pointer
 
         add(new HorizontalLayout(languageSelector));
     }
-
 
 
 
