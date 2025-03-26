@@ -29,6 +29,9 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
     private final ReportComponent reportComponent;
     private final OpenAIClient client;
     private final ReportSelectorComponent reportSelectorComponent;
+    Tab tab1;
+    Tab tab2;
+    Tab tab3;
 
     public MainView(SecurityService securityService, InventoryService inventoryService, 
                     ProductService productService, CategoryService categoryService, 
@@ -60,9 +63,9 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
         // Create tabs
         Tabs tabs = new Tabs();
-        Tab tab1 = new Tab("Dashboard");
-        Tab tab2 = new Tab("Insights");
-        Tab tab3 = new Tab("Reports");
+        tab1 = new Tab(getTranslation("dashboard"));
+        tab2 = new Tab(getTranslation("insights"));
+        tab3 = new Tab(getTranslation("reports"));
 
         // Create the content for each tab
         VerticalLayout dashboardContent = new VerticalLayout(inventoryComponent);
@@ -118,6 +121,9 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
     @Override
     public void localeChange(LocaleChangeEvent localeChangeEvent) {
         // Update text when the locale changes
+        this.tab1.setLabel(getTranslation("dashboard"));
+        this.tab2.setLabel(getTranslation("insights"));
+        this.tab3.setLabel(getTranslation("reports"));
         headerComponent.updateTexts();
         inventoryComponent.updateTexts();
     }
