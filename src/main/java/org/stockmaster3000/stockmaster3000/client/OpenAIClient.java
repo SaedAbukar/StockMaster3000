@@ -113,7 +113,7 @@ public class OpenAIClient {
     // Generates the Nutritions upon product creation
     public String getNutritions(String ingredient) throws Exception {
         String prompt = String.format(
-            "Generate the nutrition for %s and specifically provide it in this form and only the requested fields without anything extra: Calories: int, Protein: double, Fat: double, Carbohydrates: double",
+            "Generate the nutrition for %s per 100g (or per 100ml if it's a liquid/drink) and specifically provide it in this form and only the requested fields without anything extra: Calories: int, Protein: double, Fat: double, Carbohydrates: double",
             ingredient
         );
         return generateResponse(prompt);

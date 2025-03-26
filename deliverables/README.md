@@ -10,6 +10,8 @@
     - **Analytics and Insights:** Visualize spending patterns and calorie intake.
     - **Alerts and Notifications:** Reminders for expiring or left-in-the-fridge-too-long items to minimize waste.
 
+![UseCase Diagram](StructureDiagrams/UseCaseDiagram.png)
+
 ---
 
 ## 2. Project Objectives
