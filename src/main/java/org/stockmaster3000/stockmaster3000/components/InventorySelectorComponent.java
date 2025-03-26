@@ -24,6 +24,12 @@ public class InventorySelectorComponent extends VerticalLayout {
     private final InventoryService inventoryService;
     private final SecurityService securityService;
     private Inventory selectedInventory; // Store the selected inventory
+    private ComboBox<Inventory> inventoryDialogComboBox;
+    Button addInventoryButton;
+    Button deleteInventoryButton;
+    Button deleteButton;
+    Button closeButton;
+    TextField nameField;
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +38,7 @@ public class InventorySelectorComponent extends VerticalLayout {
         this.inventoryService = inventoryService;
 
         // Initialize the combo box
-        inventoryComboBox = new ComboBox<>("Select Inventory");
+        inventoryComboBox = new ComboBox<>(getTranslation("inv.sel"));
         inventoryComboBox.setItemLabelGenerator(Inventory::getName);
 
         // Load inventories for the current user
@@ -45,8 +51,8 @@ public class InventorySelectorComponent extends VerticalLayout {
         });
 
         // Create buttons for adding and deleting inventory
-        Button addInventoryButton = new Button("Add Inventory", e -> showAddInventoryDialog());
-        Button deleteInventoryButton = new Button("Delete Inventory", e -> showDeleteInventoryDialog());
+        addInventoryButton = new Button(getTranslation("inv.add"), e -> showAddInventoryDialog());
+        deleteInventoryButton = new Button(getTranslation("inv.del"), e -> showDeleteInventoryDialog());
         deleteInventoryButton.addClassName("delete-inventory-button"); // Apply red style
 
         // Create a layout to align all elements horizontally
@@ -62,19 +68,19 @@ public class InventorySelectorComponent extends VerticalLayout {
     // Displays the Delete modal for the User to choose which Inventory to Delete
     private void showDeleteInventoryDialog() {
         Dialog dialog = new Dialog();
-        ComboBox<Inventory> inventoryDialogComboBox = new ComboBox<>("Select Inventory");
+        inventoryDialogComboBox = new ComboBox<>(getTranslation("inv.sel"));
         inventoryDialogComboBox.setItemLabelGenerator(Inventory::getName);
 
         String username = getCurrentUsername();
         List<Inventory> inventories = inventoryService.getAllInventoriesByUser(username);
         inventoryDialogComboBox.setItems(inventories);
 
-        Button deleteButton = new Button("Delete", e -> {
+        deleteButton = new Button(getTranslation("delete"), e -> {
             Inventory inventory = inventoryDialogComboBox.getValue();
 
             // Validation: Ensure the name is not empty
             if (inventory == null) {
-                Notification.show("Please select an inventory.");
+                Notification.show(getTranslation("inv.sel_noti"));
                 return;
             }
 
@@ -88,14 +94,14 @@ public class InventorySelectorComponent extends VerticalLayout {
                 inventoryComboBox.setItems(inventoryService.getAllInventoriesByUser(getCurrentUsername()));
 
                 dialog.close();
-                Notification.show("Inventory deleted successfully");
+                Notification.show(getTranslation("succ.inv_del"));
             } catch (Exception ex) {
                 // Improved error handling with the exception message
-                Notification.show("Error while deleting inventory: " + ex.getMessage());
+                Notification.show(getTranslation("err.inv_del") + ex.getMessage());
             }
         });
         // Create the Close button
-        Button closeButton = new Button("Close", e -> dialog.close());
+        closeButton = new Button(getTranslation("close"), e -> dialog.close());
         closeButton.addClassName("close-button");
 
         // Create a HorizontalLayout for buttons with spacing
@@ -114,14 +120,14 @@ public class InventorySelectorComponent extends VerticalLayout {
     // Displays the Add Inventory modal, for User to add new Inventories
     private void showAddInventoryDialog() {
         Dialog dialog = new Dialog();
-        TextField nameField = new TextField("Inventory Name");
+        nameField = new TextField(getTranslation("inv.name"));
 
-        Button saveButton = new Button("Save", e -> {
+        Button saveButton = new Button(getTranslation("save"), e -> {
             String inventoryName = nameField.getValue();
 
             // Validation: Ensure the name is not empty
             if (inventoryName == null || inventoryName.trim().isEmpty()) {
-                Notification.show("Please provide a valid inventory name.");
+                Notification.show(getTranslation("provide.inv_name"));
                 return;
             }
 
@@ -134,17 +140,17 @@ public class InventorySelectorComponent extends VerticalLayout {
                 inventoryComboBox.setValue(newInventory); // Select the newly created inventory
 
                 dialog.close();
-                Notification.show("Inventory added successfully");
+                Notification.show(getTranslation("succ.inv_add"));
             } catch (Exception ex) {
                 // Improved error handling with the exception message
-                Notification.show("Error while creating inventory: " + ex.getMessage());
+                Notification.show(getTranslation("err.inv_add") + ex.getMessage());
             }
         });
         // add CSS to button
         saveButton.addClassName("save-button");
 
         // Create the Close button
-        Button closeButton = new Button("Close", e -> dialog.close());
+        Button closeButton = new Button(getTranslation("close"), e -> dialog.close());
 
         // add CSS to button
         closeButton.addClassName("close-button");
@@ -199,5 +205,15 @@ public class InventorySelectorComponent extends VerticalLayout {
 
     private String getCurrentUsername() {
         return securityService.getAuthenticatedUser().getUsername();
+    }
+
+    public void updateTexts(){
+        this.inventoryComboBox.setLabel(getTranslation("inv.sel"));
+        //this.inventoryDialogComboBox.setLabel(getTranslation("inv.sel"));
+        this.addInventoryButton.setText(getTranslation("inv.add"));
+        this.deleteInventoryButton.setText(getTranslation("inv.del"));
+        //this.deleteButton.setText(getTranslation("inv.del"));
+        //this.closeButton.setText(getTranslation("close"));
+        //this.nameField.setLabel(getTranslation("inv.name"));
     }
 }

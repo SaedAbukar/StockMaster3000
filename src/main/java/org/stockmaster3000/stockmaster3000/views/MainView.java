@@ -126,5 +126,6 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
         this.tab3.setLabel(getTranslation("reports"));
         headerComponent.updateTexts();
         inventoryComponent.updateTexts();
+        inventorySelectorComponent.updateTexts();
     }
 }

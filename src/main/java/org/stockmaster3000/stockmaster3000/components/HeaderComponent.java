@@ -61,10 +61,24 @@ public class HeaderComponent extends HorizontalLayout {
         // Use Locale with both language and country codes
         Locale russian = new Locale("ru", "RU"); // Russian (Russia)
         Locale greek = new Locale("el", "GR"); // Greek (Greece)
-        Locale finnish = new Locale("fi", "FI");
+        Locale finnish = new Locale("fi", "FI"); // Finnish (Finland)
 
         languageSelector.setItems(Locale.ENGLISH, russian, greek, finnish);
-        languageSelector.setItemLabelGenerator(Locale::getDisplayLanguage);
+
+        // Set custom ItemLabelGenerator to show flag emojis
+        languageSelector.setItemLabelGenerator(locale -> {
+            switch (locale.getLanguage()) {
+                case "ru":
+                    return "🇷🇺"; // Flag for Russia
+                case "el":
+                    return "🇬🇷"; // Flag for Greece
+                case "fi":
+                    return "🇫🇮"; // Flag for Finland
+                default:
+                    return "🇬🇧"; // Flag for English
+            }
+        });
+
         languageSelector.setValue(UI.getCurrent().getLocale()); // Set current UI locale
 
         languageSelector.addValueChangeListener(event -> {
@@ -73,12 +87,14 @@ public class HeaderComponent extends HorizontalLayout {
             }
         });
 
-        // Set background color to white and text color to black (you can customize as needed)
+        // Set background color to white, text color to black, and cursor to pointer
         languageSelector.getElement().getStyle()
-                .set("color", "white");  // Set text color to black (or any color you want)
+                .set("color", "white") // Set text color to black (or any color you want)
+                .set("cursor", "pointer"); // Change mouse cursor to pointer
 
         add(new HorizontalLayout(languageSelector));
     }
+
 
 
     public void updateTexts() {
