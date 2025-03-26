@@ -33,7 +33,7 @@ public class HeaderComponentTest {
         // Verify that the header contains the expected title
         H1 title = (H1) headerComponent.getComponentAt(0);
         assertNotNull(title, "Title should not be null");
-        assertEquals("StockMaster3000", title.getText(), "Title should match 'StockMaster3000'");
+        assertEquals("!{header.title}!", title.getText(), "Title should match 'StockMaster3000'");
     }
     
 
@@ -49,7 +49,7 @@ public class HeaderComponentTest {
         Button loginButton = (Button) authSection.getComponentAt(0);
         
         assertNotNull(loginButton, "Login button should be present");
-        assertEquals("Login", loginButton.getText(), "Login button should display 'Login'");
+        assertEquals("!{header.login}!", loginButton.getText(), "Login button should display 'Login'");
         
         // Simulate login button click
         loginButton.click();
@@ -69,10 +69,10 @@ public class HeaderComponentTest {
         Button logoutButton = (Button) authSection.getComponentAt(1);
         
         assertNotNull(greeting, "Greeting message should be present");
-        assertEquals("Hello, testUser!", greeting.getText(), "Greeting should match username");
+        assertEquals("!{header.hello}! testUser!", greeting.getText(), "Greeting should match username");
         
         assertNotNull(logoutButton, "Logout button should be present");
-        assertEquals("Logout", logoutButton.getText(), "Logout button should display 'Logout'");
+        assertEquals("!{header.logout}!", logoutButton.getText(), "Logout button should display 'Logout'");
         
         // Simulate logout button click
         logoutButton.click();
