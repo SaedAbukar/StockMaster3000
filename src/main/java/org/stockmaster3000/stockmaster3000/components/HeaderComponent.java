@@ -93,6 +93,7 @@ public class HeaderComponent extends HorizontalLayout {
                 .set("cursor", "pointer"); // Change mouse cursor to pointer
 
         add(new HorizontalLayout(languageSelector));
+        languageSelector.addClassName("custom-language-selector");
     }
 
 

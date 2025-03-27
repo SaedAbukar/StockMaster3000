@@ -498,3 +498,62 @@ vaadin-login-submit {
 .extra-spacing {
   height: 15px; /* Adjust this value as needed */
 }
+
+.custom-language-selector {
+  width: 4rem;
+  min-width: unset;
+}
+
+.custom-language-selector::part(input-field) {
+  cursor: pointer;
+  caret-color: transparent;
+  color: white;
+  background-color: transparent;
+  border-color: none;
+  width: auto;
+  text-align: center;
+  padding: 0.3rem;
+
+  outline: none;
+  box-shadow: none;
+  border-bottom: none !important;
+}
+
+.custom-language-selector::part(toggle-button) {
+  color: white;
+  fill: white;
+
+  cursor: pointer;
+}
+
+.login-register-language-selector {
+  justify-content: center;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.3em;
+}
+
+.login-register-language-selector button {
+  font-size: 0.9em;               /* Small text size */
+  padding: 0.2em 0.5em;
+  min-width: auto;
+  min-height: auto;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: black;                 /* Match your theme */
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover effect (optional) */
+.login-register-language-selector button:hover {
+  background-color: rgba(8, 62, 66, 0.1); /* subtle hover */
+}
+
+/* Active (selected) language style */
+.login-register-language-selector button.active {
+  background-color: #083e42;
+  color: white;
+  border-color: white;
+}
