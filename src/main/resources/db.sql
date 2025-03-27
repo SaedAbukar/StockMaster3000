@@ -82,13 +82,13 @@ CREATE TABLE products (
 );
 
 -- Drop the user account 'ivan' if it exists
-DROP USER IF EXISTS 'saed'@'localhost';
+DROP USER IF EXISTS 'viet'@'localhost';
 
 -- Create the 'ivan' account with a secure password
-CREATE USER 'saed'@'localhost' IDENTIFIED BY '12345678';
+CREATE USER 'viet'@'localhost' IDENTIFIED BY 'root';
 
 -- Grant appropriate privileges to 'ivan'
-GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'saed'@'localhost';
+GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'viet'@'localhost';
 
 -- Flush privileges to apply the changes
 FLUSH PRIVILEGES;
