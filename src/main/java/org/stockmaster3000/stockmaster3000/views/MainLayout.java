@@ -1,7 +1,9 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
@@ -9,6 +11,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -16,16 +20,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
+import java.util.Locale;
+
 @Route(value = "/")
 @PageTitle("Stock Master 3000")
 @AnonymousAllowed
-public class MainLayout extends VerticalLayout {
+public class MainLayout extends VerticalLayout implements LocaleChangeObserver {
 
     private final SecurityService securityService;
+    private H1 heroTitle;
+    private Paragraph heroDescription;
+    private Button inventoryButton;
+    private HeaderComponent headerComponent;
 
     public MainLayout(@Autowired SecurityService securityService) {
         this.securityService = securityService;
-        add(new HeaderComponent(securityService));
+        this.headerComponent = new HeaderComponent(securityService);
+        add(headerComponent);
         createHeroSection();
     }
 
@@ -36,12 +47,21 @@ public class MainLayout extends VerticalLayout {
         heroSection.setAlignItems(FlexComponent.Alignment.CENTER);
         heroSection.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
-        H1 heroTitle = new H1("Manage Your Stocks with Ease");
-        Paragraph heroDescription = new Paragraph("Stock Master 3000 provides powerful insights and inventory tracking for your business.");
-        Button inventoryButton = new Button("Go to Inventory");
+        heroTitle = new H1(getTranslation("hero-title"));
+        heroDescription = new Paragraph(getTranslation("hero-description"));
+        inventoryButton = new Button(getTranslation("hero.inventoryButton"));
         inventoryButton.addClickListener(click -> inventoryButton.getUI().ifPresent(ui -> ui.navigate("/main")));
 
         heroSection.add(heroTitle, heroDescription, inventoryButton);
         add(heroSection);
+    }
+
+    @Override
+    public void localeChange(LocaleChangeEvent localeChangeEvent) {
+        // Update text when the locale changes
+        heroTitle.setText(getTranslation("hero.title"));
+        heroDescription.setText(getTranslation("hero.description"));
+        inventoryButton.setText(getTranslation("hero.inventoryButton"));
+        headerComponent.updateTexts();
     }
 }

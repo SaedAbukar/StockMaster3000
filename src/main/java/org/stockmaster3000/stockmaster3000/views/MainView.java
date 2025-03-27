@@ -1,10 +1,13 @@
 package org.stockmaster3000.stockmaster3000.views;
 
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
 import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
+import org.stockmaster3000.stockmaster3000.components.LineChart;
 import org.stockmaster3000.stockmaster3000.components.ReportComponent;
 import org.stockmaster3000.stockmaster3000.components.ReportSelectorComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
@@ -18,7 +21,7 @@ import jakarta.annotation.security.PermitAll;
 
 @Route("main")
 @PermitAll
-public class MainView extends VerticalLayout {
+public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
     private final InventoryChartComponent inventoryChartComponent;
     private final InventoryComponent inventoryComponent;
@@ -27,6 +30,9 @@ public class MainView extends VerticalLayout {
     private final ReportComponent reportComponent;
     private final OpenAIClient client;
     private final ReportSelectorComponent reportSelectorComponent;
+    Tab tab1;
+    Tab tab2;
+    Tab tab3;
 
     public MainView(SecurityService securityService, InventoryService inventoryService, 
                     ProductService productService, CategoryService categoryService, 
@@ -34,6 +40,7 @@ public class MainView extends VerticalLayout {
                     ProductLogService productLogService, ReportService reportService) {
 
         this.client = client;
+
         
         // Instantiate the reusable components
         inventoryChartComponent = new InventoryChartComponent(securityService, productService);
@@ -58,9 +65,9 @@ public class MainView extends VerticalLayout {
 
         // Create tabs
         Tabs tabs = new Tabs();
-        Tab tab1 = new Tab("Dashboard");
-        Tab tab2 = new Tab("Insights");
-        Tab tab3 = new Tab("Reports");
+        tab1 = new Tab(getTranslation("dashboard"));
+        tab2 = new Tab(getTranslation("insights"));
+        tab3 = new Tab(getTranslation("reports"));
 
         // Create the content for each tab
         VerticalLayout dashboardContent = new VerticalLayout(inventoryComponent);
@@ -111,5 +118,20 @@ public class MainView extends VerticalLayout {
 
         // Select the default tab
         tabs.setSelectedTab(tab1);
+    }
+
+    @Override
+    public void localeChange(LocaleChangeEvent localeChangeEvent) {
+        Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
+        
+        // Update text when the locale changes
+        this.tab1.setLabel(getTranslation("dashboard"));
+        this.tab2.setLabel(getTranslation("insights"));
+        this.tab3.setLabel(getTranslation("reports"));
+        headerComponent.updateTexts();
+        inventoryComponent.updateTexts();
+        inventorySelectorComponent.updateTexts();
+        inventoryChartComponent.updateTexts();
+        inventoryChartComponent.updateCharts(selectedInventory);
     }
 }

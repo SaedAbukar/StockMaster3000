@@ -61,7 +61,7 @@ public class DoughnutChart extends Div {
                 "      }," +
                 "      title: {" +
                 "        display: true," +
-                "        text: 'Food Category Distribution'," +
+                "        text: ''," +
                 "        font: { size: 18 }," +
                 "        padding: 15" +
                 "      }," +

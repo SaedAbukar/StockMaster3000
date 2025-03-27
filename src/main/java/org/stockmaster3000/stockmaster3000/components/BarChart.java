@@ -89,7 +89,7 @@ public class BarChart extends Div {
                 "      }," +
                 "      title: {" +
                 "        display: true," +
-                "        text: 'Spending Per Food Item'," +
+                "        text: ''," +
                 "        font: { size: 18 }," +
                 "        padding: 15" +
                 "      }" +
