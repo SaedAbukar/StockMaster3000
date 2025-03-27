@@ -54,15 +54,6 @@ public class ReportComponent extends VerticalLayout {
         this.reportService = reportService;
         this.securityService = securityService;
 
-        
-        // H3 topic;
-        // TextArea resultTextArea;
-        // Button button1;
-        // Button button2;
-        // Button button3;
-        // String reportSavedNotification = getTranslation("reports.reportSavedNotification");
-        // String notificationSelectInventory = getTranslation("reports.notificationSelectInventory");
-
         // Giving the Report tab topic
         topic = new H3(getTranslation("reports.topic"));
 
