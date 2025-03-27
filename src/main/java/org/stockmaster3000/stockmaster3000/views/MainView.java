@@ -133,5 +133,6 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
         inventorySelectorComponent.updateTexts();
         inventoryChartComponent.updateTexts();
         inventoryChartComponent.updateCharts(selectedInventory);
+        reportComponent.updateTexts();
     }
 }
