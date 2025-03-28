@@ -67,6 +67,7 @@ public class InventoryComponent extends VerticalLayout {
     TextField categoryField;
     TextField searchbar;
     Button searchButton;
+    String getLanguage;
 
 
 
@@ -272,7 +273,8 @@ public class InventoryComponent extends VerticalLayout {
                 // Fetch the nutrition data based on the user-provided product name
                 String generatedNutritions = "";
                 try {
-                    generatedNutritions = aiClient.getNutritions(productName);
+                    getLanguage = getTranslation("getLanguage");
+                    generatedNutritions = aiClient.getNutritions(productName, getLanguage);
                     System.out.println("Nutritions for " + productName + ": " + generatedNutritions); 
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -536,5 +538,7 @@ public class InventoryComponent extends VerticalLayout {
         searchbar.setPlaceholder(getTranslation("search.pro"));
         searchButton.setText(getTranslation("search"));
         addButton.setText(getTranslation("inventory.add_pro"));
+
+        getLanguage = getTranslation("getLanguage");
     }
 }

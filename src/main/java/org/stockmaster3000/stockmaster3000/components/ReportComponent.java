@@ -41,6 +41,7 @@ public class ReportComponent extends VerticalLayout {
     private Button button3;
     private String reportSavedNotification;
     private String notificationSelectInventory;
+    private String getLanguage;
 
     public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, 
     ProductService productService, ProductLogService productLogService, ReportService reportService, 
@@ -68,6 +69,8 @@ public class ReportComponent extends VerticalLayout {
         button2 = new Button(getTranslation("reports.button2"));
         button3 = new Button(getTranslation("reports.button3"));
 
+        getLanguage = getTranslation("getLanguage");
+
         // Local date
         LocalDate date = LocalDate.now();
 
@@ -85,7 +88,8 @@ public class ReportComponent extends VerticalLayout {
             String currentMonth = date.getMonth().toString();
             try {
                 resultTextArea.setValue("");
-                String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth);
+                String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth, getLanguage);
+                System.out.println("GHAFAASKNADKNEW CHECK HERE: " + getLanguage);
                 resultTextArea.setValue(plan);
                 reportService.saveReport(plan, currentInventory);
                 System.out.println(reportSavedNotification);
@@ -105,7 +109,7 @@ public class ReportComponent extends VerticalLayout {
             String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
-                String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients);
+                String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients, getLanguage);
                 resultTextArea.setValue(analysedInventory);
                 reportService.saveReport(analysedInventory, currentInventory);
                 System.out.println(reportSavedNotification);
@@ -124,7 +128,7 @@ public class ReportComponent extends VerticalLayout {
             String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
-                String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients);
+                String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients, getLanguage);
                 resultTextArea.setValue(mealPlan);
                 reportService.saveReport(mealPlan, currentInventory);
                 System.out.println(reportSavedNotification);
@@ -167,5 +171,6 @@ public class ReportComponent extends VerticalLayout {
         // Update notification messages
         reportSavedNotification = getTranslation("reports.reportSavedNotification");
         notificationSelectInventory = getTranslation("reports.notificationSelectInventory");
+        getLanguage = getTranslation("getLanguage");
     }
 }

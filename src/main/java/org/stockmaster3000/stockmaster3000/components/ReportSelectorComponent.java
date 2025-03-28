@@ -29,7 +29,7 @@ public class ReportSelectorComponent extends VerticalLayout {
         this.inventorySelectorComponent = inventorySelectorComponent;
 
         // Initialize report ComboBox
-        reportComboBox = new ComboBox<>("Select Report");
+        reportComboBox = new ComboBox<>(getTranslation("reportsSelector.selectReport"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         reportComboBox.setItemLabelGenerator(report -> report.getCreatedAt().format(formatter));
@@ -83,5 +83,9 @@ public class ReportSelectorComponent extends VerticalLayout {
 
     public interface SelectionListener {
         void onReportSelected(Report selectedReport);
+    }
+
+    public void updateTexts() {
+        reportComboBox.setLabel(getTranslation("reportsSelector.selectReport"));
     }
 }
