@@ -99,7 +99,7 @@ pipeline {
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                                 docker buildx build --platform linux/amd64,linux/arm64 \
                                     --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                    -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} --push .
+                                    -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push .
                             """
                         }
                     }
