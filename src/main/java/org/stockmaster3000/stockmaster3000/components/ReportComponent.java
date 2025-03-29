@@ -32,6 +32,16 @@ public class ReportComponent extends VerticalLayout {
     private ReportService reportService;
     private ReportSelectorComponent reportSelectorComponent;
     private SecurityService securityService;
+    
+    // Localazion
+    private H3 topic;
+    private TextArea resultTextArea;
+    private Button button1;
+    private Button button2;
+    private Button button3;
+    private String reportSavedNotification;
+    private String notificationSelectInventory;
+    private String getLanguage;
 
     public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, 
     ProductService productService, ProductLogService productLogService, ReportService reportService, 
@@ -46,25 +56,29 @@ public class ReportComponent extends VerticalLayout {
         this.securityService = securityService;
 
         // Giving the Report tab topic
-        H3 topic = new H3("Generate Reports with AI!");
+        topic = new H3(getTranslation("reports.topic"));
 
         // Initializing the text area for displaying generated content
-        TextArea resultTextArea = new TextArea("AI Generated Report");
+        resultTextArea = new TextArea(getTranslation("reports.resultTextArea"));
         resultTextArea.setWidthFull();
         resultTextArea.setHeightFull();
         resultTextArea.setReadOnly(true);
 
         // Initializing the buttons
-        Button button1 = new Button("Get shopping list for the next 7 days + Meal Plan");
-        Button button2 = new Button("Analyze your past 30 days ingredients healthiness!");
-        Button button3 = new Button("Generate meal suggestions based on the current fridge ingredients!");
+        button1 = new Button(getTranslation("reports.button1"));
+        button2 = new Button(getTranslation("reports.button2"));
+        button3 = new Button(getTranslation("reports.button3"));
+
+        getLanguage = getTranslation("getLanguage");
+
+        // Local date
         LocalDate date = LocalDate.now();
 
         // Click listeners for each button
         button1.addClickListener(event -> {
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
-                Notification.show("Select an Inventory");
+                Notification.show(notificationSelectInventory);
                 return;
             }
 
@@ -74,10 +88,11 @@ public class ReportComponent extends VerticalLayout {
             String currentMonth = date.getMonth().toString();
             try {
                 resultTextArea.setValue("");
-                String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth);
+                String plan = client.generateInventoryPlanningSuggestionsAndMealPlans(currentIngredients, currentMonth, getLanguage);
+                System.out.println("GHAFAASKNADKNEW CHECK HERE: " + getLanguage);
                 resultTextArea.setValue(plan);
                 reportService.saveReport(plan, currentInventory);
-                System.out.println("Report saved to the database");
+                System.out.println(reportSavedNotification);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -86,7 +101,7 @@ public class ReportComponent extends VerticalLayout {
         button2.addClickListener(event -> {
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
-                Notification.show("Select an Inventory");
+                Notification.show(notificationSelectInventory);
                 return;
             }
 
@@ -94,10 +109,10 @@ public class ReportComponent extends VerticalLayout {
             String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
-                String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients);
+                String analysedInventory = client.generateInventoryHealthinessAnalysis(currentIngredients, getLanguage);
                 resultTextArea.setValue(analysedInventory);
                 reportService.saveReport(analysedInventory, currentInventory);
-                System.out.println("Report saved to the database");
+                System.out.println(reportSavedNotification);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -106,17 +121,17 @@ public class ReportComponent extends VerticalLayout {
         button3.addClickListener(event -> {
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
-                Notification.show("Select an Inventory");
+                Notification.show(notificationSelectInventory);
                 return;
             }
             List<Product> products = productService.getProductsByInventory(currentInventory.getId());
             String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");
-                String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients);
+                String mealPlan = client.generateMealPlanBasedOnCurrentInventoryIngredients(currentIngredients, getLanguage);
                 resultTextArea.setValue(mealPlan);
                 reportService.saveReport(mealPlan, currentInventory);
-                System.out.println("Report saved to the database");
+                System.out.println(reportSavedNotification);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -125,7 +140,7 @@ public class ReportComponent extends VerticalLayout {
         reportSelectorComponent.addClickListener(event -> {
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
-                Notification.show("Select an Inventory");
+                Notification.show(notificationSelectInventory);
                 return;
             }
             Report selectedReport = reportSelectorComponent.getSelectedReport(); 
@@ -144,5 +159,18 @@ public class ReportComponent extends VerticalLayout {
 
         setJustifyContentMode(JustifyContentMode.CENTER);
         setSizeFull();
+    }
+
+    public void updateTexts() {
+        topic.setText(getTranslation("reports.topic"));
+        resultTextArea.setLabel(getTranslation("reports.resultTextArea"));
+        button1.setText(getTranslation("reports.button1"));
+        button2.setText(getTranslation("reports.button2"));
+        button3.setText(getTranslation("reports.button3"));
+        
+        // Update notification messages
+        reportSavedNotification = getTranslation("reports.reportSavedNotification");
+        notificationSelectInventory = getTranslation("reports.notificationSelectInventory");
+        getLanguage = getTranslation("getLanguage");
     }
 }

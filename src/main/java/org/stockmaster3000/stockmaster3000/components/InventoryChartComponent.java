@@ -25,10 +25,16 @@ public class InventoryChartComponent extends VerticalLayout {
     private BarChart spendingChart;
     private LineChart expirationChart;
 
+    H1 componentTopic;
+    VerticalLayout doughnutContainer;
+    VerticalLayout spendingContainer;
+    VerticalLayout expirationContainer;
+
+
     public InventoryChartComponent(SecurityService securityService, ProductService productService) {
         this.productService = productService;
 
-        H1 componentTopic = new H1("Inventory Insights");
+        componentTopic = new H1(getTranslation("insights.title"));
         componentTopic.getStyle().set("text-align", "center");
         add(componentTopic);
 
@@ -39,14 +45,14 @@ public class InventoryChartComponent extends VerticalLayout {
         topChartsLayout.getStyle().set("gap", "16px");
 
         // Chart Containers
-        doughnutChart = new DoughnutChart(new String[]{"No Data"}, new int[]{1});
-        spendingChart = new BarChart(new String[]{"No Data"}, new double[]{0.0});
-        expirationChart = new LineChart(new String[]{"No Data"}, new int[]{0});
+        doughnutChart = new DoughnutChart(new String[]{getTranslation("insights.noData")}, new int[]{1});
+        spendingChart = new BarChart(new String[]{getTranslation("insights.noData")}, new double[]{0.0});
+        expirationChart = new LineChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
 
         // Container Style Method
-        VerticalLayout doughnutContainer = createChartContainer("Food Category Distribution", doughnutChart);
-        VerticalLayout spendingContainer = createChartContainer("Spending Per Food Item", spendingChart);
-        VerticalLayout expirationContainer = createChartContainer("Food Expiration Timeline", expirationChart);
+        doughnutContainer = createChartContainer(getTranslation("insights.subTitleDoughnut"), doughnutChart);
+        spendingContainer = createChartContainer(getTranslation("insights.spending"), spendingChart);
+        expirationContainer = createChartContainer(getTranslation("insights.expTimeline"), expirationChart);
         
         // Add charts to layouts
         topChartsLayout.add(doughnutContainer, spendingContainer);
@@ -93,9 +99,9 @@ public class InventoryChartComponent extends VerticalLayout {
     }
 
     private void clearCharts() {
-        doughnutChart.updateChart(new String[]{"No Data"}, new int[]{1});
-        spendingChart.updateChart(new String[]{"No Data"}, new double[]{0.0});
-        expirationChart.updateChart(new String[]{"No Data"}, new int[]{0});
+        doughnutChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{1});
+        spendingChart.updateChart(new String[]{getTranslation("insights.noData")}, new double[]{0.0});
+        expirationChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
     }
 
     /**
@@ -103,7 +109,7 @@ public class InventoryChartComponent extends VerticalLayout {
      */
     private void updateCategoryChart(Map<Category, Integer> productData) {
         if (productData.isEmpty()) {
-            doughnutChart.updateChart(new String[]{"No Data"}, new int[]{1});
+            doughnutChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{1});
         } else {
             String[] productTypes = productData.keySet().stream().map(Category::getName).toArray(String[]::new);
             int[] productCounts = productData.values().stream().mapToInt(Integer::intValue).toArray();
@@ -128,7 +134,7 @@ public class InventoryChartComponent extends VerticalLayout {
         }
 
         if (productSpending.isEmpty()) {
-            spendingChart.updateChart(new String[]{"No Data"}, new double[]{0.0});
+            spendingChart.updateChart(new String[]{getTranslation("insights.noData")}, new double[]{0.0});
             return;
         }
 
@@ -147,7 +153,7 @@ public class InventoryChartComponent extends VerticalLayout {
      */
     private void updateExpirationChart(List<Product> products) {
         if (products == null || products.isEmpty()) {
-            expirationChart.updateChart(new String[]{"No Data"}, new int[]{0});
+            expirationChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
             return;
         }
 
@@ -159,7 +165,7 @@ public class InventoryChartComponent extends VerticalLayout {
         }
 
         if (expirationDays.isEmpty()) {
-            expirationChart.updateChart(new String[]{"No Data"}, new int[]{0});
+            expirationChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
             return;
         }
 
@@ -172,4 +178,12 @@ public class InventoryChartComponent extends VerticalLayout {
         int[] values = sortedByExpiration.stream().mapToInt(Map.Entry::getValue).toArray();
         expirationChart.updateChart(labels, values);
     }
+
+    public void updateTexts() {
+        componentTopic.setText(getTranslation("insights.title"));
+        doughnutContainer.getElement().getChildren().findFirst().ifPresent(title -> title.setText(getTranslation("insights.subTitleDoughnut")));
+        spendingContainer.getElement().getChildren().findFirst().ifPresent(title -> title.setText(getTranslation("insights.spending")));
+        expirationContainer.getElement().getChildren().findFirst().ifPresent(title -> title.setText(getTranslation("insights.expTimeline")));
+    }
+    
 }

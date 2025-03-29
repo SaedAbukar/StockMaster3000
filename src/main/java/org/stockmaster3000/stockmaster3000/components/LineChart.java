@@ -31,6 +31,9 @@ public class LineChart extends Div {
             jsonData.set(i, values[i]);
         }
 
+        String textY = getTranslation("insights.LineChartTextY");
+        String textX = getTranslation("insights.LineChartTextX");
+
         getElement().executeJs("setTimeout(() => {" +
                 "const ctx = document.getElementById('lineChart').getContext('2d');" +
                 "ctx.canvas.width = 450;" + 
@@ -60,7 +63,7 @@ public class LineChart extends Div {
                 "        beginAtZero: true," +
                 "        title: {" +
                 "          display: true," +
-                "          text: 'Days Left'," +
+                "          text: $2," +
                 "          font: { size: 14 }" +
                 "        }," +
                 "        ticks: { stepSize: 5 }," +
@@ -69,7 +72,7 @@ public class LineChart extends Div {
                 "      x: {" +
                 "        title: {" +
                 "          display: true," +
-                "          text: 'Food Items'," +
+                "          text: $3," +
                 "          font: { size: 14 }" +
                 "        }," +
                 "        grid: { display: false }" +
@@ -87,7 +90,7 @@ public class LineChart extends Div {
                 "      }," +
                 "      title: {" +
                 "        display: true," +
-                "        text: 'Food Expiration Timeline'," +
+                "        text: ''," +
                 "        font: { size: 18 }," +
                 "        padding: 15" +
                 "      }" +
@@ -98,26 +101,33 @@ public class LineChart extends Div {
                 "    }" +
                 "  }" +
                 "});" +
-                "}, 100);", jsonLabels, jsonData);
+                "}, 100);", jsonLabels, jsonData, textY, textX);
     }
 
     public void updateChart(String[] labels, int[] values) {
         System.out.println("Updating chart with labels: " + Arrays.toString(labels) + ", values: " + Arrays.toString(values));
-
+    
         JsonArray jsonLabels = Json.createArray();
         JsonArray jsonData = Json.createArray();
-
+    
         for (int i = 0; i < labels.length; i++) {
             jsonLabels.set(i, labels[i]);
             jsonData.set(i, values[i]);
         }
-
+    
+        String YAxel = getTranslation("insights.LineChartTextY");  
+        String XAxel = getTranslation("insights.LineChartTextX");  
+    
+        // Execute JavaScript to update the chart data and Y-axis title
         getElement().executeJs("setTimeout(() => {" +
                 "if (window.lineChart) {" +
                 "  window.lineChart.data.labels = $0;" +
                 "  window.lineChart.data.datasets[0].data = $1;" +
+                "  window.lineChart.options.scales.y.title.text = $2;" +
+                "  window.lineChart.options.scales.x.title.text = $3;" +
                 "  window.lineChart.update();" + 
                 "}" +
-                "}, 100);", jsonLabels, jsonData);
+                "}, 100);", jsonLabels, jsonData, YAxel, XAxel);
     }
+    
 }

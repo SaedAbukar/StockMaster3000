@@ -7,6 +7,7 @@ import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
 import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
 import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
+import org.stockmaster3000.stockmaster3000.components.LineChart;
 import org.stockmaster3000.stockmaster3000.components.ReportComponent;
 import org.stockmaster3000.stockmaster3000.components.ReportSelectorComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
@@ -39,6 +40,7 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
                     ProductLogService productLogService, ReportService reportService) {
 
         this.client = client;
+
         
         // Instantiate the reusable components
         inventoryChartComponent = new InventoryChartComponent(securityService, productService);
@@ -120,6 +122,8 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
     @Override
     public void localeChange(LocaleChangeEvent localeChangeEvent) {
+        Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
+        
         // Update text when the locale changes
         this.tab1.setLabel(getTranslation("dashboard"));
         this.tab2.setLabel(getTranslation("insights"));
@@ -127,5 +131,9 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
         headerComponent.updateTexts();
         inventoryComponent.updateTexts();
         inventorySelectorComponent.updateTexts();
+        inventoryChartComponent.updateTexts();
+        inventoryChartComponent.updateCharts(selectedInventory);
+        reportComponent.updateTexts();
+        reportSelectorComponent.updateTexts();
     }
 }

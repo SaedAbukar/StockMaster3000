@@ -31,6 +31,9 @@ public class BarChart extends Div {
             jsonData.set(i, values[i]);
         }
 
+        String textY = getTranslation("insights.BarChartTextY");
+        String textX = getTranslation("insights.BarChartTextX");
+
         getElement().executeJs("setTimeout(() => {" +
                 "const ctx = document.getElementById('barChart').getContext('2d');" +
                 "ctx.canvas.width = 450;" + 
@@ -62,7 +65,7 @@ public class BarChart extends Div {
                 "        beginAtZero: true," +
                 "        title: {" +
                 "          display: true," +
-                "          text: 'Total Cost (€)'," +
+                "          text: $2," +
                 "          font: { size: 14 }" +
                 "        }," +
                 "        ticks: { stepSize: 5 }," +
@@ -71,7 +74,7 @@ public class BarChart extends Div {
                 "      x: {" +
                 "        title: {" +
                 "          display: true," +
-                "          text: 'Food Items'," +
+                "          text: $3," +
                 "          font: { size: 14 }" +
                 "        }," +
                 "        grid: { display: false }" +
@@ -89,7 +92,7 @@ public class BarChart extends Div {
                 "      }," +
                 "      title: {" +
                 "        display: true," +
-                "        text: 'Spending Per Food Item'," +
+                "        text: ''," +
                 "        font: { size: 18 }," +
                 "        padding: 15" +
                 "      }" +
@@ -100,7 +103,7 @@ public class BarChart extends Div {
                 "    }" +
                 "  }" +
                 "});" +
-                "}, 100);", jsonLabels, jsonData);
+                "}, 100);", jsonLabels, jsonData, textY, textX);
     }
 
     public void updateChart(String[] labels, double[] values) {
@@ -114,12 +117,17 @@ public class BarChart extends Div {
             jsonData.set(i, values[i]);
         }
 
+        String textY = getTranslation("insights.BarChartTextY");
+        String textX = getTranslation("insights.BarChartTextX");
+
         getElement().executeJs("setTimeout(() => {" +
                 "if (window.barChart) {" +
                 "  window.barChart.data.labels = $0;" +
                 "  window.barChart.data.datasets[0].data = $1;" +
+                "  window.barChart.options.scales.y.title.text = $2;" +
+                "  window.barChart.options.scales.x.title.text = $3;" +
                 "  window.barChart.update();" + 
                 "}" +
-                "}, 100);", jsonLabels, jsonData);
+                "}, 100);", jsonLabels, jsonData, textY, textX);
     }
 }

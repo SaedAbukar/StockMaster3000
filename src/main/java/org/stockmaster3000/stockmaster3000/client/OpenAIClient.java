@@ -54,7 +54,8 @@ public class OpenAIClient {
         payload.put("model", "gpt-4-turbo");
 
         List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content", "You are an expert in inventory and meal planning. This prompt is for my inventory application report so I need you to generate only what I request."));
+        messages.add(Map.of("role", "system", "content", "You are an expert in inventory and meal planning. Please respond with plain text without any formatting like bold or headings."));
+
         messages.add(Map.of("role", "user", "content", prompt));
 
         payload.put("messages", messages);
@@ -82,39 +83,39 @@ public class OpenAIClient {
     }
 
     // Instructions for generating Invnetory Planning Suggestions & Meal Plans
-    public String generateInventoryPlanningSuggestionsAndMealPlans(String consumptionHistory, String currentMonth) throws Exception {
+    public String generateInventoryPlanningSuggestionsAndMealPlans(String consumptionHistory, String currentMonth, String language) throws Exception {
         String prompt = String.format(
             "Analyse and generate a shopping list for the next 7 days based on the following consumption history: %s. Also, suggest seasonal ingredients for the current month %s and Generate the Meal Plan suggestion based on the ingredients you provided." + 
-            "Your part is to only generate the Shopping list for 7 days, suggest the seasonal ingredients and meal plan, do not generate anything extra and no need to add # and ** marks since it will show raw on the report.",
-            consumptionHistory, currentMonth
+            "Your part is to only generate the Shopping list for 7 days, suggest the seasonal ingredients and meal plan, do not generate anything extra and no need to add # and ** marks since it will show raw on the report. %s",
+            consumptionHistory, currentMonth, language
         );
         return generateResponse(prompt);
     }
 
     // Instructions for Analysing Inventory Healthiness
-    public String generateInventoryHealthinessAnalysis(String consumptionHistory) throws Exception {
+    public String generateInventoryHealthinessAnalysis(String consumptionHistory, String language) throws Exception {
         String prompt = String.format(
-            "Analyse the provided inventory food from the past 30 days and write a report based on its healthiness: %s. Your job is to return only the analysis part and conclusion, do not generate anything extra and no need to add # and ** marks since it will show raw on the report.",
-            consumptionHistory
+            "Analyse the provided inventory food from the past 30 days and write a report based on its healthiness: %s. Your job is to return only the analysis part and conclusion, do not generate anything extra and no need to add # and ** marks since it will show raw on the report. %s",
+            consumptionHistory, language
         );
         return generateResponse(prompt);
     }
 
     // Instructions for generating Food suggestions based on the current inventory products
-    public String generateMealPlanBasedOnCurrentInventoryIngredients(String currentIngredients) throws Exception {
+    public String generateMealPlanBasedOnCurrentInventoryIngredients(String currentIngredients, String language) throws Exception {
         String prompt = String.format(
             "Generate 1-8 meal suggestions based on the current ingredients in the fridge and take into consideration the quantities if the meal is possible to prepare: %s." +
-            "Please return the response in a String and without **",
-            currentIngredients
+            "Please return the response in a String and without ** %s",
+            currentIngredients, language
         );
         return generateResponse(prompt);
     }
 
     // Generates the Nutritions upon product creation
-    public String getNutritions(String ingredient) throws Exception {
+    public String getNutritions(String ingredient, String language) throws Exception {
         String prompt = String.format(
-            "Generate the nutrition for %s per 100g (or per 100ml if it's a liquid/drink) and specifically provide it in this form and only the requested fields without anything extra: Calories: int, Protein: double, Fat: double, Carbohydrates: double",
-            ingredient
+            "Generate the nutrition for %s per 100g (or per 100ml if it's a liquid/drink) and specifically provide it in this form and only the requested fields without anything extra: Calories: int, Protein: double, Fat: double, Carbohydrates: double %s",
+            ingredient, language
         );
         return generateResponse(prompt);
     }
