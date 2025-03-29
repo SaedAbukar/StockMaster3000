@@ -90,26 +90,23 @@ pipeline {
         stage('Build & Push Multi-Arch Image') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY')]) {
+                    withCredentials([
+                        string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY'),
+                        usernamePassword(credentialsId: 'viettranni', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')
+                    ]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
-                            if (isUnix()) {
-                                sh '''
-                                    docker buildx build --platform linux/amd64,linux/arm64 \
-                                        --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                        -t $DOCKER_IMAGE:$DOCKER_TAG --push .
-                                '''
-                            } else {
-                                bat '''
-                                    docker buildx build --platform linux/amd64,linux/arm64 ^
-                                        --build-arg OPENAI_API_KEY=%OPENAI_API_KEY% ^
-                                        -t %DOCKER_IMAGE%:%DOCKER_TAG% --push .
-                                '''
-                            }
+                            sh """
+                                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                                docker buildx build --platform linux/amd64,linux/arm64 \
+                                    --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
+                                    -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} --push .
+                            """
                         }
                     }
                 }
             }
         }
+
 
         stage('Test Docker Image') {
             steps {
