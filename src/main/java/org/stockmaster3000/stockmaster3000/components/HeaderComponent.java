@@ -67,6 +67,9 @@ public class HeaderComponent extends HorizontalLayout {
 
         // Set custom ItemLabelGenerator to show flag emojis
         languageSelector.setItemLabelGenerator(locale -> {
+            if (locale == null) {
+                return "🌍"; // Default icon if null
+            }
             switch (locale.getLanguage()) {
                 case "ru":
                     return "🇷🇺"; // Flag for Russia
@@ -79,7 +82,9 @@ public class HeaderComponent extends HorizontalLayout {
             }
         });
 
-        languageSelector.setValue(UI.getCurrent().getLocale()); // Set current UI locale
+        // Add a null check for UI.getCurrent() before setting locale
+        Locale currentLocale = (UI.getCurrent() != null) ? UI.getCurrent().getLocale() : Locale.ENGLISH;
+        languageSelector.setValue(currentLocale); // Set current UI locale if not null, otherwise fallback to English
 
         languageSelector.addValueChangeListener(event -> {
             if (event.getValue() != null) {
@@ -95,6 +100,7 @@ public class HeaderComponent extends HorizontalLayout {
         add(new HorizontalLayout(languageSelector));
         languageSelector.addClassName("custom-language-selector");
     }
+
 
 
 
