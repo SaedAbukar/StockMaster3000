@@ -6,8 +6,8 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "saedabukar/stockmaster3000"
-        DOCKER_TAG = "latest"
+        DOCKER_IMAGE = "viettranni/stockmaster3000"
+        DOCKER_TAG = "latest1"
     }
 
     stages {
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'saed2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                git branch: 'viet2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
@@ -67,17 +67,25 @@ pipeline {
             }
         }
 
-        stage('Enable Docker Buildx') {
+        stage('Set up Docker Buildx') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh 'docker buildx create --use'
-                    } else {
-                        bat 'docker buildx create --use'
-                    }
+                    sh 'docker buildx create --use || true'
+                    sh 'docker buildx inspect --bootstrap'
                 }
             }
         }
+        // stage('Enable Docker Buildx') {
+        //     steps {
+        //         script {
+        //             if (isUnix()) {
+        //                 sh 'docker buildx create --use'
+        //             } else {
+        //                 bat 'docker buildx create --use'
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Build & Push Multi-Arch Image') {
             steps {
