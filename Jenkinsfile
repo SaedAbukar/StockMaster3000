@@ -43,7 +43,7 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                bat 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
+                sh 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
             }
             post {
                 always {
