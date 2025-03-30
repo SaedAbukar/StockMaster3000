@@ -1,27 +1,17 @@
-# Stage 1: Build the JAR file using Maven
-FROM --platform=$BUILDPLATFORM maven:3.8.6-eclipse-temurin-17 AS build
+# Use Maven image to build the application
+FROM maven:latest
 
-# Set the working directory inside the container
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy the pom.xml and the src folder to the container
-COPY pom.xml .
-COPY src ./src
+# Copy the pom.xml to download dependencies first (caching optimization)
+COPY pom.xml /app/
 
-# Run the Maven build to create the JAR file
-RUN mvn clean package -Pproduction -DskipTests
+# Copy the entire project to the container
+COPY . /app/
 
-# Stage 2: Run the JAR file
-FROM --platform=$TARGETPLATFORM eclipse-temurin:17-jre
+# Package the application using Maven
+RUN mvn package
 
-# Copy the JAR file from the build stage
-COPY --from=build /app/target/*.jar app.jar
-
-# Expose port 8081 (to match docker-compose.yml)
-EXPOSE 8081
-
-# Set the environment variable OPENAI_API_KEY inside the container
-# ENV OPENAI_API_KEY=${OPENAI_API_KEY}
-
-# Set the entry point to run the JAR file
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# Run the main class from the built JAR
+CMD ["java", "-jar", "target/LocalizedGreetingApp.jar"]
