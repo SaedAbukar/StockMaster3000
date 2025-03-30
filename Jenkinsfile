@@ -15,19 +15,12 @@ pipeline {
             steps {
                 script {
                     // Install Docker Buildx
-                    if (isUnix()) {
                         sh '''
-                            mkdir -vp ~/.docker/cli-plugins/
-                            curl --silent -L "https://github.com/docker/buildx/releases/download/v0.3.0/buildx-v0.3.0.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
-                            chmod a+x ~/.docker/cli-plugins/docker-buildx
+                            mkdir -vp %USERPROFILE%\\.docker\\cli-plugins/
+                            curl --silent -L "https://github.com/docker/buildx/releases/download/v0.3.0/buildx-v0.3.0.linux-amd64" > %USERPROFILE%\\.docker\\cli-plugins\\docker-buildx
+                            chmod a+x %USERPROFILE%\\.docker\\cli-plugins\\docker-buildx
+
                         '''
-                    } else {
-                        bat '''
-                            mkdir -vp %USERPROFILE%\.docker\cli-plugins
-                            curl --silent -L "https://github.com/docker/buildx/releases/download/v0.3.0/buildx-v0.3.0.windows-amd64" -o %USERPROFILE%\.docker\cli-plugins\docker-buildx
-                            chmod a+x %USERPROFILE%\.docker\cli-plugins\docker-buildx
-                        '''
-                    }
                 }
             }
         }
