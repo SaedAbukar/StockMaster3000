@@ -15,7 +15,9 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'viet2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
+                script {
+                    env.DOCKER_HOST = 'unix:///var/run/docker.sock'
+                }
             }
         }
 
