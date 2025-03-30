@@ -9,15 +9,15 @@ pipeline {
     stages {
         stage('Set Docker Context') {
             steps {
-                sh 'docker context use unix:///Users/viettran/.docker/run/docker.sock'
+                script {
+                    env.DOCKER_HOST = 'unix:///var/run/docker.sock'
+                }
             }
         }
 
         stage('Checkout') {
             steps {
-                script {
-                    env.DOCKER_HOST = 'unix:///var/run/docker.sock'
-                }
+                git branch: 'viet2', url: 'https://github.com/SaedAbukar/StockMaster3000.git'
             }
         }
 
