@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Set Docker Context') {
             steps {
-                sh 'docker context use desktop-linux'
+                sh 'docker context use unix:///var/run/docker.sock'
             }
         }
 
