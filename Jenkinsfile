@@ -75,17 +75,6 @@ pipeline {
                 }
             }
         }
-        // stage('Enable Docker Buildx') {
-        //     steps {
-        //         script {
-        //             if (isUnix()) {
-        //                 sh 'docker buildx create --use'
-        //             } else {
-        //                 bat 'docker buildx create --use'
-        //             }
-        //         }
-        //     }
-        // }
 
         stage('Build & Push Multi-Arch Image') {
             steps {
@@ -97,9 +86,7 @@ pipeline {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                                docker buildx build --platform linux/amd64,linux/arm64 \
-                                    --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
-                                    -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push .
+                                docker buildx build --platform linux/amd64,linux/arm64 -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push .
                             """
                         }
                     }
