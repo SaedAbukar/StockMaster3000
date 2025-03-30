@@ -10,21 +10,6 @@ pipeline {
         DOCKER_TAG = "latest1"
     }
 
-    stages {
-        stage('Install Buildx') {
-            steps {
-                script {
-                    // Install Docker Buildx
-                        sh '''
-                            mkdir -vp %USERPROFILE%\\.docker\\cli-plugins/
-                            curl --silent -L "https://github.com/docker/buildx/releases/download/v0.3.0/buildx-v0.3.0.linux-amd64" > %USERPROFILE%\\.docker\\cli-plugins\\docker-buildx
-                            chmod a+x %USERPROFILE%\\.docker\\cli-plugins\\docker-buildx
-
-                        '''
-                }
-            }
-        }
-
         stage('Set Docker Host') {
             steps {
                 script {
