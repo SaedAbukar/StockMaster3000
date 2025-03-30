@@ -1,0 +1,10 @@
+import '@vaadin/polymer-legacy-adapter/style-modules.js';
+import '@vaadin/combo-box/theme/lumo/vaadin-combo-box.js';
+import 'Frontend/generated/jar-resources/flow-component-renderer.js';
+import 'Frontend/generated/jar-resources/comboBoxConnector.js';
+import '@vaadin/tooltip/theme/lumo/vaadin-tooltip.js';
+import '@vaadin/multi-select-combo-box/theme/lumo/vaadin-multi-select-combo-box.js';
+import '@vaadin/button/theme/lumo/vaadin-button.js';
+import '@vaadin/vertical-layout/theme/lumo/vaadin-vertical-layout.js';
+import '@vaadin/horizontal-layout/theme/lumo/vaadin-horizontal-layout.js';
+import 'Frontend/generated/jar-resources/disableOnClickFunctions.js';
