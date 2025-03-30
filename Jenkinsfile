@@ -11,6 +11,27 @@ pipeline {
     }
 
     stages {
+        stage('Install Buildx') {
+            steps {
+                script {
+                    // Install Docker Buildx
+                    if (isUnix()) {
+                        sh '''
+                            mkdir -vp ~/.docker/cli-plugins/
+                            curl --silent -L "https://github.com/docker/buildx/releases/download/v0.3.0/buildx-v0.3.0.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
+                            chmod a+x ~/.docker/cli-plugins/docker-buildx
+                        '''
+                    } else {
+                        bat '''
+                            mkdir -vp %USERPROFILE%\.docker\cli-plugins
+                            curl --silent -L "https://github.com/docker/buildx/releases/download/v0.3.0/buildx-v0.3.0.windows-amd64" -o %USERPROFILE%\.docker\cli-plugins\docker-buildx
+                            chmod a+x %USERPROFILE%\.docker\cli-plugins\docker-buildx
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Set Docker Host') {
             steps {
                 script {
@@ -43,16 +64,14 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh 'mvn test jacoco:report' // Runs tests & generates JaCoCo coverage report
+                sh 'mvn test jacoco:report'
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml' // Publish JUnit test results
+                    junit 'target/surefire-reports/*.xml'
 
-                    // Discover reference build for comparison
                     discoverReferenceBuild()
 
-                    // Record Coverage using Coverage Plugin
                     recordCoverage(
                         tools: [[parser: 'JACOCO']],
                         id: 'jacoco',
@@ -95,7 +114,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Test Docker Image') {
             steps {
