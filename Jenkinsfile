@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Set Docker Context') {
             steps {
-                sh 'docker context use unix:///var/run/docker.sock'
+                sh 'docker context use unix:///Users/viettran/.docker/run/docker.sock'
             }
         }
 
