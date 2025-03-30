@@ -37,7 +37,7 @@ pipeline {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             sh """
                                 docker buildx create --use'
-                                docker login -u "$DOCKER_USER" --password-stdin <<< "$DOCKER_PASS"
+                                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                                 docker buildx build --platform linux/amd64,linux/arm64 \
                                     --build-arg OPENAI_API_KEY=$OPENAI_API_KEY \
                                     -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push .
