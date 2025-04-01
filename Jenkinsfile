@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "viettranni/stockmaster3000"
-        DOCKER_TAG = "latest1"
+        DOCKER_TAG = "latest2"
     }
 
     stages {
@@ -26,8 +26,6 @@ pipeline {
                 sh 'mvn clean package -Pproduction -DskipTests'
             }
         }
-
-
 
         stage('Build & Push Image') {
             steps {
