@@ -47,6 +47,18 @@ pipeline {
                 }
             }
         }
+        stage('Compose up!') {
+            steps {
+                script {
+                    sh '''
+                         docker-compose -f docker-compose.yml down
+                         docker-compose -f docker-compose.yml up -d
+                         docker-compose ps
+                         docker-compose logs
+                         '''
+                }
+            }
+        }
     }
 
     post {
