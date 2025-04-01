@@ -36,7 +36,7 @@ pipeline {
         }
 
 
-        stage('Build & Push Multi-Arch Image') {
+        stage('Build & Push Image') {
             steps {
                 script {
                     withCredentials([
@@ -45,7 +45,8 @@ pipeline {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                                docker buildx build --platform linux/amd64,linux/arm64 -t ${DOCKER_IMAGE}:${DOCKER_TAG} --push .
+                                docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                                docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
                             """
                         }
                     }
