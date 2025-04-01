@@ -38,6 +38,7 @@ pipeline {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                                export DOCKER_BUILDKIT=0
                                 docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
                                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
                             """
