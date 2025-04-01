@@ -33,13 +33,14 @@ pipeline {
             steps {
                 script {
                     withCredentials([
+                        string(credentialsId: 'openai-api-key-id', variable: 'OPENAI_API_KEY'),
                         usernamePassword(credentialsId: 'viettranni', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')
                     ]) {
                         docker.withRegistry('https://index.docker.io/v1/', 'viettranni') {
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                                 export DOCKER_BUILDKIT=0
-                                docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                                docker build --build-arg OPENAI_API_KEY=${OPENAI_API_KEY} -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
                                 docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
                             """
                         }
