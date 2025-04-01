@@ -1,7 +1,6 @@
 # Stage 1: Build the JAR file using Maven
 FROM maven:3.8.6-eclipse-temurin-17 AS build
 
-
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -9,11 +8,17 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
+# Download dependencies first for better caching
+RUN mvn dependency:go-offline
+
 # Run the Maven build to create the JAR file
 RUN mvn clean package -Pproduction -DskipTests
 
 # Stage 2: Run the JAR file
-FROM --platform=$TARGETPLATFORM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre
+
+# Set the working directory
+WORKDIR /app
 
 # Copy the JAR file from the build stage
 COPY --from=build /app/target/*.jar app.jar
@@ -21,8 +26,5 @@ COPY --from=build /app/target/*.jar app.jar
 # Expose port 8081 (to match docker-compose.yml)
 EXPOSE 8081
 
-# Set the environment variable OPENAI_API_KEY inside the container
-# ENV OPENAI_API_KEY=${OPENAI_API_KEY}
-
 # Set the entry point to run the JAR file
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
