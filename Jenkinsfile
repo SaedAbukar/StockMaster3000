@@ -27,13 +27,6 @@ pipeline {
             }
         }
 
-        stage('Enable Docker Buildx') {
-            steps {
-                script {
-                    sh 'docker buildx create --use'
-                }
-            }
-        }
 
 
         stage('Build & Push Image') {
