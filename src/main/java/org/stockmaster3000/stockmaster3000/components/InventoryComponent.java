@@ -11,6 +11,7 @@ import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
+import org.stockmaster3000.stockmaster3000.event.LanguageChangeListener;
 
 import com.vaadin.flow.component.UI;
 import org.springframework.stereotype.Component;
@@ -28,14 +29,16 @@ import com.vaadin.flow.component.notification.Notification;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 
 @PermitAll
-public class InventoryComponent extends VerticalLayout {
+public class InventoryComponent extends VerticalLayout implements LanguageChangeListener{
     private final InventoryService inventoryService;
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
     private final InventorySelectorComponent inventorySelectorComponent;
+    private final HeaderComponent headerComponent;
 
     String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
 
@@ -80,7 +83,8 @@ public class InventoryComponent extends VerticalLayout {
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-    public InventoryComponent(SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
+    public InventoryComponent(HeaderComponent headerComponent, SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
+        this.headerComponent = headerComponent;
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
@@ -93,6 +97,7 @@ public class InventoryComponent extends VerticalLayout {
         createFilterButtons();
         createGrid();
         updateGrid(currentInventory, currentLanguageCode);
+        headerComponent.addLanguageChangeListener(this);
     }
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -527,6 +532,13 @@ public class InventoryComponent extends VerticalLayout {
         }
 
         return filteredProducts;
+    }
+
+    @Override
+    public void onLanguageChange(Locale newLocale) {
+        UI.getCurrent().setLocale(newLocale);
+        currentLanguageCode = newLocale.getLanguage();
+        updateGrid(currentInventory, currentLanguageCode); 
     }
 
     public void updateTexts() {

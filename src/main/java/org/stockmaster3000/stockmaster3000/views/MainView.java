@@ -49,11 +49,11 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
         
         // Instantiate the reusable components
+        headerComponent = new HeaderComponent(securityService);
         inventoryChartComponent = new InventoryChartComponent(securityService, productService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
         reportSelectorComponent = new ReportSelectorComponent(securityService, reportService, inventorySelectorComponent);
-        inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
-        headerComponent = new HeaderComponent(securityService);
+        inventoryComponent = new InventoryComponent(headerComponent, securityService, inventoryService, productService, categoryService, supplierService);
         reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService, reportService, reportSelectorComponent, securityService);
 
         // Set to take up all the available space 100%

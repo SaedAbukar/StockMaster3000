@@ -8,11 +8,12 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
-import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
+import org.stockmaster3000.stockmaster3000.event.LanguageChangeListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-
 
 public class HeaderComponent extends HorizontalLayout {
 
@@ -22,8 +23,7 @@ public class HeaderComponent extends HorizontalLayout {
     private Button logout;
     private Span greeting;
 
-    Inventory currentInventory;
-    // String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
+    private final List<LanguageChangeListener> languageChangeListeners = new ArrayList<>();
 
     public HeaderComponent(SecurityService securityService) {
         this.securityService = securityService;
@@ -63,63 +63,42 @@ public class HeaderComponent extends HorizontalLayout {
 
     private void addLanguageSelector() {
         ComboBox<Locale> languageSelector = new ComboBox<>();
+        languageSelector.setItems(Locale.ENGLISH, new Locale("ru", "RU"), new Locale("el", "GR"), new Locale("fi", "FI"));
 
-        // Use Locale with both language and country codes
-        Locale russian = new Locale("ru", "RU"); // Russian (Russia)
-        Locale greek = new Locale("el", "GR"); // Greek (Greece)
-        Locale finnish = new Locale("fi", "FI"); // Finnish (Finland)
-
-        languageSelector.setItems(Locale.ENGLISH, russian, greek, finnish);
-
-        // Set custom ItemLabelGenerator to show flag emojis
-        languageSelector.setItemLabelGenerator(locale -> {
-            if (locale == null) {
-                return "🌍"; // Default icon if null
-            }
-            switch (locale.getLanguage()) {
-                case "ru":
-                    return "🇷🇺"; // Flag for Russia
-                case "el":
-                    return "🇬🇷"; // Flag for Greece
-                case "fi":
-                    return "🇫🇮"; // Flag for Finland
-                default:
-                    return "🇬🇧"; // Flag for English
-            }
+        languageSelector.setItemLabelGenerator(locale -> switch (locale.getLanguage()) {
+            case "ru" -> "🇷🇺";
+            case "el" -> "🇬🇷";
+            case "fi" -> "🇫🇮";
+            default -> "🇬🇧";
         });
 
-        // Listening the current inventory
-        // inventorySelectorComponent.setSelectionListener(selectedInventory -> {
-        //     currentInventory = selectedInventory;
-        // });
-
-        // Add a null check for UI.getCurrent() before setting locale
         Locale currentLocale = (UI.getCurrent() != null) ? UI.getCurrent().getLocale() : Locale.ENGLISH;
-        languageSelector.setValue(currentLocale); // Set current UI locale if not null, otherwise fallback to English
+        languageSelector.setValue(currentLocale);
 
         languageSelector.addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().setLocale(event.getValue()); // Change locale, triggers localeChange()
-                // inventoryComponent.updateGrid(currentInventory, currentLanguageCode);
+                Locale newLocale = event.getValue();
+                UI.getCurrent().setLocale(newLocale);
+                notifyLanguageChangeListeners(newLocale); // Notify other components
             }
         });
 
-        
-
-        // Set background color to white, text color to black, and cursor to pointer
-        languageSelector.getElement().getStyle()
-                .set("color", "white") // Set text color to black (or any color you want)
-                .set("cursor", "pointer"); // Change mouse cursor to pointer
-
+        languageSelector.getElement().getStyle().set("color", "white").set("cursor", "pointer");
         add(new HorizontalLayout(languageSelector));
         languageSelector.addClassName("custom-language-selector");
     }
 
+    public void addLanguageChangeListener(LanguageChangeListener listener) {
+        languageChangeListeners.add(listener);
+    }
 
-
+    private void notifyLanguageChangeListeners(Locale newLocale) {
+        for (LanguageChangeListener listener : languageChangeListeners) {
+            listener.onLanguageChange(newLocale);
+        }
+    }
 
     public void updateTexts() {
-        // Update all translatable text
         title.setText(getTranslation("header.title"));
         login.setText(getTranslation("header.login"));
 

@@ -192,7 +192,7 @@ public class InventorySelectorComponent extends VerticalLayout {
     }
 
     public Inventory getSelectedInventory() {
-        return selectedInventory; // Return the currently selected inventory
+        return selectedInventory;
     }
 
     public long getInventoryId() {
