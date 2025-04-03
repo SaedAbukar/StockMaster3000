@@ -13,6 +13,8 @@ import org.stockmaster3000.stockmaster3000.components.ReportSelectorComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.service.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
+
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -30,6 +32,10 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
     private final ReportComponent reportComponent;
     private final OpenAIClient client;
     private final ReportSelectorComponent reportSelectorComponent;
+
+
+    String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
+
     Tab tab1;
     Tab tab2;
     Tab tab3;
@@ -44,9 +50,9 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
         
         // Instantiate the reusable components
         inventoryChartComponent = new InventoryChartComponent(securityService, productService);
-        inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
         reportSelectorComponent = new ReportSelectorComponent(securityService, reportService, inventorySelectorComponent);
+        inventoryComponent = new InventoryComponent(securityService, inventoryService, productService, categoryService, supplierService);
         headerComponent = new HeaderComponent(securityService);
         reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService, reportService, reportSelectorComponent, securityService);
 
@@ -59,7 +65,7 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
         // Set up inventory selection listener
         inventorySelectorComponent.setSelectionListener(selectedInventory -> {
-            inventoryComponent.updateGrid(selectedInventory); // Update InventoryComponent
+            inventoryComponent.updateGrid(selectedInventory, currentLanguageCode); // Update InventoryComponent
             inventoryChartComponent.updateCharts(selectedInventory); // Update ALL charts
         });
 

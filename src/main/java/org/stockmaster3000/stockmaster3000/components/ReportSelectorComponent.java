@@ -6,6 +6,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.model.Report;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
@@ -14,6 +15,7 @@ import org.stockmaster3000.stockmaster3000.service.ReportService;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class ReportSelectorComponent extends VerticalLayout {
 

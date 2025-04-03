@@ -37,16 +37,16 @@ public class ProductService {
 
 
     // Get all products in a specific inventory
-    public List<Product> getProductsByInventory(Long inventoryId) {
-        return productRepository.findByInventoryId(inventoryId);
+    public List<Product> getProductsByInventory(Long inventoryId, String languageCode) {
+        return productRepository.findByInventoryIdAndLanguageCode(inventoryId, languageCode);
     }
 
     // Fetching Product by Name
-    public List<Product> getProductsByName(Long inventoryId, String productName) {
+    public List<Product> getProductsByName(Long inventoryId, String productName, String languageCode) {
         if (productName != null && !productName.isEmpty()) {
             return productRepository.findByInventoryIdAndName(inventoryId, productName);
         } else {
-            return productRepository.findByInventoryId(inventoryId);
+            return productRepository.findByInventoryIdAndLanguageCode(inventoryId, languageCode);
         }
     }
 
@@ -110,8 +110,8 @@ public class ProductService {
     }
 
     // Method to fetch product data categorized by inventory
-    public Map<Category, Integer> getProductDataByInventory(Long inventoryId) {
-        List<Product> products = productRepository.findByInventoryId(inventoryId);
+    public Map<Category, Integer> getProductDataByInventory(Long inventoryId, String languageCode) {
+        List<Product> products = productRepository.findByInventoryIdAndLanguageCode(inventoryId, languageCode);
         Map<Category, Integer> productData = new HashMap<>();
 
         // Loop through products and categorize them by category

@@ -42,6 +42,9 @@ public class Product {
 
     private Integer amountOfDaysUntilExpiration;
 
+    @Column(name = "language_code")
+    private String languageCode;
+
     // Relationships
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)
@@ -68,12 +71,13 @@ public class Product {
     // Constructor
     public Product() {}
 
-    public Product(String name, Double price, Integer quantity, String nutritions, Integer amountOfDaysUntilExpiration, Supplier supplier, Category category, Inventory inventory) {
+    public Product(String name, Double price, Integer quantity, String nutritions, Integer amountOfDaysUntilExpiration, String languageCode, Supplier supplier, Category category, Inventory inventory) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.nutritions = nutritions;
         this.amountOfDaysUntilExpiration = amountOfDaysUntilExpiration;
+        this.languageCode = languageCode;
         this.supplier = supplier;
         this.category = category;
         this.inventory = inventory;
@@ -118,6 +122,14 @@ public class Product {
 
     public void setNutritions(String nutritions) {
         this.nutritions = nutritions;
+    }
+
+    public String getLanguageCode () {
+        return languageCode;
+    }
+
+    public void setLanguageCode (String languageCode) {
+        this.languageCode = languageCode;
     }
 
     public Integer getAmountOfDaysUntilExpiration() {
@@ -171,7 +183,7 @@ public class Product {
     // hashCode and equals
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, quantity, nutritions, amountOfDaysUntilExpiration, supplier, category, inventory);
+        return Objects.hash(id, name, price, quantity, nutritions, amountOfDaysUntilExpiration, languageCode, supplier, category, inventory);
     }
 
     @Override
@@ -185,6 +197,7 @@ public class Product {
                 Objects.equals(quantity, product.quantity) &&
                 Objects.equals(nutritions, product.nutritions) &&
                 Objects.equals(amountOfDaysUntilExpiration, product.amountOfDaysUntilExpiration) &&
+                Objects.equals(languageCode, product.languageCode) &&
                 Objects.equals(supplier, product.supplier) &&
                 Objects.equals(category, product.category) &&
                 Objects.equals(inventory, product.inventory);
@@ -197,6 +210,7 @@ public class Product {
                 ", quantity=" + quantity +
                 ", nutritions=" + nutritions +
                 ", amountOfDaysUntilExpiration=" + amountOfDaysUntilExpiration +
+                ", language_code=" + languageCode +
                 ", supplier=" + (supplier != null ? supplier.getName() : "null") +
                 ", category=" + (category != null ? category.getName() : "null") +
                 ", inventory=" + (inventory != null ? inventory.getName() : "null");

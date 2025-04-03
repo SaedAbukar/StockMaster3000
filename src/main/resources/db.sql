@@ -22,9 +22,6 @@ CREATE TABLE categories (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Track updates
 );
 
--- Inserting default categories
-INSERT INTO categories (name) VALUES ('Food'), ('Beverages'), ('Electronics');
-
 -- Create the Inventories table
 CREATE TABLE inventories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,  -- auto-incrementing primary key
@@ -35,8 +32,6 @@ CREATE TABLE inventories (
     CONSTRAINT fk_inventory_user FOREIGN KEY (user_id) REFERENCES _users(id)  -- Linking inventories to users (if applicable)
 );
 
--- Inserting inventories
-INSERT INTO inventories (name) VALUES ('Fridge');
 
 -- Create Suppliers table
 CREATE TABLE suppliers (
@@ -46,8 +41,6 @@ CREATE TABLE suppliers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Track updates
 );
 
--- Inserting suppliers
-INSERT INTO suppliers (name) VALUES ('Fazer'), ('Valio'), ('Rainbow');
 
 -- Create the Reports table
 CREATE TABLE reports (
@@ -60,7 +53,6 @@ CREATE TABLE reports (
     CONSTRAINT fk_reports_inventory FOREIGN KEY (inventory_id) REFERENCES inventories(id)
 );
 
-
 -- Create the Products table
 CREATE TABLE products (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,      -- Auto-incrementing primary key
@@ -69,6 +61,7 @@ CREATE TABLE products (
     quantity INT NOT NULL,                      -- Quantity of the product
     nutritions TEXT,                            -- TEXT data type for storing nutritional values (depends on DB)
     amountOfDaysUntilExpiration INT,            -- Expiration days for the product
+    language_code VARCHAR(5) DEFAULT 'en',      -- Language code db localization
     supplier_id BIGINT NOT NULL,                -- Foreign key for the supplier
     category_id BIGINT NOT NULL,                -- Foreign key for the category
     inventory_id BIGINT NOT NULL,               -- Foreign key for the inventory

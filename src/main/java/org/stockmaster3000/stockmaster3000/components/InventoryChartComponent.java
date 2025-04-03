@@ -15,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 
 
@@ -86,11 +87,12 @@ public class InventoryChartComponent extends VerticalLayout {
      * Updates all charts based on the selected inventory.
      */
     public void updateCharts(Inventory selectedInventory) {
+        String languageCode = UI.getCurrent().getLocale().getLanguage();
         if (selectedInventory != null) {
-            Map<Category, Integer> productData = productService.getProductDataByInventory(selectedInventory.getId());
+            Map<Category, Integer> productData = productService.getProductDataByInventory(selectedInventory.getId(), languageCode);
             updateCategoryChart(productData);
 
-            List<Product> products = productService.getProductsByInventory(selectedInventory.getId());
+            List<Product> products = productService.getProductsByInventory(selectedInventory.getId(), languageCode);
             updateSpendingChart(products);
             updateExpirationChart(products);
         } else {

@@ -7,9 +7,12 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+
+import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
 import java.util.Locale;
+
 
 public class HeaderComponent extends HorizontalLayout {
 
@@ -18,6 +21,9 @@ public class HeaderComponent extends HorizontalLayout {
     private Button login;
     private Button logout;
     private Span greeting;
+
+    Inventory currentInventory;
+    // String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
 
     public HeaderComponent(SecurityService securityService) {
         this.securityService = securityService;
@@ -82,6 +88,11 @@ public class HeaderComponent extends HorizontalLayout {
             }
         });
 
+        // Listening the current inventory
+        // inventorySelectorComponent.setSelectionListener(selectedInventory -> {
+        //     currentInventory = selectedInventory;
+        // });
+
         // Add a null check for UI.getCurrent() before setting locale
         Locale currentLocale = (UI.getCurrent() != null) ? UI.getCurrent().getLocale() : Locale.ENGLISH;
         languageSelector.setValue(currentLocale); // Set current UI locale if not null, otherwise fallback to English
@@ -89,8 +100,11 @@ public class HeaderComponent extends HorizontalLayout {
         languageSelector.addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 UI.getCurrent().setLocale(event.getValue()); // Change locale, triggers localeChange()
+                // inventoryComponent.updateGrid(currentInventory, currentLanguageCode);
             }
         });
+
+        
 
         // Set background color to white, text color to black, and cursor to pointer
         languageSelector.getElement().getStyle()

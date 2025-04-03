@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     // You can add custom queries here if needed
-    List<Product> findByInventoryId(Long inventoryId);
+    List<Product> findByInventoryIdAndLanguageCode(Long inventoryId, String languageCode);
 
     List<Product> findByInventoryIdAndName(Long inventoryId, String name);
 

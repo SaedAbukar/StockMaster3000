@@ -19,6 +19,8 @@ import static org.mockito.Mockito.*;
 public class HeaderComponentTest {
 
     private SecurityService securityService;
+    private InventoryComponent inventoryComponent;
+    private InventorySelectorComponent inventorySelectorComponent;
     private HeaderComponent headerComponent;
 
     @BeforeEach

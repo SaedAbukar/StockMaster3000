@@ -9,13 +9,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
+
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.InventoryService;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class InventorySelectorComponent extends VerticalLayout {
 

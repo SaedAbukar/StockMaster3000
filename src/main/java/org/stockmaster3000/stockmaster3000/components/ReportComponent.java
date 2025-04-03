@@ -3,6 +3,7 @@ package org.stockmaster3000.stockmaster3000.components;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
@@ -76,6 +77,7 @@ public class ReportComponent extends VerticalLayout {
 
         // Click listeners for each button
         button1.addClickListener(event -> {
+            String languageCode = UI.getCurrent().getLocale().getLanguage();
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
             if (currentInventory == null) {
                 Notification.show(notificationSelectInventory);
@@ -83,7 +85,7 @@ public class ReportComponent extends VerticalLayout {
             }
 
             // Fetching the products from inventory
-            List<Product> products = productService.getProductsByInventory(currentInventory.getId());
+            List<Product> products = productService.getProductsByInventory(currentInventory.getId(), languageCode);
             String currentIngredients = products.toString();
             String currentMonth = date.getMonth().toString();
             try {
@@ -120,11 +122,12 @@ public class ReportComponent extends VerticalLayout {
 
         button3.addClickListener(event -> {
             Inventory currentInventory = inventorySelectorComponent.getSelectedInventory();
+            String languageCode = UI.getCurrent().getLocale().getLanguage();
             if (currentInventory == null) {
                 Notification.show(notificationSelectInventory);
                 return;
             }
-            List<Product> products = productService.getProductsByInventory(currentInventory.getId());
+            List<Product> products = productService.getProductsByInventory(currentInventory.getId(), languageCode);
             String currentIngredients = products.toString();
             try {
                 resultTextArea.setValue("");

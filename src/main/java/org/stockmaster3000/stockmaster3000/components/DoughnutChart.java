@@ -2,6 +2,8 @@ package org.stockmaster3000.stockmaster3000.components;
 
 import com.vaadin.flow.component.html.Div;
 import java.util.Arrays;
+
+
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import elemental.json.Json;

@@ -18,6 +18,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
+import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
+import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
 import java.util.Locale;

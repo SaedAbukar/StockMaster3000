@@ -11,6 +11,9 @@ import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
+
+import com.vaadin.flow.component.UI;
+import org.springframework.stereotype.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -26,7 +29,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-
 @PermitAll
 public class InventoryComponent extends VerticalLayout {
     private final InventoryService inventoryService;
@@ -34,6 +36,8 @@ public class InventoryComponent extends VerticalLayout {
     private final CategoryService categoryService;
     private final SupplierService supplierService;
     private final InventorySelectorComponent inventorySelectorComponent;
+
+    String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
 
     private HorizontalLayout filterLayout;
 
@@ -88,7 +92,7 @@ public class InventoryComponent extends VerticalLayout {
         searchByName();
         createFilterButtons();
         createGrid();
-        updateGrid(currentInventory);
+        updateGrid(currentInventory, currentLanguageCode);
     }
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -138,7 +142,7 @@ public class InventoryComponent extends VerticalLayout {
         button.addClickListener(e -> {
             updateActiveButton(button);
             currentFilter = filter;
-            updateGrid(currentInventory);
+            updateGrid(currentInventory, currentLanguageCode);
         });
     
         return button;
@@ -253,6 +257,7 @@ public class InventoryComponent extends VerticalLayout {
         expirationDate = new DatePicker(getTranslation("exp_date"));
         supplierField = new TextField(getTranslation("supplier"));
         categoryField = new TextField(getTranslation("category"));
+        String languageCode = UI.getCurrent().getLocale().getLanguage();
 
         // Get selected inventory
         Inventory selectedInventory = currentInventory;
@@ -288,6 +293,8 @@ public class InventoryComponent extends VerticalLayout {
                 newProduct.setPrice(Double.parseDouble(priceField.getValue()));
                 
                 newProduct.setNutritions(generatedNutritions);
+
+                newProduct.setLanguageCode(languageCode);
 
                 if (expirationDate.getValue() != null) {
                     long daysUntilExpiration = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate.getValue());
@@ -326,7 +333,7 @@ public class InventoryComponent extends VerticalLayout {
                 newProduct.setCategory(category);
 
                 productService.addProduct(newProduct);
-                updateGrid(currentInventory);
+                updateGrid(currentInventory, currentLanguageCode);
                 dialog.close();
                 Notification.show(getTranslation("succ.pro_add"));
             } catch (NumberFormatException ex) {
@@ -418,7 +425,7 @@ public class InventoryComponent extends VerticalLayout {
 
                 // Update the product in the database
                 productService.updateProduct(product);
-                updateGrid(currentInventory);
+                updateGrid(currentInventory, currentLanguageCode);
                 dialog.close();
                 Notification.show(getTranslation("succ.pro_add"));
             } catch (NumberFormatException ex) {
@@ -448,7 +455,7 @@ public class InventoryComponent extends VerticalLayout {
     // Deleting the Product from inventory and updates the grid
     private void deleteProduct(Product product) {
         productService.deleteProduct(product.getId());
-        updateGrid(currentInventory);
+        updateGrid(currentInventory, currentLanguageCode);
         Notification.show(getTranslation("succ.pro_del"));
     }
 
@@ -468,11 +475,12 @@ public class InventoryComponent extends VerticalLayout {
             }
     
             String searchText = searchbar.getValue().trim();
+            String languageCode = UI.getCurrent().getLocale().getLanguage();
             if (!searchText.isEmpty()) {
-                List<Product> products = productService.getProductsByName(inventory.getId(), searchText);
+                List<Product> products = productService.getProductsByName(inventory.getId(), searchText, languageCode);
                 grid.setItems(products);
             } else {
-                List<Product> products = productService.getProductsByInventory(inventory.getId());
+                List<Product> products = productService.getProductsByInventory(inventory.getId(), languageCode);
                 grid.setItems(products);
             }
         });
@@ -488,8 +496,8 @@ public class InventoryComponent extends VerticalLayout {
         add(searchLayout);
     }
 
-    // Updating the grid according to the current Inventory
-    public void updateGrid(Inventory selectedInventory) {
+    // Updating the grid according to the current Inventory and language
+    public void updateGrid(Inventory selectedInventory, String currentLanguageCode) {
         currentInventory = selectedInventory;
         if (selectedInventory != null) {
             List<Product> products = getFilteredProducts(currentFilter, currentInventory);
@@ -500,7 +508,8 @@ public class InventoryComponent extends VerticalLayout {
     }
 
     private List<Product> getFilteredProducts(String filter, Inventory inventory) {
-        List<Product> filteredProducts = productService.getProductsByInventory(inventory.getId());
+        String languageCode = UI.getCurrent().getLocale().getLanguage();
+        List<Product> filteredProducts = productService.getProductsByInventory(inventory.getId(), languageCode);
 
         switch (filter) {
             case "EXPIRING":
