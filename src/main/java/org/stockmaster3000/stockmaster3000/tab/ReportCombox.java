@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.components;
+package org.stockmaster3000.stockmaster3000.tab;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -17,16 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ReportSelectorComponent extends VerticalLayout {
+public class ReportCombox extends VerticalLayout {
 
     private final ComboBox<Report> reportComboBox;
     private final List<SelectionListener> listeners = new ArrayList<>();
     private final ReportService reportService;
-    private final InventorySelectorComponent inventorySelectorComponent;
+    private final InventoryCombox inventorySelectorComponent;
     private Report selectedReport;
 
     // Constructor
-    public ReportSelectorComponent(SecurityService securityService, ReportService reportService, InventorySelectorComponent inventorySelectorComponent) {
+    public ReportCombox(SecurityService securityService, ReportService reportService, InventoryCombox inventorySelectorComponent) {
         this.reportService = reportService;
         this.inventorySelectorComponent = inventorySelectorComponent;
 

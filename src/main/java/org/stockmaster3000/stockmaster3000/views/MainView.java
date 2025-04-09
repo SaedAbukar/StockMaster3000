@@ -4,14 +4,14 @@ import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
-import org.stockmaster3000.stockmaster3000.components.InventoryChartComponent;
-import org.stockmaster3000.stockmaster3000.components.InventoryComponent;
-import org.stockmaster3000.stockmaster3000.components.InventorySelectorComponent;
 import org.stockmaster3000.stockmaster3000.components.LineChart;
-import org.stockmaster3000.stockmaster3000.components.ReportComponent;
-import org.stockmaster3000.stockmaster3000.components.ReportSelectorComponent;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.service.*;
+import org.stockmaster3000.stockmaster3000.tab.DashboardTab;
+import org.stockmaster3000.stockmaster3000.tab.InsightsTab;
+import org.stockmaster3000.stockmaster3000.tab.InventoryCombox;
+import org.stockmaster3000.stockmaster3000.tab.ReportCombox;
+import org.stockmaster3000.stockmaster3000.tab.ReportsTab;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
 import com.vaadin.flow.component.UI;
@@ -25,13 +25,13 @@ import jakarta.annotation.security.PermitAll;
 @PermitAll
 public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
-    private final InventoryChartComponent inventoryChartComponent;
-    private final InventoryComponent inventoryComponent;
-    private final InventorySelectorComponent inventorySelectorComponent;
+    private final InsightsTab inventoryChartComponent;
+    private final DashboardTab inventoryComponent;
+    private final InventoryCombox inventorySelectorComponent;
     private final HeaderComponent headerComponent;
-    private final ReportComponent reportComponent;
+    private final ReportsTab reportComponent;
     private final OpenAIClient client;
-    private final ReportSelectorComponent reportSelectorComponent;
+    private final ReportCombox reportSelectorComponent;
 
 
     String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
@@ -50,11 +50,11 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
         
         // Instantiate the reusable components
         headerComponent = new HeaderComponent(securityService);
-        inventoryChartComponent = new InventoryChartComponent(securityService, productService);
-        inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
-        reportSelectorComponent = new ReportSelectorComponent(securityService, reportService, inventorySelectorComponent);
-        inventoryComponent = new InventoryComponent(headerComponent, securityService, inventoryService, productService, categoryService, supplierService);
-        reportComponent = new ReportComponent(client, inventorySelectorComponent, productService, productLogService, reportService, reportSelectorComponent, securityService);
+        inventoryChartComponent = new InsightsTab(securityService, productService);
+        inventorySelectorComponent = new InventoryCombox(securityService, inventoryService);
+        reportSelectorComponent = new ReportCombox(securityService, reportService, inventorySelectorComponent);
+        inventoryComponent = new DashboardTab(headerComponent, securityService, inventoryService, productService, categoryService, supplierService);
+        reportComponent = new ReportsTab(client, inventorySelectorComponent, productService, productLogService, reportService, reportSelectorComponent, securityService);
 
         // Set to take up all the available space 100%
         setSizeFull();

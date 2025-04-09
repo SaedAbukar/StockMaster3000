@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.components;
+package org.stockmaster3000.stockmaster3000.tab;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
@@ -22,16 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ReportComponent extends VerticalLayout {
+public class ReportsTab extends VerticalLayout {
 
     @Autowired
     private OpenAIClient client;
 
-    private InventorySelectorComponent inventorySelectorComponent;
+    private InventoryCombox inventorySelectorComponent;
     private ProductService productService;
     private ProductLogService productLogService;
     private ReportService reportService;
-    private ReportSelectorComponent reportSelectorComponent;
+    private ReportCombox reportSelectorComponent;
     private SecurityService securityService;
     
     // Localazion
@@ -44,9 +44,9 @@ public class ReportComponent extends VerticalLayout {
     private String notificationSelectInventory;
     private String getLanguage;
 
-    public ReportComponent(OpenAIClient client, InventorySelectorComponent inventorySelectorComponent, 
+    public ReportsTab(OpenAIClient client, InventoryCombox inventorySelectorComponent, 
     ProductService productService, ProductLogService productLogService, ReportService reportService, 
-    ReportSelectorComponent reportSelectorComponent, SecurityService securityService) {
+    ReportCombox reportSelectorComponent, SecurityService securityService) {
 
         this.client = client;
         this.inventorySelectorComponent = inventorySelectorComponent;

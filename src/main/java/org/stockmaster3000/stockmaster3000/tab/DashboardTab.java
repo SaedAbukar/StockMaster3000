@@ -1,4 +1,4 @@
-package org.stockmaster3000.stockmaster3000.components;
+package org.stockmaster3000.stockmaster3000.tab;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -8,6 +8,7 @@ import jakarta.annotation.security.PermitAll;
 
 import org.aspectj.weaver.SignatureUtils;
 import org.stockmaster3000.stockmaster3000.client.OpenAIClient;
+import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.model.*;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.*;
@@ -32,12 +33,12 @@ import java.util.List;
 import java.util.Locale;
 
 @PermitAll
-public class InventoryComponent extends VerticalLayout implements LanguageChangeListener{
+public class DashboardTab extends VerticalLayout implements LanguageChangeListener{
     private final InventoryService inventoryService;
     private final ProductService productService;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
-    private final InventorySelectorComponent inventorySelectorComponent;
+    private final InventoryCombox inventorySelectorComponent;
     private final HeaderComponent headerComponent;
 
     String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
@@ -83,14 +84,14 @@ public class InventoryComponent extends VerticalLayout implements LanguageChange
 
     // Component Constructor
     // ----------------------------------------------------------------------------------------------------------------------------------------------------------
-    public InventoryComponent(HeaderComponent headerComponent, SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
+    public DashboardTab(HeaderComponent headerComponent, SecurityService securityService, InventoryService inventoryService, ProductService productService, CategoryService categoryService, SupplierService supplierService) {
         this.headerComponent = headerComponent;
         this.securityService = securityService;
         this.inventoryService = inventoryService;
         this.productService = productService;
         this.categoryService = categoryService;
         this.supplierService = supplierService;
-        this.inventorySelectorComponent = new InventorySelectorComponent(securityService, inventoryService);
+        this.inventorySelectorComponent = new InventoryCombox(securityService, inventoryService);
 
         addClassName("inventory-view");
         searchByName();

@@ -10,6 +10,8 @@ import org.mockito.Mockito;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
+import org.stockmaster3000.stockmaster3000.tab.DashboardTab;
+import org.stockmaster3000.stockmaster3000.tab.InventoryCombox;
 
 import java.util.Collections;
 
@@ -19,8 +21,8 @@ import static org.mockito.Mockito.*;
 public class HeaderComponentTest {
 
     private SecurityService securityService;
-    private InventoryComponent inventoryComponent;
-    private InventorySelectorComponent inventorySelectorComponent;
+    private DashboardTab inventoryComponent;
+    private InventoryCombox inventorySelectorComponent;
     private HeaderComponent headerComponent;
 
     @BeforeEach

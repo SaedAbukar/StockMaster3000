@@ -1,10 +1,13 @@
-package org.stockmaster3000.stockmaster3000.components;
+package org.stockmaster3000.stockmaster3000.tab;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.stockmaster3000.stockmaster3000.components.BarChart;
+import org.stockmaster3000.stockmaster3000.components.DoughnutChart;
+import org.stockmaster3000.stockmaster3000.components.LineChart;
 import org.stockmaster3000.stockmaster3000.model.Category;
 import org.stockmaster3000.stockmaster3000.model.Inventory;
 import org.stockmaster3000.stockmaster3000.model.Product;
@@ -19,7 +22,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 
 
-public class InventoryChartComponent extends VerticalLayout {
+public class InsightsTab extends VerticalLayout {
 
     private final ProductService productService;
     private DoughnutChart doughnutChart;
@@ -32,7 +35,7 @@ public class InventoryChartComponent extends VerticalLayout {
     VerticalLayout expirationContainer;
 
 
-    public InventoryChartComponent(SecurityService securityService, ProductService productService) {
+    public InsightsTab(SecurityService securityService, ProductService productService) {
         this.productService = productService;
 
         componentTopic = new H1(getTranslation("insights.title"));
