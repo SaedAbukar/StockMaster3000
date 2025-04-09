@@ -26,7 +26,7 @@ import java.util.Locale;
 @Route(value = "/")
 @PageTitle("Stock Master 3000")
 @AnonymousAllowed
-public class MainLayout extends VerticalLayout implements LocaleChangeObserver {
+public class PreMainView extends VerticalLayout implements LocaleChangeObserver {
 
     private final SecurityService securityService;
     private H1 heroTitle;
@@ -34,7 +34,7 @@ public class MainLayout extends VerticalLayout implements LocaleChangeObserver {
     private Button inventoryButton;
     private HeaderComponent headerComponent;
 
-    public MainLayout(@Autowired SecurityService securityService) {
+    public PreMainView(@Autowired SecurityService securityService) {
         this.securityService = securityService;
         this.headerComponent = new HeaderComponent(securityService);
         add(headerComponent);
