@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.stockmaster3000.stockmaster3000.components.BarChart;
 import org.stockmaster3000.stockmaster3000.components.DoughnutChart;
 import org.stockmaster3000.stockmaster3000.components.LineChart;
@@ -21,13 +20,13 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 
-
+// Insights tab
 public class InsightsTab extends VerticalLayout {
-
     private final ProductService productService;
     private DoughnutChart doughnutChart;
     private BarChart spendingChart;
     private LineChart expirationChart;
+    private String noData = "insights.noData";
 
     H1 componentTopic;
     VerticalLayout doughnutContainer;
@@ -49,9 +48,9 @@ public class InsightsTab extends VerticalLayout {
         topChartsLayout.getStyle().set("gap", "16px");
 
         // Chart Containers
-        doughnutChart = new DoughnutChart(new String[]{getTranslation("insights.noData")}, new int[]{1});
-        spendingChart = new BarChart(new String[]{getTranslation("insights.noData")}, new double[]{0.0});
-        expirationChart = new LineChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
+        doughnutChart = new DoughnutChart(new String[]{getTranslation(noData)}, new int[]{1});
+        spendingChart = new BarChart(new String[]{getTranslation(noData)}, new double[]{0.0});
+        expirationChart = new LineChart(new String[]{getTranslation(noData)}, new int[]{0});
 
         // Container Style Method
         doughnutContainer = createChartContainer(getTranslation("insights.subTitleDoughnut"), doughnutChart);
@@ -104,9 +103,9 @@ public class InsightsTab extends VerticalLayout {
     }
 
     private void clearCharts() {
-        doughnutChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{1});
-        spendingChart.updateChart(new String[]{getTranslation("insights.noData")}, new double[]{0.0});
-        expirationChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
+        doughnutChart.updateChart(new String[]{getTranslation(noData)}, new int[]{1});
+        spendingChart.updateChart(new String[]{getTranslation(noData)}, new double[]{0.0});
+        expirationChart.updateChart(new String[]{getTranslation(noData)}, new int[]{0});
     }
 
     /**
@@ -114,7 +113,7 @@ public class InsightsTab extends VerticalLayout {
      */
     private void updateCategoryChart(Map<Category, Integer> productData) {
         if (productData.isEmpty()) {
-            doughnutChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{1});
+            doughnutChart.updateChart(new String[]{getTranslation(noData)}, new int[]{1});
         } else {
             String[] productTypes = productData.keySet().stream().map(Category::getName).toArray(String[]::new);
             int[] productCounts = productData.values().stream().mapToInt(Integer::intValue).toArray();
@@ -139,7 +138,7 @@ public class InsightsTab extends VerticalLayout {
         }
 
         if (productSpending.isEmpty()) {
-            spendingChart.updateChart(new String[]{getTranslation("insights.noData")}, new double[]{0.0});
+            spendingChart.updateChart(new String[]{getTranslation(noData)}, new double[]{0.0});
             return;
         }
 
@@ -158,7 +157,7 @@ public class InsightsTab extends VerticalLayout {
      */
     private void updateExpirationChart(List<Product> products) {
         if (products == null || products.isEmpty()) {
-            expirationChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
+            expirationChart.updateChart(new String[]{getTranslation(noData)}, new int[]{0});
             return;
         }
 
@@ -170,7 +169,7 @@ public class InsightsTab extends VerticalLayout {
         }
 
         if (expirationDays.isEmpty()) {
-            expirationChart.updateChart(new String[]{getTranslation("insights.noData")}, new int[]{0});
+            expirationChart.updateChart(new String[]{getTranslation(noData)}, new int[]{0});
             return;
         }
 

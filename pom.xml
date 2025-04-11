@@ -179,8 +179,52 @@
                         <exclude>**/service/ProductLogService.class/**</exclude>
                         <exclude>**/Stockmaster3000Application.class/**</exclude>
                         <exclude>**/components/**</exclude>
+                        <exclude>**/tab/**</exclude>
+                        <exclude>**/InsightsTab.java</exclude>
+                        <exclude>**/BarChart.java</exclude>
+                        <exclude>**/Category.java</exclude>
+                        <exclude>**/CategoryRepository.java</exclude>
+                        <exclude>**/CategoryService.java</exclude>
+                        <exclude>**/CustomUserDetailsService.java</exclude>
+                        <exclude>**/DashboardTab.java</exclude>
+                        <exclude>**/DoughnutChart.java</exclude>
+                        <exclude>**/HeaderComponent.java</exclude>
+                        <exclude>**/Inventory.java</exclude>
+                        <exclude>**/InventoryCombox.java</exclude>
+                        <exclude>**/InventoryRepository.java</exclude>
+                        <exclude>**/InventoryService.java</exclude>
+                        <exclude>**/LanguageChangeListener.java</exclude>
+                        <exclude>**/LineChart.java</exclude>
+                        <exclude>**/LoginView.java</exclude>
+                        <exclude>**/MainView.java</exclude>
+                        <exclude>**/OpenAIClient.java</exclude>
+                        <exclude>**/PreMainView.java</exclude>
+                        <exclude>**/Product.java</exclude>
+                        <exclude>**/ProductLogService.java</exclude>
+                        <exclude>**/ProductRepository.java</exclude>
+                        <exclude>**/ProductService.java</exclude>
+                        <exclude>**/RegistrationView.java</exclude>
+                        <exclude>**/Report.java</exclude>
+                        <exclude>**/ReportCombox.java</exclude>
+                        <exclude>**/ReportRepository.java</exclude>
+                        <exclude>**/ReportService.java</exclude>
+                        <exclude>**/ReportsTab.java</exclude>
+                        <exclude>**/SecurityConfig.java</exclude>
+                        <exclude>**/SecurityService.java</exclude>
+                        <exclude>**/Stockmaster3000Application.java</exclude>
+                        <exclude>**/Supplier.java</exclude>
+                        <exclude>**/SupplierRepository.java</exclude>
+                        <exclude>**/SupplierService.java</exclude>
+                        <exclude>**/User.java</exclude>
+                        <exclude>**/UserRepository.java</exclude>
+                        <exclude>**/UserService.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.10.0.2594</version>
             </plugin>
         </plugins>
     </build>

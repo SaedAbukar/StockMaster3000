@@ -1,4 +1,5 @@
 package org.stockmaster3000.stockmaster3000.repository;
+
 import org.springframework.stereotype.Repository;
 import org.stockmaster3000.stockmaster3000.model.Supplier;
 import org.springframework.data.jpa.repository.JpaRepository;
