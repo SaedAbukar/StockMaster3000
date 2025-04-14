@@ -11,9 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a category of products in the system.
+ *
+ * <p>This entity maps to the {@code categories} table in the database.
+ * Each category can be associated with multiple products.</p>
+ *
+ */
 @Entity
 @Table(name = "categories")
 public class Category {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
   private Long id;
@@ -24,10 +32,18 @@ public class Category {
   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Product> products = new ArrayList<>();
 
-  // Constructor
+  /**
+   * Default no-argument constructor.
+   * Required by JPA for entity instantiation.
+   */
   public Category() {
   }
 
+  /**
+   * Constructs a new {@code Category} with the specified name.
+   *
+   * @param name the name of the category
+   */
   public Category(String name) {
     this.name = name;
   }

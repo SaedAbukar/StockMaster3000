@@ -7,10 +7,21 @@ import elemental.json.Json;
 import elemental.json.JsonArray;
 import java.util.Arrays;
 
+/**
+ * A custom Vaadin component that renders a Doughnut chart using Chart.js.
+ *
+ * <p>This chart visualizes category distribution data using a doughnut-style chart.
+ */
 @Tag("canvas")
 @JsModule("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js")
 public class DoughnutChart extends Div {
 
+  /**
+   * Constructs a DoughnutChart component with the given labels and values.
+   *
+   * @param labels the category labels
+   * @param values the corresponding numeric values
+   */
   public DoughnutChart(String[] labels, int[] values) {
     getElement().setAttribute("id", "doughnutChart");
 
@@ -22,6 +33,12 @@ public class DoughnutChart extends Div {
     initializeChart(labels, values);
   }
 
+  /**
+   * Initializes the Chart.js doughnut chart with provided labels and values.
+   *
+   * @param labels array of category labels
+   * @param values array of category values
+   */
   private void initializeChart(String[] labels, int[] values) {
     JsonArray jsonLabels = Json.createArray();
     JsonArray jsonData = Json.createArray();
@@ -43,8 +60,7 @@ public class DoughnutChart extends Div {
         + "      label: 'Category Distribution',"
         + "      data: $1,"
         + "      backgroundColor: ["
-        + "        '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#9B59B6', '#1ABC9C', "
-        + "'#F39C12'"
+        + "        '#E74C3C', '#3498DB', '#F1C40F', '#2ECC71', '#9B59B6', '#1ABC9C', '#F39C12'"
         + "      ],"
         + "      hoverOffset: 8"
         + "    }]"
@@ -55,10 +71,7 @@ public class DoughnutChart extends Div {
         + "    plugins: {"
         + "      legend: {"
         + "        position: 'top',"
-        + "        labels: {"
-        + "          font: { size: 14 },"
-        + "          color: '#333'"
-        + "        }"
+        + "        labels: { font: { size: 14 }, color: '#333' }"
         + "      },"
         + "      title: {"
         + "        display: true,"
@@ -78,6 +91,12 @@ public class DoughnutChart extends Div {
         + "}, 100);", jsonLabels, jsonData);
   }
 
+  /**
+   * Updates the chart dynamically with new labels and values.
+   *
+   * @param labels the updated labels
+   * @param values the updated values
+   */
   public void updateChart(String[] labels, int[] values) {
     System.out.println("Updating chart with labels: " + Arrays.toString(labels) + ", values: "
         + Arrays.toString(values));

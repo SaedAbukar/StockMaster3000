@@ -22,11 +22,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
   Collection<Object> findByInventoryName(String inventoryName);
 
-  // Custom query to fetch products added after the specified date for the given inventoryId
-  @Query("SELECT p FROM Product p WHERE p.inventory.id = :inventoryId AND p.createdAt > "
-      + ":sevenDaysAgo")
-  List<Product> findByInventoryIdAndAddedDateAfter(@Param("inventoryId") Long inventoryId,
-                                                   @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
-
-
+  /**
+   * Custom query to find products added after a certain date in a given inventory.
+   *
+   * @param inventoryId the inventory ID
+   * @param sevenDaysAgo the LocalDateTime to compare with createdAt
+   * @return list of newly added products
+   */
+  @Query(
+      "SELECT p FROM Product p WHERE p.inventory.id = :inventoryId AND p.createdAt > :sevenDaysAgo"
+  )
+  List<Product> findByInventoryIdAndAddedDateAfter(
+      @Param("inventoryId") Long inventoryId,
+      @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
 }

@@ -66,7 +66,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
   Span quantity;
   Span price;
   Span nutritions;
-  Span days_until_exp;
+  Span daysUntilExp;
   Span category;
   Span supplier;
   TextField nameField;
@@ -182,15 +182,36 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     grid.addClassName("inventory-grid");
     grid.setSelectionMode(Grid.SelectionMode.NONE); // Disable row selection
 
-    grid.addColumn(Product::getName).setKey("name").setHeader(getTranslation("name")).setSortable(true);
-    grid.addColumn(Product::getQuantity).setKey("quantity").setHeader(getTranslation(
-        "quantity")).setSortable(true);
-    grid.addColumn(Product::getPrice).setKey("price").setHeader(getTranslation("price")).setSortable(true);
-    grid.addColumn(Product::getNutritions).setKey("nutritions").setHeader(getTranslation(
-        "nutritions")).setSortable(true);
-    grid.addColumn(Product::getAmountOfDaysUntilExpiration).setKey("days_until_expiration").setHeader(getTranslation("days_until_expiration")).setSortable(true);
-    grid.addColumn(product -> product.getCategory().getName()).setKey("category").setHeader(getTranslation("category")).setSortable(true);
-    grid.addColumn(product -> product.getSupplier().getName()).setKey("supplier").setHeader(getTranslation("supplier")).setSortable(true);
+    grid.addColumn(Product::getName)
+        .setKey("name")
+        .setHeader(getTranslation("name"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getQuantity)
+        .setKey("quantity")
+        .setHeader(getTranslation("quantity"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getPrice)
+        .setKey("price")
+        .setHeader(getTranslation("price"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getNutritions)
+        .setKey("nutritions")
+        .setHeader(getTranslation("nutritions"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getAmountOfDaysUntilExpiration)
+        .setKey("days_until_expiration")
+        .setHeader(getTranslation("days_until_expiration"))
+        .setSortable(true);
+
+    grid.addColumn(product -> product.getCategory().getName()).setKey("category")
+        .setHeader(getTranslation("category")).setSortable(true);
+
+    grid.addColumn(product -> product.getSupplier().getName()).setKey("supplier")
+        .setHeader(getTranslation("supplier")).setSortable(true);
 
 
     // Add a class name to each row for styling
@@ -227,7 +248,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     quantity = new Span(getTranslation("quantity"));
     price = new Span(getTranslation("price"));
     nutritions = new Span(getTranslation("nutritions"));
-    days_until_exp = new Span(getTranslation("days_until_expiration"));
+    daysUntilExp = new Span(getTranslation("days_until_expiration"));
     category = new Span(getTranslation("category"));
     supplier = new Span(getTranslation("supplier"));
     layout.add(title);
@@ -237,7 +258,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     layout.add(quantity.getText() + ": " + product.getQuantity() + "\n");
     layout.add(price.getText() + ": " + product.getPrice() + "\n");
     layout.add(nutritions.getText() + ": " + product.getNutritions() + "\n");
-    layout.add(days_until_exp.getText() + ": " + product.getAmountOfDaysUntilExpiration() + "\n");
+    layout.add(daysUntilExp.getText() + ": " + product.getAmountOfDaysUntilExpiration() + "\n");
     layout.add(category.getText() + ": " + product.getCategory().getName() + "\n");
     layout.add(supplier.getText() + ": " + product.getSupplier().getName() + "\n");
 
@@ -265,7 +286,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
   // Displaying the Add Product Modal
   private void showAddProductDialog() {
-    Dialog dialog = new Dialog();
+    final Dialog dialog = new Dialog();
     nameField = new TextField(getTranslation("name"));
     quantityField = new TextField(getTranslation("quantity"));
     priceField = new TextField(getTranslation("price"));
@@ -378,7 +399,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
   // Displaying the Edit modal
   private void showEditProductDialog(Product product) {
-    Dialog dialog = new Dialog();
+    final Dialog dialog = new Dialog();
     nameField = new TextField(getTranslation("name"));
     nameField.setValue(product.getName());
 

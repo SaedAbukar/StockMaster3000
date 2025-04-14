@@ -34,6 +34,15 @@ import java.util.Arrays;
 @JsModule("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js")
 public class BarChart extends Div {
 
+  /**
+   * Constructs a new {@code BarChart} component with the specified labels and values.
+   *
+   * <p>This constructor initializes the chart by creating a canvas element
+   * and rendering the chart using Chart.js with the provided data.</p>
+   *
+   * @param labels the labels for the bar chart (e.g., categories)
+   * @param values the corresponding values for each label
+   */
   public BarChart(String[] labels, double[] values) {
     getElement().setAttribute("id", "barChart");
 
@@ -45,6 +54,12 @@ public class BarChart extends Div {
     initializeChart(labels, values);
   }
 
+  /**
+   * Initializes the Chart.js bar chart with the given labels and values.
+   *
+   * @param labels the labels for the x-axis
+   * @param values the values for the y-axis
+   */
   private void initializeChart(String[] labels, double[] values) {
     JsonArray jsonLabels = Json.createArray();
     JsonArray jsonData = Json.createArray();
@@ -104,9 +119,7 @@ public class BarChart extends Div {
         + "      }"
         + "    },"
         + "    plugins: {"
-        + "      legend: {"
-        + "        display: false"
-        + "      },"
+        + "      legend: { display: false },"
         + "      tooltip: {"
         + "        enabled: true,"
         + "        backgroundColor: 'rgba(0, 0, 0, 0.8)',"
@@ -129,6 +142,15 @@ public class BarChart extends Div {
         + "}, 100);", jsonLabels, jsonData, textY, textX);
   }
 
+  /**
+   * Updates the bar chart with new labels and values.
+   *
+   * <p>This method updates the data and axis titles of the existing chart
+   * without recreating the chart instance.</p>
+   *
+   * @param labels the new labels for the bar chart
+   * @param values the new values corresponding to each label
+   */
   public void updateChart(String[] labels, double[] values) {
     System.out.println("Updating chart with labels: " + Arrays.toString(labels) + ", values: "
         + Arrays.toString(values));
@@ -147,7 +169,7 @@ public class BarChart extends Div {
     getElement().executeJs("setTimeout(() => {"
         + "if (window.barChart) {"
         + "  window.barChart.data.labels = $0;"
-        + "window.barChart.data.datasets[0].data = $1;"
+        + "  window.barChart.data.datasets[0].data = $1;"
         + "  window.barChart.options.scales.y.title.text = $2;"
         + "  window.barChart.options.scales.x.title.text = $3;"
         + "  window.barChart.update();"

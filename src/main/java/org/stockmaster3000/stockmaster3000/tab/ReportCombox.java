@@ -81,6 +81,11 @@ public class ReportCombox extends VerticalLayout {
   }
 
   public interface SelectionListener {
+    /**
+     * Called when a new report is selected.
+     *
+     * @param selectedReport the report that was selected
+     */
     void onReportSelected(Report selectedReport);
   }
 

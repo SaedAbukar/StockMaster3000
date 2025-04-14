@@ -93,7 +93,7 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
     insightsContent.setVisible(false);
     reportContent.setVisible(false);
 
-    // Add tabs to the Tabs component
+    Tabs tabs = new Tabs();
     tabs.add(tab1, tab2, tab3);
 
     // Set up tab click listener to change content
@@ -131,16 +131,16 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
 
   @Override
   public void localeChange(LocaleChangeEvent localeChangeEvent) {
-    Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
+    tab1.setLabel(getTranslation("dashboard"));
+    tab2.setLabel(getTranslation("insights"));
+    tab3.setLabel(getTranslation("reports"));
 
-    // Update text when the locale changes
-    this.tab1.setLabel(getTranslation("dashboard"));
-    this.tab2.setLabel(getTranslation("insights"));
-    this.tab3.setLabel(getTranslation("reports"));
     headerComponent.updateTexts();
     inventoryComponent.updateTexts();
     inventorySelectorComponent.updateTexts();
     inventoryChartComponent.updateTexts();
+
+    Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
     inventoryChartComponent.updateCharts(selectedInventory);
     reportComponent.updateTexts();
     reportSelectorComponent.updateTexts();

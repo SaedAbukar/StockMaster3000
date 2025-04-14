@@ -61,23 +61,21 @@ public class ProductService {
   public Product addProduct(Product product) {
     Inventory inventory = inventoryRepository.findById(product.getInventory().getId())
         .orElseThrow(() -> new RuntimeException("Inventory not found"));
+    product.setInventory(inventory);
 
     Supplier supplier = supplierRepository.findById(product.getSupplier().getId())
         .orElseThrow(() -> new RuntimeException("Supplier not found"));
+    product.setSupplier(supplier);
 
     Category category = categoryRepository.findById(product.getCategory().getId())
         .orElseThrow(() -> new RuntimeException("Category not found"));
+    product.setCategory(category);
 
     LocalDateTime firstCreatedAt = product.getCreatedAt();
-
     if (firstCreatedAt == null) {
       firstCreatedAt = LocalDateTime.now();
     }
 
-    // Attach managed entities
-    product.setInventory(inventory);
-    product.setSupplier(supplier);
-    product.setCategory(category);
     product.setCreatedAt(firstCreatedAt);
     product.setUpdatedAt(LocalDateTime.now());
 

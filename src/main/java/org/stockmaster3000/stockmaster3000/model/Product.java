@@ -1,5 +1,7 @@
 package org.stockmaster3000.stockmaster3000.model;
 
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,59 +17,114 @@ import java.util.Objects;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
-import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
+/**
+ * Represents a product stored in an inventory.
+ *
+ * <p>Contains data about the product's name, price, quantity, nutritional data,
+ * supplier, category, and expiration-related info. Supports audit tracking and JSON storage.</p>
+ */
 @Entity
 @Audited
 @AuditTable(value = "product_AUD")
 @Table(name = "products")
 public class Product {
+
+  /**
+   * Unique identifier for the product.
+   */
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  /**
+   * Name of the product.
+   */
   private String name;
 
+  /**
+   * Price of the product.
+   */
   private Double price;
 
+  /**
+   * Quantity available of the product.
+   */
   private Integer quantity;
 
+  /**
+   * JSON-formatted nutrition data.
+   */
   @Column(name = "nutritions", columnDefinition = "LONGTEXT", nullable = true)
   @Type(JsonType.class)
   private String nutritions;
 
+  /**
+   * Days left until expiration from current date.
+   */
   private Integer amountOfDaysUntilExpiration;
 
+  /**
+   * Language code used for product information.
+   */
   @Column(name = "language_code")
   private String languageCode;
 
-  // Relationships
+  /**
+   * Supplier of the product.
+   */
   @ManyToOne
   @JoinColumn(name = "supplier_id", nullable = false)
   @Audited(targetAuditMode = NOT_AUDITED)
   private Supplier supplier;
 
+  /**
+   * Category the product belongs to.
+   */
   @ManyToOne
   @JoinColumn(name = "category_id", nullable = false)
   @Audited(targetAuditMode = NOT_AUDITED)
   private Category category;
 
+  /**
+   * Inventory this product is associated with.
+   */
   @ManyToOne(cascade = CascadeType.PERSIST)
   @Audited
   @JoinColumn(name = "inventory_id", nullable = false)
   private Inventory inventory;
 
+  /**
+   * Timestamp of when the product was created.
+   */
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
+  /**
+   * Timestamp of the last update to the product.
+   */
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-
-  // Constructor
+  /**
+   * Default constructor.
+   */
   public Product() {
   }
 
+  /**
+   * Constructs a new product with all main fields set.
+   *
+   * @param name                      the product name
+   * @param price                     the price
+   * @param quantity                  the quantity
+   * @param nutritions                nutrition information in JSON
+   * @param amountOfDaysUntilExpiration number of days until expiration
+   * @param languageCode              language code
+   * @param supplier                  supplier entity
+   * @param category                  category entity
+   * @param inventory                 associated inventory
+   */
   public Product(String name, Double price, Integer quantity, String nutritions,
                  Integer amountOfDaysUntilExpiration, String languageCode, Supplier supplier,
                  Category category, Inventory inventory) {
@@ -219,5 +276,4 @@ public class Product {
         + ", category=" + (category != null ? category.getName() : "null")
         + ", inventory=" + (inventory != null ? inventory.getName() : "null");
   }
-
 }
