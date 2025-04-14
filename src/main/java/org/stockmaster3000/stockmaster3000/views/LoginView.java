@@ -20,74 +20,72 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * The LoginView provides a custom login page with localization and register redirect.
+ */
 @Route("login")
 @PageTitle("Login")
 @AnonymousAllowed
-public class LoginView extends VerticalLayout implements BeforeEnterListener, LocaleChangeObserver {
+public class LoginView extends VerticalLayout
+    implements BeforeEnterListener, LocaleChangeObserver {
 
   private final LoginForm loginForm = new LoginForm();
   private Button registerButton;
-  Paragraph notUserText;
-  H1 title;
+  private Paragraph notUserText;
+  private H1 title;
 
+  /**
+   * Constructs the login view UI, including form, language switch, and register button.
+   */
   public LoginView() {
     addClassName("login-view");
     setSizeFull();
     setAlignItems(Alignment.CENTER);
     setJustifyContentMode(JustifyContentMode.CENTER);
 
-    // Login form container (for styling)
     Div loginCard = new Div();
     loginCard.addClassName("login-card");
 
-    // Branding header instead of "Login"
     title = new H1(getTranslation("header.title"));
     title.addClassName("app-title");
 
-    // Configure login form (remove Forgot Password)
     loginForm.setAction("login");
     loginForm.setForgotPasswordButtonVisible(false);
 
-    // Register button
     registerButton = new Button(getTranslation("button.register"));
     registerButton.addClassName("signup-button");
     registerButton.addClickListener(click ->
         registerButton.getUI().ifPresent(ui -> ui.navigate("register")));
 
-    // "Not a user yet?" text
     notUserText = new Paragraph(getTranslation("noaccount"));
     notUserText.addClassName("plain-text");
 
     String currentLang = UI.getCurrent().getLocale().getLanguage();
 
-    Button englishButton = new Button("🇬🇧", click -> UI.getCurrent().setLocale(Locale.ENGLISH));
-    Button russianButton = new Button("🇷🇺", click -> UI.getCurrent().setLocale(new Locale("ru",
-        "RU")));
-    Button greekButton = new Button("🇬🇷", click -> UI.getCurrent().setLocale(new Locale("el",
-        "GR")));
-    Button finnishButton = new Button("🇫🇮", click -> UI.getCurrent().setLocale(new Locale("fi",
-        "FI")));
+    Button englishButton = new Button("🇬🇧",
+        click -> UI.getCurrent().setLocale(Locale.ENGLISH));
+    Button russianButton = new Button("🇷🇺",
+        click -> UI.getCurrent().setLocale(new Locale("ru", "RU")));
+    Button greekButton = new Button("🇬🇷",
+        click -> UI.getCurrent().setLocale(new Locale("el", "GR")));
+    Button finnishButton = new Button("🇫🇮",
+        click -> UI.getCurrent().setLocale(new Locale("fi", "FI")));
 
-    // Add active class based on current language
     Map<String, Button> buttonMap = Map.of(
         "en", englishButton,
         "ru", russianButton,
         "el", greekButton,
         "fi", finnishButton
     );
-
-    // Apply active class to the correct button
     buttonMap.getOrDefault(currentLang, englishButton).addClassName("active");
 
-    // Style buttons
-    Stream.of(englishButton, russianButton, greekButton, finnishButton).forEach(button ->
-        button.getElement().getStyle().set("cursor", "pointer")
-    );
+    Stream.of(englishButton, russianButton, greekButton, finnishButton)
+        .forEach(button -> button.getElement().getStyle().set("cursor", "pointer"));
 
-    HorizontalLayout languageSelectorLayout = new HorizontalLayout(englishButton, russianButton,
-        greekButton, finnishButton);
+    HorizontalLayout languageSelectorLayout = new HorizontalLayout(
+        englishButton, russianButton, greekButton, finnishButton);
     languageSelectorLayout.addClassName("login-register-language-selector");
-    // Add elements to login card
+
     loginCard.add(
         title,
         loginForm,
@@ -96,33 +94,38 @@ public class LoginView extends VerticalLayout implements BeforeEnterListener, Lo
         languageSelectorLayout
     );
 
-    // Add the card to the layout
     add(loginCard);
   }
 
+  /**
+   * Displays login error message when login fails.
+   *
+   * @param event the navigation event
+   */
   @Override
-  public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-    if (beforeEnterEvent.getLocation()
-        .getQueryParameters()
-        .getParameters()
-        .containsKey("error")) {
+  public void beforeEnter(BeforeEnterEvent event) {
+    if (event.getLocation().getQueryParameters().getParameters().containsKey("error")) {
       loginForm.setError(true);
     }
   }
 
+  /**
+   * Updates UI text when the locale is changed.
+   *
+   * @param event the locale change event
+   */
   @Override
-  public void localeChange(LocaleChangeEvent localeChangeEvent) {
+  public void localeChange(LocaleChangeEvent event) {
     notUserText.setText(getTranslation("noaccount"));
     title.setText(getTranslation("header.title"));
     registerButton.setText(getTranslation("button.register"));
-    // Update LoginForm text (username, password, title, and submit)
+
     LoginI18n i18n = LoginI18n.createDefault();
     i18n.getForm().setUsername(getTranslation("login.username"));
     i18n.getForm().setPassword(getTranslation("login.password"));
     i18n.getForm().setTitle(getTranslation("login.title"));
     i18n.getForm().setSubmit(getTranslation("login.submit"));
 
-    // Apply updated translations to the LoginForm
     loginForm.setI18n(i18n);
   }
 }

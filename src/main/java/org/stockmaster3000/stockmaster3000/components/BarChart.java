@@ -27,7 +27,6 @@ import java.util.Arrays;
  * animation, color scheme, and axis titles which are localized using translation keys:
  * {@code insights.BarChartTextX} and {@code insights.BarChartTextY}.</p>
  *
- * @author [Your Name]
  * @see <a href="https://www.chartjs.org/">Chart.js Documentation</a>
  */
 @Tag("canvas")

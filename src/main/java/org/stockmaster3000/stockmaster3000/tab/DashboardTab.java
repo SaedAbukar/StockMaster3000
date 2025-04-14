@@ -33,6 +33,12 @@ import org.stockmaster3000.stockmaster3000.service.InventoryService;
 import org.stockmaster3000.stockmaster3000.service.ProductService;
 import org.stockmaster3000.stockmaster3000.service.SupplierService;
 
+/**
+ * Dashboard tab UI for managing inventory items including adding, editing,
+ * filtering, and searching products.
+ *
+ * <p>Supports multiple languages and integrates with OpenAI for nutrition data.
+ */
 
 @PermitAll
 public class DashboardTab extends VerticalLayout implements LanguageChangeListener {
@@ -81,6 +87,17 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
 
   OpenAiClient aiClient = new OpenAiClient();
+
+  /**
+   * Initializes the dashboard tab and sets up all components and services.
+   *
+   * @param headerComponent top header bar used for language switching
+   * @param securityService handles authentication and user details
+   * @param inventoryService service for accessing inventory data
+   * @param productService service for handling product-related logic
+   * @param categoryService service for handling product categories
+   * @param supplierService service for handling product suppliers
+   */
 
   // Component Constructor
   // -----------------------------------------------------------------------------------------//
@@ -538,6 +555,14 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     add(searchLayout);
   }
 
+
+  /**
+   * Updates the product grid display for a given inventory and language.
+   *
+   * @param selectedInventory the selected inventory to show products for
+   * @param currentLanguageCode current language used for localized content
+   */
+
   // Updating the grid according to the current Inventory and language
   public void updateGrid(Inventory selectedInventory, String currentLanguageCode) {
     currentInventory = selectedInventory;
@@ -572,12 +597,26 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     return filteredProducts;
   }
 
+  /**
+   * Callback triggered when the user changes the application language.
+   *
+   * @param newLocale the new locale selected by the user
+   */
+
+
   @Override
   public void onLanguageChange(Locale newLocale) {
     UI.getCurrent().setLocale(newLocale);
     currentLanguageCode = newLocale.getLanguage();
     updateGrid(currentInventory, currentLanguageCode);
   }
+
+  /**
+   * Updates all UI texts (buttons, headers, placeholders) based on the current locale.
+   *
+   * <p>This ensures dynamic language switching updates all relevant UI elements.
+   */
+
 
   public void updateTexts() {
     allButton.setText(getTranslation("inventory.filter_all"));

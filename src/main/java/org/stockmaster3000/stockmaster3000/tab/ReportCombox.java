@@ -12,7 +12,9 @@ import org.stockmaster3000.stockmaster3000.model.Report;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 import org.stockmaster3000.stockmaster3000.service.ReportService;
 
-
+/**
+ * A component for selecting reports based on inventory selection.
+ */
 public class ReportCombox extends VerticalLayout {
 
   private final ComboBox<Report> reportComboBox;
@@ -21,65 +23,86 @@ public class ReportCombox extends VerticalLayout {
   private final InventoryCombox inventorySelectorComponent;
   private Report selectedReport;
 
-  // Constructor
+  /**
+   * Creates a report selection component that updates dynamically based on inventory.
+   *
+   * @param securityService the user session handler
+   * @param reportService service to fetch reports
+   * @param inventorySelectorComponent inventory selection component dependency
+   */
   public ReportCombox(SecurityService securityService, ReportService reportService,
                       InventoryCombox inventorySelectorComponent) {
     this.reportService = reportService;
     this.inventorySelectorComponent = inventorySelectorComponent;
 
-    // Initialize report ComboBox
     reportComboBox = new ComboBox<>(getTranslation("reportsSelector.selectReport"));
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    reportComboBox.setItemLabelGenerator(report ->
+        report.getCreatedAt().format(formatter));
 
-    reportComboBox.setItemLabelGenerator(report -> report.getCreatedAt().format(formatter));
-
-    // Load reports based on selected inventory
     refreshReports();
 
-    // Update reports when inventory selection changes
-    inventorySelectorComponent.setSelectionListener(selectedInventory -> refreshReports());
+    inventorySelectorComponent.setSelectionListener(
+        selectedInventory -> refreshReports());
 
-    // Set up value change listener
     reportComboBox.addValueChangeListener(event -> {
       selectedReport = event.getValue();
       notifySelectionListeners(selectedReport);
       getUI().ifPresent(UI::push);
     });
 
-    // Layout setup
     HorizontalLayout reportLayout = new HorizontalLayout(reportComboBox);
     reportLayout.setSpacing(true);
     add(reportLayout);
   }
 
-  // Fetch reports based on selected inventory
+  /**
+   * Refreshes the list of reports based on the currently selected inventory.
+   */
   private void refreshReports() {
     Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
     if (selectedInventory != null) {
-      List<Report> reports = reportService.getReportsByInventoryId(selectedInventory.getId());
+      List<Report> reports = reportService
+          .getReportsByInventoryId(selectedInventory.getId());
       reportComboBox.setItems(reports);
     } else {
       reportComboBox.clear();
-      reportComboBox.setItems(new ArrayList<>()); // Clear the list if no inventory is selected
+      reportComboBox.setItems(new ArrayList<>());
     }
   }
 
-  // Notify listeners when a report is selected
+  /**
+   * Notifies registered listeners when a new report is selected.
+   *
+   * @param selectedReport the report that was selected
+   */
   private void notifySelectionListeners(Report selectedReport) {
     for (SelectionListener listener : listeners) {
       listener.onReportSelected(selectedReport);
     }
   }
 
-  // Allow external classes to listen for report selection
+  /**
+   * Registers a listener for report selection changes.
+   *
+   * @param listener the listener to be added
+   */
   public void setSelectionListener(SelectionListener listener) {
     listeners.add(listener);
   }
 
+  /**
+   * Gets the currently selected report.
+   *
+   * @return the selected report
+   */
   public Report getSelectedReport() {
     return selectedReport;
   }
 
+  /**
+   * Interface for receiving selection change notifications.
+   */
   public interface SelectionListener {
     /**
      * Called when a new report is selected.
@@ -89,6 +112,9 @@ public class ReportCombox extends VerticalLayout {
     void onReportSelected(Report selectedReport);
   }
 
+  /**
+   * Updates all translated labels.
+   */
   public void updateTexts() {
     reportComboBox.setLabel(getTranslation("reportsSelector.selectReport"));
   }

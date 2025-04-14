@@ -16,6 +16,12 @@ import org.stockmaster3000.stockmaster3000.repository.InventoryRepository;
 import org.stockmaster3000.stockmaster3000.repository.ProductRepository;
 import org.stockmaster3000.stockmaster3000.repository.SupplierRepository;
 
+/**
+ * Service layer for managing products.
+ *
+ * <p>Handles creation, retrieval, updating, and deletion of product entities,
+ * as well as inventory-related queries like stock levels and category summaries.</p>
+ */
 @Service
 public class ProductService {
 
@@ -24,7 +30,14 @@ public class ProductService {
   private final InventoryRepository inventoryRepository;
   private final CategoryRepository categoryRepository;
 
-  // ProductService constructor
+  /**
+   * Creates a new {@code ProductService} with the required repositories.
+   *
+   * @param productRepository the product repository
+   * @param supplierRepository the supplier repository
+   * @param inventoryRepository the inventory repository
+   * @param categoryRepository the category repository
+   */
   public ProductService(ProductRepository productRepository,
                         SupplierRepository supplierRepository,
                         InventoryRepository inventoryRepository,
@@ -35,15 +48,30 @@ public class ProductService {
     this.categoryRepository = categoryRepository;
   }
 
-
-  // Get all products in a specific inventory
+  /**
+   * Retrieves all products for a specific inventory and language.
+   *
+   * @param inventoryId the ID of the inventory
+   * @param languageCode the language code for filtering products
+   * @return list of matching products
+   */
   public List<Product> getProductsByInventory(Long inventoryId, String languageCode) {
     return productRepository.findByInventoryIdAndLanguageCode(inventoryId, languageCode);
   }
 
-  // Fetching Product by Name
-  public List<Product> getProductsByName(Long inventoryId, String productName,
-                                         String languageCode) {
+  /**
+   * Searches for products by name or returns all products for an inventory if name is empty.
+   *
+   * @param inventoryId the ID of the inventory
+   * @param productName the name to search for
+   * @param languageCode fallback language code if name is not provided
+   * @return list of matching products
+   */
+  public List<Product> getProductsByName(
+      Long inventoryId,
+      String productName,
+      String languageCode
+  ) {
     if (productName != null && !productName.isEmpty()) {
       return productRepository.findByInventoryIdAndName(inventoryId, productName);
     } else {
@@ -51,12 +79,22 @@ public class ProductService {
     }
   }
 
-  // Get a single product by ID
+  /**
+   * Retrieves a single product by its ID.
+   *
+   * @param productId the product ID
+   * @return an optional product if found
+   */
   public Optional<Product> getProductById(Long productId) {
     return productRepository.findById(productId);
   }
 
-  // Add a new product
+  /**
+   * Adds a new product to the database.
+   *
+   * @param product the product to add
+   * @return the saved product
+   */
   @Transactional
   public Product addProduct(Product product) {
     Inventory inventory = inventoryRepository.findById(product.getInventory().getId())
@@ -82,47 +120,74 @@ public class ProductService {
     return productRepository.save(product);
   }
 
-
-  // Update an existing product
+  /**
+   * Updates an existing product.
+   *
+   * @param product the product to update
+   * @return the updated product
+   */
   public Product updateProduct(Product product) {
     return productRepository.save(product);
   }
 
-  // Delete a product by ID
+  /**
+   * Deletes a product by its ID.
+   *
+   * @param productId the ID of the product to delete
+   */
   public void deleteProduct(Long productId) {
     productRepository.deleteById(productId);
   }
 
-  // Get products that are expiring soon (e.g., less than 7 days left)
-  public List<Product> getExpiringSoonItems(Long inventoryId) {
-    return productRepository.findByInventoryIdAndAmountOfDaysUntilExpirationLessThan(inventoryId,
-        7);
+  /**
+   * Gets all products that are expiring soon (in less than 7 days).
+   *
+   * @param invId the ID of the inventory
+   * @return list of soon-to-expire products
+   */
+  public List<Product> getExpiringSoonItems(Long invId) {
+    return productRepository.findByInventoryIdAndAmountOfDaysUntilExpirationLessThan(invId, 7);
   }
 
-  // Get products that are low in stock (e.g., less than 5 units)
+  /**
+   * Gets products that are low in stock (less than 5 units).
+   *
+   * @param inventoryId the ID of the inventory
+   * @return list of low-stock products
+   */
   public List<Product> getLowStockItems(Long inventoryId) {
     return productRepository.findByInventoryIdAndQuantityLessThan(inventoryId, 5);
   }
 
-  // Get products that are out of stock (e.g., less than 1 units)
+  /**
+   * Gets products that are out of stock.
+   *
+   * @param id the ID of the inventory
+   * @return list of out-of-stock products
+   */
   public List<Product> getOutOfStockItems(Long id) {
     return productRepository.findByInventoryIdAndQuantityLessThan(id, 1);
   }
 
-  // Method to fetch product data categorized by inventory
-  public Map<Category, Integer> getProductDataByInventory(Long inventoryId, String languageCode) {
-    List<Product> products = productRepository.findByInventoryIdAndLanguageCode(inventoryId,
-        languageCode);
+  /**
+   * Retrieves product counts grouped by category for a given inventory.
+   *
+   * @param inventoryId the ID of the inventory
+   * @param langCode the language code for filtering
+   * @return a map of categories to product count
+   */
+  public Map<Category, Integer> getProductDataByInventory(Long inventoryId, String langCode) {
+
+    List<Product> products =
+        productRepository.findByInventoryIdAndLanguageCode(inventoryId, langCode);
+
     Map<Category, Integer> productData = new HashMap<>();
 
-    // Loop through products and categorize them by category
     for (Product product : products) {
       Category category = product.getCategory();
-      // Update the count of products in this category
       productData.put(category, productData.getOrDefault(category, 0) + 1);
     }
 
     return productData;
   }
-
 }

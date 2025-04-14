@@ -13,6 +13,10 @@ import java.util.Locale;
 import org.stockmaster3000.stockmaster3000.event.LanguageChangeListener;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
+/**
+ * A reusable header component containing branding, login/logout controls, greeting,
+ * and a language selector.
+ */
 public class HeaderComponent extends HorizontalLayout {
 
   private final SecurityService securityService;
@@ -23,12 +27,20 @@ public class HeaderComponent extends HorizontalLayout {
 
   private final List<LanguageChangeListener> languageChangeListeners = new ArrayList<>();
 
+  /**
+   * Constructs the header with authentication and language switch support.
+   *
+   * @param securityService the service to determine authentication state
+   */
   public HeaderComponent(SecurityService securityService) {
     this.securityService = securityService;
     createHeader();
     addLanguageSelector();
   }
 
+  /**
+   * Creates the branding, greeting, and authentication buttons in the header.
+   */
   private void createHeader() {
     addClassName("header");
     setWidthFull();
@@ -59,6 +71,9 @@ public class HeaderComponent extends HorizontalLayout {
     add(title, authSection);
   }
 
+  /**
+   * Adds a ComboBox for switching between supported UI languages.
+   */
   private void addLanguageSelector() {
     ComboBox<Locale> languageSelector = new ComboBox<>();
     languageSelector.setItems(Locale.ENGLISH, new Locale("ru", "RU"),
@@ -89,16 +104,29 @@ public class HeaderComponent extends HorizontalLayout {
     languageSelector.addClassName("custom-language-selector");
   }
 
+  /**
+   * Registers a listener that will be notified when the language changes.
+   *
+   * @param listener the language change listener
+   */
   public void addLanguageChangeListener(LanguageChangeListener listener) {
     languageChangeListeners.add(listener);
   }
 
+  /**
+   * Notifies all registered language change listeners of a locale change.
+   *
+   * @param newLocale the new locale that was selected
+   */
   private void notifyLanguageChangeListeners(Locale newLocale) {
     for (LanguageChangeListener listener : languageChangeListeners) {
       listener.onLanguageChange(newLocale);
     }
   }
 
+  /**
+   * Updates the displayed UI text content to reflect the current locale.
+   */
   public void updateTexts() {
     title.setText(getTranslation("header.title"));
     login.setText(getTranslation("header.login"));
