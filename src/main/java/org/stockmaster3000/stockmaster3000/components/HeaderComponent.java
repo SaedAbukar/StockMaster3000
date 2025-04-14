@@ -7,106 +7,106 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import org.stockmaster3000.stockmaster3000.security.SecurityService;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import org.stockmaster3000.stockmaster3000.event.LanguageChangeListener;
+import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
 public class HeaderComponent extends HorizontalLayout {
 
-    private final SecurityService securityService;
-    private H1 title;
-    private Button login;
-    private Button logout;
-    private Span greeting;
+  private final SecurityService securityService;
+  private H1 title;
+  private Button login;
+  private Button logout;
+  private Span greeting;
 
-    public HeaderComponent(SecurityService securityService) {
-        this.securityService = securityService;
-        createHeader();
-        addLanguageSelector();
+  private final List<LanguageChangeListener> languageChangeListeners = new ArrayList<>();
+
+  public HeaderComponent(SecurityService securityService) {
+    this.securityService = securityService;
+    createHeader();
+    addLanguageSelector();
+  }
+
+  private void createHeader() {
+    addClassName("header");
+    setWidthFull();
+    setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+    setSpacing(true);
+
+    title = new H1(getTranslation("header.title"));
+    title.addClassName("logo");
+
+    HorizontalLayout authSection = new HorizontalLayout();
+    authSection.setWidthFull();
+    authSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+    authSection.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+
+    login = new Button(getTranslation("header.login"));
+    if (securityService.getAuthenticatedUser() != null) {
+      String username = securityService.getAuthenticatedUser().getUsername();
+      greeting = new Span(getTranslation("header.hello") + " " + username + "!");
+      logout = new Button(getTranslation("header.logout"), click -> securityService.logout());
+      logout.addClassName("log-button");
+      authSection.add(greeting, logout);
+    } else {
+      login.addClickListener(click -> login.getUI().ifPresent(ui -> ui.navigate("login")));
+      login.addClassName("log-button");
+      authSection.add(login);
     }
 
-    private void createHeader() {
-        addClassName("header");
-        setWidthFull();
-        setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        setSpacing(true);
+    add(title, authSection);
+  }
 
-        title = new H1(getTranslation("header.title"));
-        title.addClassName("logo");
+  private void addLanguageSelector() {
+    ComboBox<Locale> languageSelector = new ComboBox<>();
+    languageSelector.setItems(Locale.ENGLISH, new Locale("ru", "RU"),
+        new Locale("el", "GR"),
+        new Locale("fi", "FI"));
 
-        HorizontalLayout authSection = new HorizontalLayout();
-        authSection.setWidthFull();
-        authSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        authSection.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+    languageSelector.setItemLabelGenerator(locale -> switch (locale.getLanguage()) {
+      case "ru" -> "🇷🇺";
+      case "el" -> "🇬🇷";
+      case "fi" -> "🇫🇮";
+      default -> "🇬🇧";
+    });
 
-        login = new Button(getTranslation("header.login"));
-        if (securityService.getAuthenticatedUser() != null) {
-            String username = securityService.getAuthenticatedUser().getUsername();
-            greeting = new Span(getTranslation("header.hello") + " " + username + "!");
-            logout = new Button(getTranslation("header.logout"), click -> securityService.logout());
-            logout.addClassName("log-button");
-            authSection.add(greeting, logout);
-        } else {
-            login.addClickListener(click -> login.getUI().ifPresent(ui -> ui.navigate("login")));
-            login.addClassName("log-button");
-            authSection.add(login);
-        }
+    Locale currentLocale = (UI.getCurrent() != null) ? UI.getCurrent().getLocale() :
+        Locale.ENGLISH;
+    languageSelector.setValue(currentLocale);
 
-        add(title, authSection);
+    languageSelector.addValueChangeListener(event -> {
+      if (event.getValue() != null) {
+        Locale newLocale = event.getValue();
+        UI.getCurrent().setLocale(newLocale);
+        notifyLanguageChangeListeners(newLocale); // Notify other components
+      }
+    });
+
+    languageSelector.getElement().getStyle().set("color", "white").set("cursor", "pointer");
+    add(new HorizontalLayout(languageSelector));
+    languageSelector.addClassName("custom-language-selector");
+  }
+
+  public void addLanguageChangeListener(LanguageChangeListener listener) {
+    languageChangeListeners.add(listener);
+  }
+
+  private void notifyLanguageChangeListeners(Locale newLocale) {
+    for (LanguageChangeListener listener : languageChangeListeners) {
+      listener.onLanguageChange(newLocale);
     }
+  }
 
-    private void addLanguageSelector() {
-        ComboBox<Locale> languageSelector = new ComboBox<>();
+  public void updateTexts() {
+    title.setText(getTranslation("header.title"));
+    login.setText(getTranslation("header.login"));
 
-        // Use Locale with both language and country codes
-        Locale russian = new Locale("ru", "RU"); // Russian (Russia)
-        Locale greek = new Locale("el", "GR"); // Greek (Greece)
-        Locale finnish = new Locale("fi", "FI"); // Finnish (Finland)
-
-        languageSelector.setItems(Locale.ENGLISH, russian, greek, finnish);
-
-        // Set custom ItemLabelGenerator to show flag emojis
-        languageSelector.setItemLabelGenerator(locale -> {
-            switch (locale.getLanguage()) {
-                case "ru":
-                    return "🇷🇺"; // Flag for Russia
-                case "el":
-                    return "🇬🇷"; // Flag for Greece
-                case "fi":
-                    return "🇫🇮"; // Flag for Finland
-                default:
-                    return "🇬🇧"; // Flag for English
-            }
-        });
-
-        languageSelector.setValue(UI.getCurrent().getLocale()); // Set current UI locale
-
-        languageSelector.addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                UI.getCurrent().setLocale(event.getValue()); // Change locale, triggers localeChange()
-            }
-        });
-
-        // Set background color to white, text color to black, and cursor to pointer
-        languageSelector.getElement().getStyle()
-                .set("color", "white") // Set text color to black (or any color you want)
-                .set("cursor", "pointer"); // Change mouse cursor to pointer
-
-        add(new HorizontalLayout(languageSelector));
-        languageSelector.addClassName("custom-language-selector");
+    if (securityService.getAuthenticatedUser() != null) {
+      String username = securityService.getAuthenticatedUser().getUsername();
+      greeting.setText(getTranslation("header.hello") + " " + username + "!");
+      logout.setText(getTranslation("header.logout"));
     }
-
-
-
-    public void updateTexts() {
-        // Update all translatable text
-        title.setText(getTranslation("header.title"));
-        login.setText(getTranslation("header.login"));
-
-        if (securityService.getAuthenticatedUser() != null) {
-            String username = securityService.getAuthenticatedUser().getUsername();
-            greeting.setText(getTranslation("header.hello") + " " + username + "!");
-            logout.setText(getTranslation("header.logout"));
-        }
-    }
+  }
 }

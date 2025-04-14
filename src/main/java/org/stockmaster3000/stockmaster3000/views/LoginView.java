@@ -2,6 +2,7 @@ package org.stockmaster3000.stockmaster3000.views;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.login.LoginForm;
@@ -15,8 +16,6 @@ import com.vaadin.flow.router.BeforeEnterListener;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.component.html.Div;
-
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -26,100 +25,104 @@ import java.util.stream.Stream;
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterListener, LocaleChangeObserver {
 
-    private final LoginForm loginForm = new LoginForm();
-    private Button registerButton;
-    Paragraph notUserText;
-    H1 title;
+  private final LoginForm loginForm = new LoginForm();
+  private Button registerButton;
+  Paragraph notUserText;
+  H1 title;
 
-    public LoginView() {
-        addClassName("login-view");
-        setSizeFull();
-        setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.CENTER);
+  public LoginView() {
+    addClassName("login-view");
+    setSizeFull();
+    setAlignItems(Alignment.CENTER);
+    setJustifyContentMode(JustifyContentMode.CENTER);
 
-        // Login form container (for styling)
-        Div loginCard = new Div();
-        loginCard.addClassName("login-card");
+    // Login form container (for styling)
+    Div loginCard = new Div();
+    loginCard.addClassName("login-card");
 
-        // Branding header instead of "Login"
-        title = new H1(getTranslation("header.title"));
-        title.addClassName("app-title");
+    // Branding header instead of "Login"
+    title = new H1(getTranslation("header.title"));
+    title.addClassName("app-title");
 
-        // Configure login form (remove Forgot Password)
-        loginForm.setAction("login");
-        loginForm.setForgotPasswordButtonVisible(false);
+    // Configure login form (remove Forgot Password)
+    loginForm.setAction("login");
+    loginForm.setForgotPasswordButtonVisible(false);
 
-        // Register button
-        registerButton = new Button(getTranslation("button.register"));
-        registerButton.addClassName("signup-button");
-        registerButton.addClickListener(click ->
-                registerButton.getUI().ifPresent(ui -> ui.navigate("register")));
+    // Register button
+    registerButton = new Button(getTranslation("button.register"));
+    registerButton.addClassName("signup-button");
+    registerButton.addClickListener(click ->
+        registerButton.getUI().ifPresent(ui -> ui.navigate("register")));
 
-        // "Not a user yet?" text
-        notUserText = new Paragraph(getTranslation("noaccount"));
-        notUserText.addClassName("plain-text");
+    // "Not a user yet?" text
+    notUserText = new Paragraph(getTranslation("noaccount"));
+    notUserText.addClassName("plain-text");
 
-        String currentLang = UI.getCurrent().getLocale().getLanguage();
+    String currentLang = UI.getCurrent().getLocale().getLanguage();
 
-        Button englishButton = new Button("🇬🇧", click -> UI.getCurrent().setLocale(Locale.ENGLISH));
-        Button russianButton = new Button("🇷🇺", click -> UI.getCurrent().setLocale(new Locale("ru", "RU")));
-        Button greekButton = new Button("🇬🇷", click -> UI.getCurrent().setLocale(new Locale("el", "GR")));
-        Button finnishButton = new Button("🇫🇮", click -> UI.getCurrent().setLocale(new Locale("fi", "FI")));
+    Button englishButton = new Button("🇬🇧", click -> UI.getCurrent().setLocale(Locale.ENGLISH));
+    Button russianButton = new Button("🇷🇺", click -> UI.getCurrent().setLocale(new Locale("ru",
+        "RU")));
+    Button greekButton = new Button("🇬🇷", click -> UI.getCurrent().setLocale(new Locale("el",
+        "GR")));
+    Button finnishButton = new Button("🇫🇮", click -> UI.getCurrent().setLocale(new Locale("fi",
+        "FI")));
 
-        // Add active class based on current language
-        Map<String, Button> buttonMap = Map.of(
-                "en", englishButton,
-                "ru", russianButton,
-                "el", greekButton,
-                "fi", finnishButton
-        );
+    // Add active class based on current language
+    Map<String, Button> buttonMap = Map.of(
+        "en", englishButton,
+        "ru", russianButton,
+        "el", greekButton,
+        "fi", finnishButton
+    );
 
-// Apply active class to the correct button
-        buttonMap.getOrDefault(currentLang, englishButton).addClassName("active");
+    // Apply active class to the correct button
+    buttonMap.getOrDefault(currentLang, englishButton).addClassName("active");
 
-        // Style buttons
-        Stream.of(englishButton, russianButton, greekButton, finnishButton).forEach(button ->
-                button.getElement().getStyle().set("cursor", "pointer")
-        );
+    // Style buttons
+    Stream.of(englishButton, russianButton, greekButton, finnishButton).forEach(button ->
+        button.getElement().getStyle().set("cursor", "pointer")
+    );
 
-        HorizontalLayout languageSelectorLayout = new HorizontalLayout(englishButton, russianButton, greekButton, finnishButton);
-        languageSelectorLayout.addClassName("login-register-language-selector");
-        // Add elements to login card
-        loginCard.add(
-                title,
-                loginForm,
-                notUserText,
-                registerButton,
-                languageSelectorLayout
-        );
+    HorizontalLayout languageSelectorLayout = new HorizontalLayout(englishButton, russianButton,
+        greekButton, finnishButton);
+    languageSelectorLayout.addClassName("login-register-language-selector");
+    // Add elements to login card
+    loginCard.add(
+        title,
+        loginForm,
+        notUserText,
+        registerButton,
+        languageSelectorLayout
+    );
 
-        // Add the card to the layout
-        add(loginCard);
+    // Add the card to the layout
+    add(loginCard);
+  }
+
+  @Override
+  public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+    if (beforeEnterEvent.getLocation()
+        .getQueryParameters()
+        .getParameters()
+        .containsKey("error")) {
+      loginForm.setError(true);
     }
+  }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (beforeEnterEvent.getLocation()
-                .getQueryParameters()
-                .getParameters()
-                .containsKey("error")) {
-            loginForm.setError(true);
-        }
-    }
+  @Override
+  public void localeChange(LocaleChangeEvent localeChangeEvent) {
+    notUserText.setText(getTranslation("noaccount"));
+    title.setText(getTranslation("header.title"));
+    registerButton.setText(getTranslation("button.register"));
+    // Update LoginForm text (username, password, title, and submit)
+    LoginI18n i18n = LoginI18n.createDefault();
+    i18n.getForm().setUsername(getTranslation("login.username"));
+    i18n.getForm().setPassword(getTranslation("login.password"));
+    i18n.getForm().setTitle(getTranslation("login.title"));
+    i18n.getForm().setSubmit(getTranslation("login.submit"));
 
-    @Override
-    public void localeChange(LocaleChangeEvent localeChangeEvent) {
-        notUserText.setText(getTranslation("noaccount"));
-        title.setText(getTranslation("header.title"));
-        registerButton.setText(getTranslation("button.register"));
-        // Update LoginForm text (username, password, title, and submit)
-        LoginI18n i18n = LoginI18n.createDefault();
-        i18n.getForm().setUsername(getTranslation("login.username"));
-        i18n.getForm().setPassword(getTranslation("login.password"));
-        i18n.getForm().setTitle(getTranslation("login.title"));
-        i18n.getForm().setSubmit(getTranslation("login.submit"));
-
-        // Apply updated translations to the LoginForm
-        loginForm.setI18n(i18n);
-    }
+    // Apply updated translations to the LoginForm
+    loginForm.setI18n(i18n);
+  }
 }

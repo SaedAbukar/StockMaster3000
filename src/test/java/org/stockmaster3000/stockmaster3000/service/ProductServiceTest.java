@@ -70,16 +70,16 @@ class ProductServiceTest {
 
     @Test
     void testGetProductsByInventory() {
-        // Mock repository to return products associated with an inventory ID
-        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+        // Mock repository to return products associated with an inventory ID and a language code
+        when(productRepository.findByInventoryIdAndLanguageCode(1L, "en")).thenReturn(List.of(product));
 
-        // Call the method to fetch products by inventory
-        List<Product> result = productService.getProductsByInventory(1L);
+        // Call the method to fetch products by inventory (including language code)
+        List<Product> result = productService.getProductsByInventory(1L, "en"); 
 
         // Verify the result
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        verify(productRepository, times(1)).findByInventoryId(1L);
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en"); 
     }
 
     @Test
@@ -198,8 +198,8 @@ class ProductServiceTest {
         when(productRepository.findByInventoryIdAndName(1L, "Test Product"))
                 .thenReturn(List.of(product));
 
-        // Call the method
-        List<Product> result = productService.getProductsByName(1L, "Test Product");
+        // Call the method with productName
+        List<Product> result = productService.getProductsByName(1L, "Test Product", "en");
 
         // Verify the result
         assertThat(result).hasSize(1);
@@ -207,31 +207,36 @@ class ProductServiceTest {
         verify(productRepository, times(1)).findByInventoryIdAndName(1L, "Test Product");
     }
 
+
     @Test
     void testGetProductsByName_WithoutProductName() {
-        // Mock repository to return all products for an inventory when no name is provided
-        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+        // Mock repository to return products by inventoryId and languageCode when productName is empty
+        when(productRepository.findByInventoryIdAndLanguageCode(1L, "en")).thenReturn(List.of(product));
 
-        // Call the method
-        List<Product> result = productService.getProductsByName(1L, "");
+        // Call the method with empty productName
+        List<Product> result = productService.getProductsByName(1L, "", "en");
 
         // Verify the result
         assertThat(result).hasSize(1);
-        verify(productRepository, times(1)).findByInventoryId(1L);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en"); 
     }
+
 
     @Test
     void testGetProductsByName_WithNullProductName() {
-        // Mock repository to return all products when productName is null
-        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+        // Mock repository to return products by inventoryId and languageCode when productName is null
+        when(productRepository.findByInventoryIdAndLanguageCode(1L, "en")).thenReturn(List.of(product));
 
-        // Call the method
-        List<Product> result = productService.getProductsByName(1L, null);
+        // Call the method with null productName
+        List<Product> result = productService.getProductsByName(1L, null, "en");
 
         // Verify the result
         assertThat(result).hasSize(1);
-        verify(productRepository, times(1)).findByInventoryId(1L);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en"); 
     }
+
 
     @Test
     void testDeleteProduct() {
@@ -286,14 +291,20 @@ class ProductServiceTest {
 
     @Test
     void testGetProductDataByInventory() {
-        // Mock repository to return a list of products associated with an inventory ID
-        when(productRepository.findByInventoryId(1L)).thenReturn(List.of(product));
+        // Mock repository to return a list of products associated with an inventory ID and language code
+        when(productRepository.findByInventoryIdAndLanguageCode(1L, "en")).thenReturn(List.of(product));
 
         // Call the method to fetch product data by inventory
-        Map<Category, Integer> result = productService.getProductDataByInventory(1L);
+        Map<Category, Integer> result = productService.getProductDataByInventory(1L, "en");
 
-        // Verify the result
+        // Verify the result is not empty
         assertThat(result).isNotEmpty();
-        verify(productRepository, times(1)).findByInventoryId(1L);
+        assertThat(result).containsKey(product.getCategory()); // Ensure the category is in the map
+
+        // Verify the product count for the category
+        assertThat(result.get(product.getCategory())).isEqualTo(1);
+
+        // Verify the repository method is called once with correct parameters
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en");
     }
 }
