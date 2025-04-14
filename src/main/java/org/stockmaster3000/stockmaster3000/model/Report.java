@@ -14,35 +14,63 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
+/**
+ * Represents an AI-generated report related to a specific inventory.
+ *
+ * <p>Each report includes a summary generated from the current state of an inventory, and
+ * is timestamped upon creation.</p>
+ */
 @Entity
 @Table(name = "reports")
 public class Report {
+
+  /**
+   * Unique identifier for the report.
+   */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  /**
+   * Summary content generated for the report.
+   */
   @Column(columnDefinition = "TEXT")
   private String summary;
 
+  /**
+   * The inventory associated with this report.
+   */
   @ManyToOne
   @JoinColumn(name = "inventory_id", nullable = false)
   @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
   private Inventory inventory;
 
+  /**
+   * Timestamp indicating when the report was created.
+   */
   @CreationTimestamp
   @Column(name = "created_at", updatable = false, nullable = false)
   private LocalDateTime createdAt;
 
-  // Constructor
+  /**
+   * Default constructor.
+   */
   public Report() {
   }
 
+  /**
+   * Constructs a report with a summary and linked inventory.
+   *
+   * @param summary   the content of the report
+   * @param inventory the associated inventory
+   */
   public Report(String summary, Inventory inventory) {
     this.summary = summary;
     this.inventory = inventory;
   }
 
   // Getters
+
   public Long getId() {
     return id;
   }
@@ -60,6 +88,7 @@ public class Report {
   }
 
   // Setters
+
   public void setSummary(String summary) {
     this.summary = summary;
   }
@@ -69,6 +98,7 @@ public class Report {
   }
 
   // hashCode and equals
+
   @Override
   public int hashCode() {
     return Objects.hash(id, summary, inventory, createdAt);

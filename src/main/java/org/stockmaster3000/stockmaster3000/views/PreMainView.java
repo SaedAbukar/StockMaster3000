@@ -14,7 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.stockmaster3000.stockmaster3000.components.HeaderComponent;
 import org.stockmaster3000.stockmaster3000.security.SecurityService;
 
-
+/**
+ * PreMainView serves as the landing page before login or navigation to the main app.
+ *
+ * <p>It contains a hero section with a welcome message and a call-to-action button
+ * that navigates the user to the main application.
+ */
 @Route(value = "/")
 @PageTitle("Stock Master 3000")
 @AnonymousAllowed
@@ -26,6 +31,11 @@ public class PreMainView extends VerticalLayout implements LocaleChangeObserver 
   private Button inventoryButton;
   private HeaderComponent headerComponent;
 
+  /**
+   * Constructs the pre-login landing view.
+   *
+   * @param securityService security service injected by Spring
+   */
   public PreMainView(@Autowired SecurityService securityService) {
     this.securityService = securityService;
     this.headerComponent = new HeaderComponent(securityService);
@@ -33,6 +43,9 @@ public class PreMainView extends VerticalLayout implements LocaleChangeObserver 
     createHeroSection();
   }
 
+  /**
+   * Creates the hero section containing a title, description, and button.
+   */
   private void createHeroSection() {
     VerticalLayout heroSection = new VerticalLayout();
     heroSection.addClassName("hero-section");
@@ -50,9 +63,13 @@ public class PreMainView extends VerticalLayout implements LocaleChangeObserver 
     add(heroSection);
   }
 
+  /**
+   * Updates localized texts when the language is changed.
+   *
+   * @param localeChangeEvent the locale change event
+   */
   @Override
   public void localeChange(LocaleChangeEvent localeChangeEvent) {
-    // Update text when the locale changes
     heroTitle.setText(getTranslation("hero.title"));
     heroDescription.setText(getTranslation("hero.description"));
     inventoryButton.setText(getTranslation("hero.inventoryButton"));

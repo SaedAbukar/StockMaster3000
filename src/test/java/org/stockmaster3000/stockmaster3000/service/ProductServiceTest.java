@@ -79,7 +79,7 @@ class ProductServiceTest {
         // Verify the result
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en"); 
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en");
     }
 
     @Test
@@ -219,7 +219,7 @@ class ProductServiceTest {
         // Verify the result
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en"); 
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en");
     }
 
 
@@ -234,7 +234,7 @@ class ProductServiceTest {
         // Verify the result
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en"); 
+        verify(productRepository, times(1)).findByInventoryIdAndLanguageCode(1L, "en");
     }
 
 

@@ -7,10 +7,22 @@ import elemental.json.Json;
 import elemental.json.JsonArray;
 import java.util.Arrays;
 
+/**
+ * A Vaadin component that renders a Line Chart using Chart.js.
+ *
+ * <p>It displays data using a labeled x-axis and numeric y-axis, and supports
+ * dynamic updates of both the data and the axis labels.
+ */
 @Tag("canvas")
 @JsModule("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js")
 public class LineChart extends Div {
 
+  /**
+   * Constructs a LineChart component with the provided labels and values.
+   *
+   * @param labels an array of x-axis labels
+   * @param values an array of y-axis values
+   */
   public LineChart(String[] labels, int[] values) {
     getElement().setAttribute("id", "lineChart");
 
@@ -22,6 +34,12 @@ public class LineChart extends Div {
     initializeChart(labels, values);
   }
 
+  /**
+   * Initializes the Line Chart using JavaScript and Chart.js.
+   *
+   * @param labels array of x-axis labels
+   * @param values array of corresponding y-axis values
+   */
   private void initializeChart(String[] labels, int[] values) {
     JsonArray jsonLabels = Json.createArray();
     JsonArray jsonData = Json.createArray();
@@ -104,6 +122,12 @@ public class LineChart extends Div {
         + "}, 100);", jsonLabels, jsonData, textY, textX);
   }
 
+  /**
+   * Updates the Line Chart with new data and axis labels.
+   *
+   * @param labels new x-axis labels
+   * @param values new y-axis values
+   */
   public void updateChart(String[] labels, int[] values) {
     System.out.println("Updating chart with labels: " + Arrays.toString(labels) + ", values: "
         + Arrays.toString(values));
@@ -116,8 +140,8 @@ public class LineChart extends Div {
       jsonData.set(i, values[i]);
     }
 
-    String YAxel = getTranslation("insights.LineChartTextY");
-    String XAxel = getTranslation("insights.LineChartTextX");
+    String axisY = getTranslation("insights.LineChartTextY");
+    String axelX = getTranslation("insights.LineChartTextX");
 
     // Execute JavaScript to update the chart data and Y-axis title
     getElement().executeJs("setTimeout(() => {"
@@ -128,7 +152,7 @@ public class LineChart extends Div {
         + "  window.lineChart.options.scales.x.title.text = $3;"
         + "  window.lineChart.update();"
         + "}"
-        + "}, 100);", jsonLabels, jsonData, YAxel, XAxel);
+        + "}, 100);", jsonLabels, jsonData, axisY, axelX);
   }
 
 }

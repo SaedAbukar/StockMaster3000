@@ -24,6 +24,11 @@ import org.stockmaster3000.stockmaster3000.tab.InventoryCombox;
 import org.stockmaster3000.stockmaster3000.tab.ReportCombox;
 import org.stockmaster3000.stockmaster3000.tab.ReportsTab;
 
+/**
+ * Main view of the application that contains tabs for Dashboard, Insights, and Reports.
+ *
+ * <p>It provides language switching and integrates all major components.
+ */
 @Route("main")
 @PermitAll
 public class MainView extends VerticalLayout implements LocaleChangeObserver {
@@ -35,19 +40,29 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
   private final ReportsTab reportComponent;
   private final ReportCombox reportSelectorComponent;
 
+  private final Tab tab1;
+  private final Tab tab2;
+  private final Tab tab3;
 
-  String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
+  private final String currentLanguageCode = UI.getCurrent().getLocale().getLanguage();
 
-  Tab tab1;
-  Tab tab2;
-  Tab tab3;
-
+  /**
+   * Constructs the MainView with all required services and UI components.
+   *
+   * @param securityService    security service
+   * @param inventoryService   inventory service
+   * @param productService     product service
+   * @param categoryService    category service
+   * @param supplierService    supplier service
+   * @param client             OpenAI client
+   * @param productLogService  product log service
+   * @param reportService      report service
+   */
   public MainView(SecurityService securityService, InventoryService inventoryService,
                   ProductService productService, CategoryService categoryService,
                   SupplierService supplierService, OpenAiClient client,
                   ProductLogService productLogService, ReportService reportService) {
 
-    // Instantiate the reusable components
     headerComponent = new HeaderComponent(securityService);
     inventoryChartComponent = new InsightsTab(securityService, productService);
     inventorySelectorComponent = new InventoryCombox(securityService, inventoryService);
@@ -58,89 +73,70 @@ public class MainView extends VerticalLayout implements LocaleChangeObserver {
     reportComponent = new ReportsTab(client, inventorySelectorComponent, productService,
         productLogService, reportService, reportSelectorComponent, securityService);
 
-    // Set to take up all the available space 100%
     setSizeFull();
-    setSpacing(true); // Adds spacing between elements
-
-    // Add the header and inventory selector at the top
+    setSpacing(true);
     add(headerComponent, inventorySelectorComponent);
 
-    // Set up inventory selection listener
     inventorySelectorComponent.setSelectionListener(selectedInventory -> {
-      inventoryComponent.updateGrid(selectedInventory, currentLanguageCode); // Update
-      // InventoryComponent
-      inventoryChartComponent.updateCharts(selectedInventory); // Update ALL charts
+      inventoryComponent.updateGrid(selectedInventory, currentLanguageCode);
+      inventoryChartComponent.updateCharts(selectedInventory);
     });
 
-    // Create tabs
-    Tabs tabs = new Tabs();
     tab1 = new Tab(getTranslation("dashboard"));
     tab2 = new Tab(getTranslation("insights"));
     tab3 = new Tab(getTranslation("reports"));
 
-    // Create the content for each tab
     VerticalLayout dashboardContent = new VerticalLayout(inventoryComponent);
     VerticalLayout insightsContent = new VerticalLayout(inventoryChartComponent);
     VerticalLayout reportContent = new VerticalLayout(reportComponent);
 
-    // Add margin and padding for better UI
     dashboardContent.getStyle().set("padding", "20px");
     insightsContent.getStyle().set("padding", "20px");
     reportContent.getStyle().set("padding", "20px");
 
-    // Initially show the dashboard content and hide the insights & reports content
     dashboardContent.setVisible(true);
     insightsContent.setVisible(false);
     reportContent.setVisible(false);
 
-    // Add tabs to the Tabs component
+    Tabs tabs = new Tabs();
     tabs.add(tab1, tab2, tab3);
 
-    // Set up tab click listener to change content
     tabs.addSelectedChangeListener(event -> {
-      if (event.getSelectedTab().equals(tab1)) {
-        // Show dashboard content and hide other content
-        dashboardContent.setVisible(true);
-        insightsContent.setVisible(false);
-        reportContent.setVisible(false);
+      boolean isDashboard = event.getSelectedTab().equals(tab1);
+      boolean isInsights = event.getSelectedTab().equals(tab2);
+      boolean isReports = event.getSelectedTab().equals(tab3);
 
-      } else if (event.getSelectedTab().equals(tab2)) {
-        // Show insights content and hide other content
-        dashboardContent.setVisible(false);
-        insightsContent.setVisible(true);
-        reportContent.setVisible(false);
+      dashboardContent.setVisible(isDashboard);
+      insightsContent.setVisible(isInsights);
+      reportContent.setVisible(isReports);
 
-        // Update the charts with the currently selected inventory
+      if (isInsights) {
         Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
         inventoryChartComponent.updateCharts(selectedInventory);
-
-      } else if (event.getSelectedTab().equals(tab3)) {
-        // Show report content and hide other content
-        dashboardContent.setVisible(false);
-        insightsContent.setVisible(false);
-        reportContent.setVisible(true);
       }
     });
 
-    // Add the tabs and content to the layout
     add(tabs, dashboardContent, insightsContent, reportContent);
-
-    // Select the default tab
     tabs.setSelectedTab(tab1);
   }
 
+  /**
+   * Handles text updates when the locale is changed.
+   *
+   * @param localeChangeEvent the locale change event
+   */
   @Override
   public void localeChange(LocaleChangeEvent localeChangeEvent) {
-    Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
+    tab1.setLabel(getTranslation("dashboard"));
+    tab2.setLabel(getTranslation("insights"));
+    tab3.setLabel(getTranslation("reports"));
 
-    // Update text when the locale changes
-    this.tab1.setLabel(getTranslation("dashboard"));
-    this.tab2.setLabel(getTranslation("insights"));
-    this.tab3.setLabel(getTranslation("reports"));
     headerComponent.updateTexts();
     inventoryComponent.updateTexts();
     inventorySelectorComponent.updateTexts();
     inventoryChartComponent.updateTexts();
+
+    Inventory selectedInventory = inventorySelectorComponent.getSelectedInventory();
     inventoryChartComponent.updateCharts(selectedInventory);
     reportComponent.updateTexts();
     reportSelectorComponent.updateTexts();

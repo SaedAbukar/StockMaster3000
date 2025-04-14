@@ -33,6 +33,12 @@ import org.stockmaster3000.stockmaster3000.service.InventoryService;
 import org.stockmaster3000.stockmaster3000.service.ProductService;
 import org.stockmaster3000.stockmaster3000.service.SupplierService;
 
+/**
+ * Dashboard tab UI for managing inventory items including adding, editing,
+ * filtering, and searching products.
+ *
+ * <p>Supports multiple languages and integrates with OpenAI for nutrition data.
+ */
 
 @PermitAll
 public class DashboardTab extends VerticalLayout implements LanguageChangeListener {
@@ -47,9 +53,9 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
   private HorizontalLayout filterLayout;
 
-  private SecurityService securityService;
+  // private SecurityService securityService;
   private Grid<Product> grid = new Grid<>(Product.class, false);
-  private ComboBox<Inventory> inventoryComboBox;
+  // private ComboBox<Inventory> inventoryComboBox;
   private String currentFilter = "ALL";
   private Inventory currentInventory;
   Button button;
@@ -66,7 +72,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
   Span quantity;
   Span price;
   Span nutritions;
-  Span days_until_exp;
+  Span daysUntilExp;
   Span category;
   Span supplier;
   TextField nameField;
@@ -82,13 +88,24 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
   OpenAiClient aiClient = new OpenAiClient();
 
+  /**
+   * Initializes the dashboard tab and sets up all components and services.
+   *
+   * @param headerComponent top header bar used for language switching
+   * @param securityService handles authentication and user details
+   * @param inventoryService service for accessing inventory data
+   * @param productService service for handling product-related logic
+   * @param categoryService service for handling product categories
+   * @param supplierService service for handling product suppliers
+   */
+
   // Component Constructor
   // -----------------------------------------------------------------------------------------//
   public DashboardTab(HeaderComponent headerComponent, SecurityService securityService,
                       InventoryService inventoryService, ProductService productService,
                       CategoryService categoryService, SupplierService supplierService) {
     this.headerComponent = headerComponent;
-    this.securityService = securityService;
+    // this.securityService = securityService;
     this.inventoryService = inventoryService;
     this.productService = productService;
     this.categoryService = categoryService;
@@ -182,15 +199,36 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     grid.addClassName("inventory-grid");
     grid.setSelectionMode(Grid.SelectionMode.NONE); // Disable row selection
 
-    grid.addColumn(Product::getName).setKey("name").setHeader(getTranslation("name")).setSortable(true);
-    grid.addColumn(Product::getQuantity).setKey("quantity").setHeader(getTranslation(
-        "quantity")).setSortable(true);
-    grid.addColumn(Product::getPrice).setKey("price").setHeader(getTranslation("price")).setSortable(true);
-    grid.addColumn(Product::getNutritions).setKey("nutritions").setHeader(getTranslation(
-        "nutritions")).setSortable(true);
-    grid.addColumn(Product::getAmountOfDaysUntilExpiration).setKey("days_until_expiration").setHeader(getTranslation("days_until_expiration")).setSortable(true);
-    grid.addColumn(product -> product.getCategory().getName()).setKey("category").setHeader(getTranslation("category")).setSortable(true);
-    grid.addColumn(product -> product.getSupplier().getName()).setKey("supplier").setHeader(getTranslation("supplier")).setSortable(true);
+    grid.addColumn(Product::getName)
+        .setKey("name")
+        .setHeader(getTranslation("name"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getQuantity)
+        .setKey("quantity")
+        .setHeader(getTranslation("quantity"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getPrice)
+        .setKey("price")
+        .setHeader(getTranslation("price"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getNutritions)
+        .setKey("nutritions")
+        .setHeader(getTranslation("nutritions"))
+        .setSortable(true);
+
+    grid.addColumn(Product::getAmountOfDaysUntilExpiration)
+        .setKey("days_until_expiration")
+        .setHeader(getTranslation("days_until_expiration"))
+        .setSortable(true);
+
+    grid.addColumn(product -> product.getCategory().getName()).setKey("category")
+        .setHeader(getTranslation("category")).setSortable(true);
+
+    grid.addColumn(product -> product.getSupplier().getName()).setKey("supplier")
+        .setHeader(getTranslation("supplier")).setSortable(true);
 
 
     // Add a class name to each row for styling
@@ -227,7 +265,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     quantity = new Span(getTranslation("quantity"));
     price = new Span(getTranslation("price"));
     nutritions = new Span(getTranslation("nutritions"));
-    days_until_exp = new Span(getTranslation("days_until_expiration"));
+    daysUntilExp = new Span(getTranslation("days_until_expiration"));
     category = new Span(getTranslation("category"));
     supplier = new Span(getTranslation("supplier"));
     layout.add(title);
@@ -237,7 +275,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     layout.add(quantity.getText() + ": " + product.getQuantity() + "\n");
     layout.add(price.getText() + ": " + product.getPrice() + "\n");
     layout.add(nutritions.getText() + ": " + product.getNutritions() + "\n");
-    layout.add(days_until_exp.getText() + ": " + product.getAmountOfDaysUntilExpiration() + "\n");
+    layout.add(daysUntilExp.getText() + ": " + product.getAmountOfDaysUntilExpiration() + "\n");
     layout.add(category.getText() + ": " + product.getCategory().getName() + "\n");
     layout.add(supplier.getText() + ": " + product.getSupplier().getName() + "\n");
 
@@ -265,7 +303,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
   // Displaying the Add Product Modal
   private void showAddProductDialog() {
-    Dialog dialog = new Dialog();
+    final Dialog dialog = new Dialog();
     nameField = new TextField(getTranslation("name"));
     quantityField = new TextField(getTranslation("quantity"));
     priceField = new TextField(getTranslation("price"));
@@ -378,7 +416,7 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
 
   // Displaying the Edit modal
   private void showEditProductDialog(Product product) {
-    Dialog dialog = new Dialog();
+    final Dialog dialog = new Dialog();
     nameField = new TextField(getTranslation("name"));
     nameField.setValue(product.getName());
 
@@ -517,6 +555,14 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     add(searchLayout);
   }
 
+
+  /**
+   * Updates the product grid display for a given inventory and language.
+   *
+   * @param selectedInventory the selected inventory to show products for
+   * @param currentLanguageCode current language used for localized content
+   */
+
   // Updating the grid according to the current Inventory and language
   public void updateGrid(Inventory selectedInventory, String currentLanguageCode) {
     currentInventory = selectedInventory;
@@ -551,12 +597,26 @@ public class DashboardTab extends VerticalLayout implements LanguageChangeListen
     return filteredProducts;
   }
 
+  /**
+   * Callback triggered when the user changes the application language.
+   *
+   * @param newLocale the new locale selected by the user
+   */
+
+
   @Override
   public void onLanguageChange(Locale newLocale) {
     UI.getCurrent().setLocale(newLocale);
     currentLanguageCode = newLocale.getLanguage();
     updateGrid(currentInventory, currentLanguageCode);
   }
+
+  /**
+   * Updates all UI texts (buttons, headers, placeholders) based on the current locale.
+   *
+   * <p>This ensures dynamic language switching updates all relevant UI elements.
+   */
+
 
   public void updateTexts() {
     allButton.setText(getTranslation("inventory.filter_all"));

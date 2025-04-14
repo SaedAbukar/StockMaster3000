@@ -105,13 +105,13 @@ VALUES
 
 
 -- Drop the user account 'ivan' if it exists
-DROP USER IF EXISTS 'viet'@'localhost';
+DROP USER IF EXISTS 'pavel'@'localhost';
 
 -- Create the 'ivan' account with a secure password
-CREATE USER 'viet'@'localhost' IDENTIFIED BY 'root';
+CREATE USER 'pavel'@'localhost' IDENTIFIED BY 'pavel';
 
 -- Grant appropriate privileges to 'ivan'
-GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'viet'@'localhost';
+GRANT ALL PRIVILEGES ON stockmaster3000.* TO 'pavel'@'localhost';
 
 -- Flush privileges to apply the changes
 FLUSH PRIVILEGES;

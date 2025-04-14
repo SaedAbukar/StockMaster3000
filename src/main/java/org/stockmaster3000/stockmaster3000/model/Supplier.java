@@ -11,28 +11,50 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Represents a supplier who provides products for the inventory system.
+ *
+ * <p>Each supplier can be associated with multiple products.</p>
+ */
 @Entity
 @Table(name = "suppliers")
 public class Supplier {
+
+  /**
+   * Unique identifier for the supplier.
+   */
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  /**
+   * Name of the supplier.
+   */
   private String name;
 
-  // Relationships
+  /**
+   * List of products provided by this supplier.
+   */
   @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Product> products = new ArrayList<>();
 
-  // Constructor
+  /**
+   * Default constructor.
+   */
   public Supplier() {
   }
 
+  /**
+   * Constructs a supplier with a given name.
+   *
+   * @param name the name of the supplier
+   */
   public Supplier(String name) {
     this.name = name;
   }
 
   // Getters and Setters
+
   public Long getId() {
     return id;
   }
@@ -58,6 +80,7 @@ public class Supplier {
   }
 
   // hashCode and equals
+
   @Override
   public int hashCode() {
     return Objects.hash(id, name);

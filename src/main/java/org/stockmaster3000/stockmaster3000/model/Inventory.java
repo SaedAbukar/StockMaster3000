@@ -16,33 +16,61 @@ import java.util.List;
 import java.util.Objects;
 import org.hibernate.envers.Audited;
 
+/**
+ * Represents an inventory belonging to a specific user.
+ *
+ * <p>Inventories hold multiple products and reports and are tracked with auditing.
+ */
 @Entity
 @Audited
 @Table(name = "inventories")
 public class Inventory {
+
+  /**
+   * Unique identifier for the inventory.
+   */
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  /**
+   * Name of the inventory.
+   */
   private String name;
 
-  // Relationships
+  /**
+   * Products associated with this inventory.
+   */
   @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Product> products = new ArrayList<>();
 
+  /**
+   * Reports associated with this inventory.
+   */
   @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
   @Audited(targetAuditMode = NOT_AUDITED)
   private List<Report> reports = new ArrayList<>();
 
+  /**
+   * The user who owns this inventory.
+   */
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   @Audited(targetAuditMode = NOT_AUDITED)
   private User user;
 
-  // Constructor
+  /**
+   * Default constructor.
+   */
   public Inventory() {
   }
 
+  /**
+   * Constructs a new inventory with a name and user.
+   *
+   * @param name the inventory name
+   * @param user the user who owns the inventory
+   */
   public Inventory(String name, User user) {
     this.name = name;
     this.user = user;
@@ -89,7 +117,6 @@ public class Inventory {
     this.user = user;
   }
 
-  // hashCode and equals
   @Override
   public int hashCode() {
     return Objects.hash(id, name, user);
