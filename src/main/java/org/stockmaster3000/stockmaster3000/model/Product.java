@@ -3,15 +3,7 @@ package org.stockmaster3000.stockmaster3000.model;
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.hibernate.annotations.Type;
@@ -20,9 +12,6 @@ import org.hibernate.envers.Audited;
 
 /**
  * Represents a product stored in an inventory.
- *
- * <p>Contains data about the product's name, price, quantity, nutritional data,
- * supplier, category, and expiration-related info. Supports audit tracking and JSON storage.</p>
  */
 @Entity
 @Audited
@@ -30,116 +19,64 @@ import org.hibernate.envers.Audited;
 @Table(name = "products")
 public class Product {
 
-  /**
-   * Unique identifier for the product.
-   */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  /**
-   * Name of the product.
-   */
   private String name;
 
-  /**
-   * Price of the product.
-   */
   private Double price;
 
-  /**
-   * Quantity available of the product.
-   */
   private Integer quantity;
 
-  /**
-   * JSON-formatted nutrition data.
-   */
-  @Column(name = "nutritions", columnDefinition = "LONGTEXT", nullable = true)
+  @Column(name = "nutritions", columnDefinition = "LONGTEXT")
   @Type(JsonType.class)
   private String nutritions;
 
-  /**
-   * Days left until expiration from current date.
-   */
   private Integer amountOfDaysUntilExpiration;
 
-  /**
-   * Language code used for product information.
-   */
   @Column(name = "language_code")
   private String languageCode;
 
-  /**
-   * Supplier of the product.
-   */
   @ManyToOne
   @JoinColumn(name = "supplier_id", nullable = false)
   @Audited(targetAuditMode = NOT_AUDITED)
   private Supplier supplier;
 
-  /**
-   * Category the product belongs to.
-   */
   @ManyToOne
   @JoinColumn(name = "category_id", nullable = false)
   @Audited(targetAuditMode = NOT_AUDITED)
   private Category category;
 
-  /**
-   * Inventory this product is associated with.
-   */
   @ManyToOne(cascade = CascadeType.PERSIST)
-  @Audited
   @JoinColumn(name = "inventory_id", nullable = false)
   private Inventory inventory;
 
-  /**
-   * Timestamp of when the product was created.
-   */
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  /**
-   * Timestamp of the last update to the product.
-   */
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  /**
-   * Default constructor.
-   */
   public Product() {
   }
 
-  /**
-   * Constructs a new product with all main fields set.
-   *
-   * @param name                      the product name
-   * @param price                     the price
-   * @param quantity                  the quantity
-   * @param nutritions                nutrition information in JSON
-   * @param amountOfDaysUntilExpiration number of days until expiration
-   * @param languageCode              language code
-   * @param supplier                  supplier entity
-   * @param category                  category entity
-   * @param inventory                 associated inventory
-   */
   public Product(String name, Double price, Integer quantity, String nutritions,
-                 Integer amountOfDaysUntilExpiration, String languageCode, Supplier supplier,
-                 Category category, Inventory inventory) {
+                 Integer amountOfDaysUntilExpiration, String languageCode,
+                 Supplier supplier, Category category, Inventory inventory) {
     this.name = name;
     this.price = price;
     this.quantity = quantity;
     this.nutritions = nutritions;
     this.amountOfDaysUntilExpiration = amountOfDaysUntilExpiration;
     this.languageCode = languageCode;
-    this.supplier = supplier;
-    this.category = category;
-    this.inventory = inventory;
+    this.setSupplier(supplier);
+    this.setCategory(category);
+    this.setInventory(inventory);
   }
 
   // Getters and Setters
+
   public Long getId() {
     return id;
   }
@@ -201,7 +138,7 @@ public class Product {
   }
 
   public void setSupplier(Supplier supplier) {
-    this.supplier = supplier;
+    this.supplier = supplier; // Defensive copy not needed unless Supplier is mutable
   }
 
   public Category getCategory() {
@@ -209,7 +146,7 @@ public class Product {
   }
 
   public void setCategory(Category category) {
-    this.category = category;
+    this.category = category; // Same logic as Supplier
   }
 
   public Inventory getInventory() {
@@ -217,7 +154,7 @@ public class Product {
   }
 
   public void setInventory(Inventory inventory) {
-    this.inventory = inventory;
+    this.inventory = inventory; // Same logic as above
   }
 
   public LocalDateTime getCreatedAt() {
@@ -236,44 +173,42 @@ public class Product {
     this.updatedAt = updatedAt;
   }
 
-  // hashCode and equals
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, price, quantity, nutritions, amountOfDaysUntilExpiration,
-        languageCode, supplier, category, inventory);
+    return Objects.hash(id, name, price, quantity, nutritions,
+            amountOfDaysUntilExpiration, languageCode,
+            supplier, category, inventory);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
+    if (this == o) return true;
+    if (!(o instanceof Product)) return false;
     Product product = (Product) o;
     return Objects.equals(id, product.id)
-        && Objects.equals(name, product.name)
-        && Objects.equals(price, product.price)
-        && Objects.equals(quantity, product.quantity)
-        && Objects.equals(nutritions, product.nutritions)
-        && Objects.equals(amountOfDaysUntilExpiration, product.amountOfDaysUntilExpiration)
-        && Objects.equals(languageCode, product.languageCode)
-        && Objects.equals(supplier, product.supplier)
-        && Objects.equals(category, product.category)
-        && Objects.equals(inventory, product.inventory);
+            && Objects.equals(name, product.name)
+            && Objects.equals(price, product.price)
+            && Objects.equals(quantity, product.quantity)
+            && Objects.equals(nutritions, product.nutritions)
+            && Objects.equals(amountOfDaysUntilExpiration, product.amountOfDaysUntilExpiration)
+            && Objects.equals(languageCode, product.languageCode)
+            && Objects.equals(supplier, product.supplier)
+            && Objects.equals(category, product.category)
+            && Objects.equals(inventory, product.inventory);
   }
 
   @Override
   public String toString() {
-    return "name='" + name + '\''
-        + ", price=" + price
-        + ", quantity=" + quantity
-        + ", nutritions=" + nutritions
-        + ", amountOfDaysUntilExpiration=" + amountOfDaysUntilExpiration
-        + ", language_code=" + languageCode
-        + ", supplier=" + (supplier != null ? supplier.getName() : "null")
-        + ", category=" + (category != null ? category.getName() : "null")
-        + ", inventory=" + (inventory != null ? inventory.getName() : "null");
+    return "Product{" +
+            "name='" + name + '\'' +
+            ", price=" + price +
+            ", quantity=" + quantity +
+            ", nutritions='" + nutritions + '\'' +
+            ", expirationDays=" + amountOfDaysUntilExpiration +
+            ", languageCode='" + languageCode + '\'' +
+            ", supplier=" + (supplier != null ? supplier.getName() : "null") +
+            ", category=" + (category != null ? category.getName() : "null") +
+            ", inventory=" + (inventory != null ? inventory.getName() : "null") +
+            '}';
   }
 }
