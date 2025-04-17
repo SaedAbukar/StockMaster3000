@@ -74,6 +74,28 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('LocalSonarQube') {
+                    script {
+                        if (isUnix()) {
+                            sh 'sonar-scanner'
+                        } else {
+                            bat 'sonar-scanner'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Wait for Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Enable Docker Buildx') {
             steps {
                 script {
@@ -136,27 +158,6 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('LocalSonarQube') {
-                    script {
-                        if (isUnix()) {
-                            sh 'sonar-scanner'
-                        } else {
-                            bat 'sonar-scanner'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Wait for Quality Gate') {
-            steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
     }
 
     post {
