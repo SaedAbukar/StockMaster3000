@@ -102,6 +102,12 @@
             <artifactId>hibernate-envers</artifactId>
             <version>6.6.5.Final</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>4.7.3</version> <!-- Or latest -->
+            <scope>compile</scope>
+        </dependency>
 
 
     </dependencies>

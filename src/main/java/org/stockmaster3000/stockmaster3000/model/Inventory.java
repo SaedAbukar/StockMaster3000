@@ -11,25 +11,42 @@ import org.hibernate.envers.Audited;
 
 /**
  * Represents an inventory belonging to a specific user.
+ *
+ * <p>Inventories hold multiple products and reports and are tracked with auditing.
  */
 @Entity
 @Audited
 @Table(name = "inventories")
 public class Inventory {
 
+  /**
+   * Unique identifier for the inventory.
+   */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  /**
+   * Name of the inventory.
+   */
   private String name;
 
+  /**
+   * Products associated with this inventory.
+   */
   @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Product> products = new ArrayList<>();
 
+  /**
+   * Reports associated with this inventory.
+   */
   @OneToMany(mappedBy = "inventory", cascade = CascadeType.ALL, orphanRemoval = true)
   @Audited(targetAuditMode = NOT_AUDITED)
   private List<Report> reports = new ArrayList<>();
 
+  /**
+   * The user who owns this inventory.
+   */
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   @Audited(targetAuditMode = NOT_AUDITED)
@@ -37,11 +54,18 @@ public class Inventory {
 
   public Inventory() {}
 
+  /**
+   * Constructs a new inventory with a name and user.
+   *
+   * @param name the inventory name
+   * @param user the user who owns the inventory
+   */
   public Inventory(String name, User user) {
     this.name = name;
     this.user = user != null ? new User(user) : null;
   }
 
+  // Getters and Setters
   public Long getId() {
     return id;
   }
