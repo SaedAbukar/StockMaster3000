@@ -138,7 +138,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('LocalSonarQube') {
+                withSonarQubeEnv('sonar-token-local') {
                     script {
                         if (isUnix()) {
                             sh 'sonar-scanner'
